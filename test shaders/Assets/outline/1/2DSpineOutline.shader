@@ -12,7 +12,7 @@ Shader "Custom/2DSpineOutline"
 
 		SubShader
 	{
-		Tags { "Queue"="Transparent" "IgnoreProjector"="True"  }
+		Tags { "Queue"="Overlay" "IgnoreProjector"="True"  }
 		LOD 100
 
 		Fog { Mode Off }

@@ -79,11 +79,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\inline\SpriteOutline.cs" />
+    <Compile Include="Assets\outline\2\LinkedSet.cs" />
+    <Compile Include="Assets\outline\2\Outline.cs" />
+    <Compile Include="Assets\outline\2\OutlineEffect.cs" />
+    <Compile Include="Assets\outline\3\Scripts\Outline.cs" />
+    <Compile Include="Assets\outline\3\Scripts\OutlineManager.cs" />
+    <Compile Include="Assets\outline\4\Sprite__Outline.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\inline\Sprites-Outline.shader" />
-    <None Include="Assets\inline\SpritesOutline.shader" />
+    <None Include="Assets\inline\source.txt" />
     <None Include="Assets\outline\1\2DSpineOutline.shader" />
+    <None Include="Assets\outline\1\source.txt" />
+    <None Include="Assets\outline\2\Resources\OutlineBufferCullOffShader.shader" />
+    <None Include="Assets\outline\2\Resources\OutlineBufferShader.shader" />
+    <None Include="Assets\outline\2\Resources\OutlineShader.shader" />
+    <None Include="Assets\outline\3\Resources\Mats\OutlineBufferShader.shader" />
+    <None Include="Assets\outline\3\Resources\Mats\OutlineShader.shader" />
+    <None Include="Assets\outline\4\SpriteOutline.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Sprites/Outline"
 {
 	Properties
@@ -11,8 +13,8 @@ Shader "Sprites/Outline"
 		[PerRendererData] _EnableExternalAlpha ("Enable External Alpha", Float) = 0
 
 		// Add values to determine if outlining is enabled and outline color.
-		[PerRendererData] _Outline("Outline", Float) = 0
-		[PerRendererData] _OutlineColor("Outline Color", Color) = (1,1,1,1)
+		[PerRendererData] _Outline("Outline", Float) = 1
+		[PerRendererData] _OutlineColor("Outline Color", Color) = (0, 0, 0, 0)
 		[PerRendererData] _OutlineSize("Outline Size", int) = 1
 	}
 
