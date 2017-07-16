@@ -1,0 +1,10 @@
+Base path: D:/Unity/Editor/Data
+Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=1 type=0 insize=1658 outsize=504 kw= pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_COLORSPACE_GAMMA ok=1
+Cmd: disassembleShader
+  api=1 insize=504 outsize=843 ok=1
+Cmd: disassembleShader
+  api=4 insize=1542 outsize=2635 ok=1
+Cmd: disassembleShader
+  api=4 insize=1446 outsize=2610 ok=1
