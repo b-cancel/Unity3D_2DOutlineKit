@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\inline\SpriteOutline.cs" />
+    <Compile Include="Assets\new\ultimate_2D_script.cs" />
     <Compile Include="Assets\outline\2\LinkedSet.cs" />
     <Compile Include="Assets\outline\2\Outline.cs" />
     <Compile Include="Assets\outline\2\OutlineEffect.cs" />
@@ -89,6 +90,7 @@
   <ItemGroup>
     <None Include="Assets\inline\Sprites-Outline.shader" />
     <None Include="Assets\inline\source.txt" />
+    <None Include="Assets\new\Ultimate_2D_Outline.shader" />
     <None Include="Assets\outline\1\2DSpineOutline.shader" />
     <None Include="Assets\outline\1\source.txt" />
     <None Include="Assets\outline\2\Resources\OutlineBufferCullOffShader.shader" />

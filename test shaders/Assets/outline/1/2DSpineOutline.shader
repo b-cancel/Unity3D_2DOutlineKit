@@ -6,7 +6,6 @@ Shader "Custom/2DSpineOutline"
 	{
 		_MainTex("Base (RGBA)", 2D) = "white" {}
 		_OutlineColor("OutlineColor", Color) = (0, 0, 0, 0)
-		StepStrength("StepStrength", Range(1, 5)) = 1
 		Padding("Padding", Range(0, 1)) = 0.5
 	}
 
@@ -18,7 +17,7 @@ Shader "Custom/2DSpineOutline"
 		Fog { Mode Off }
 		Cull Off
 		ZWrite Off
-		Blend SrcAlpha OneMinusSrcAlpha
+		Blend SrcAlpha OneMinusSrcAlpha //cant change to... One OneMinusSrcAlpha
 		Lighting Off
 
 		Pass
@@ -49,7 +48,7 @@ Shader "Custom/2DSpineOutline"
 
 			uniform float4 _MainTex_TexelSize;
 
-			// vertex shader에서 MVT matrix 연산을 하지 않고 geometry shader 에서 진행 
+			// vertex shader in MVT matrix Without computation geometry shader proceed from [rough korean translation]
 			v2f vert (appdata v)
 			{
 				v2f o;
@@ -63,8 +62,8 @@ Shader "Custom/2DSpineOutline"
 
 			uniform float Padding;
 
-			// 아웃라인을 그리려면 할당받은 texture영역보다 살짝 크게 그려줘야 한다
-			// 해당 작업을 위하여, quad의 vertex값을 살짝 늘려 그릴 수 있는 영억을 늘린다 
+			// To draw an outline, you need to draw it slightly larger than the assigned texture area
+			// For that task, increase the vertex value of quad by a little bit
 			[maxvertexcount(3)]
 			void geom(triangle v2f v[3], inout TriangleStream<v2f> triStream)
 			{
@@ -105,13 +104,12 @@ Shader "Custom/2DSpineOutline"
 			
 			sampler2D _MainTex;
 			uniform fixed4 _OutlineColor;
-			uniform float StepStrength;
 
 			float getAlpha(float2 uv, float2 uv_min, float2 uv_max)
 			{
 				float ret = 0;
 
-				// TODO @sangmoon if문 대신 다른 제어문 사용 권장
+				// TODO @sangmoon Use another control statement instead of an if statement
 				if (uv_min.x <= uv.x && uv.x <= uv_max.x
 					&& uv_min.y <= uv.y && uv.y <= uv_max.y)
 				{
@@ -121,8 +119,8 @@ Shader "Custom/2DSpineOutline"
 				return ret;
 			}
 
-			// circle로 검색해서 해당 픽셀 주변에 alpha값이 있는지 검색하여
-			// alpha값이 있으면 색을 입력한다 
+			// Search with circle and search for alpha value around the pixel
+			// Enter the color if alpha is found 
 			fixed4 frag (v2f frag) : SV_Target
 			{
 				float circleAlpha = 0.0;
@@ -141,7 +139,7 @@ Shader "Custom/2DSpineOutline"
 					stepPosition = mul(rotationMatrix, stepPosition);
 				}
 
-				// TOOD @sangmoon 더해진 alpha 총 값을 이용 + smoothstep을 이용하여 아웃라인이 자연스럽게 빠지도록 하자 				
+				// TOOD @sangmoon Use the added alpha total + smoothstep to let the outline fall naturally			
 				circleAlpha = clamp(circleAlpha, 0.0, 1.0);
 				
 				return float4(_OutlineColor.rgb, circleAlpha);
@@ -150,11 +148,12 @@ Shader "Custom/2DSpineOutline"
 			ENDCG
 		}
 
-		Pass{
+		Pass
+		{
 			ColorMaterial AmbientAndDiffuse
 			SetTexture[_MainTex]{
-			Combine texture * primary
-		}
+				Combine texture * primary
+			}
 		}
 	}
 }

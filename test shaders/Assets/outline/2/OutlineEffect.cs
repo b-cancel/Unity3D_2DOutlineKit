@@ -51,7 +51,7 @@ namespace cakeslice
 
         [Range(1.0f, 6.0f)]
         public float lineThickness = 1.25f;
-        [Range(0, 10)]
+        [Range(0, 1)]
         public float lineIntensity = .5f;
         [Range(0, 1)]
         public float fillAmount = 0.2f;

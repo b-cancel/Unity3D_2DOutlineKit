@@ -26,12 +26,14 @@
 
 Shader "Hidden/OutlineEffect" 
 {
-	Properties 
+	Properties
 	{
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-		
+		_MainTex("Base (RGB)", 2D) = "white" {}
+		_LineThicknessX ("LineThickX", Float) = 1
+		_LineThicknessY ("LineThickY", Float) = 1
 	}
-	SubShader 
+
+	SubShader
 	{
 		Pass
 		{
@@ -77,9 +79,10 @@ Shader "Hidden/OutlineEffect"
 				float2 uv = input.uv;
 				if (_FlipY == 1)
 					uv.y = uv.y;
+
 				#if UNITY_UV_STARTS_AT_TOP
-				if (_MainTex_TexelSize.y < 0)
-					uv.y = 1 - uv.y;
+						if (_MainTex_TexelSize.y < 0)
+							uv.y = 1 - uv.y;
 				#endif
 
 				//half4 originalPixel = tex2D(_MainTex,input.uv);
@@ -95,7 +98,7 @@ Shader "Hidden/OutlineEffect"
 				bool red = sample1.r > h || sample2.r > h || sample3.r > h || sample4.r > h;
 				bool green = sample1.g > h || sample2.g > h || sample3.g > h || sample4.g > h;
 				bool blue = sample1.b > h || sample2.b > h || sample3.b > h || sample4.b > h;
-				 
+
 				if ((red && blue) || (green && blue) || (red && green))
 					return float4(0,0,0,0);
 				else
@@ -107,12 +110,12 @@ Shader "Hidden/OutlineEffect"
 
 		Pass
 		{
-			Tags { "RenderType"="Opaque" }
+			Tags{ "RenderType" = "Opaque" }
 			LOD 200
 			ZTest Always
 			ZWrite Off
 			Cull Off
-			
+
 			CGPROGRAM
 
 			#pragma vertex vert
@@ -125,17 +128,17 @@ Shader "Hidden/OutlineEffect"
 			sampler2D _OutlineSource;
 
 			struct v2f {
-			   float4 position : SV_POSITION;
-			   float2 uv : TEXCOORD0;
+				float4 position : SV_POSITION;
+				float2 uv : TEXCOORD0;
 			};
-			
+
 			v2f vert(appdata_img v)
 			{
-			   	v2f o;
+				v2f o;
 				o.position = UnityObjectToClipPos(v.vertex);
 				o.uv = v.texcoord;
-				
-			   	return o;
+
+				return o;
 			}
 
 			float _LineThicknessX;
@@ -150,19 +153,20 @@ Shader "Hidden/OutlineEffect"
 			int _CornerOutlines;
 			uniform float4 _MainTex_TexelSize;
 
-			half4 frag (v2f input) : COLOR
-			{	
+			half4 frag(v2f input) : COLOR
+			{
 				float2 uv = input.uv;
 				if (_FlipY == 1)
 					uv.y = 1 - uv.y;
+
 				#if UNITY_UV_STARTS_AT_TOP
-					if (_MainTex_TexelSize.y < 0)
-						uv.y = 1 - uv.y;
+						if (_MainTex_TexelSize.y < 0)
+							uv.y = 1 - uv.y;
 				#endif
 
 				half4 originalPixel = tex2D(_MainTex, UnityStereoScreenSpaceUVAdjust(input.uv, _MainTex_ST));
 				half4 outlineSource = tex2D(_OutlineSource, UnityStereoScreenSpaceUVAdjust(uv, _MainTex_ST));
-								
+
 				const float h = .95f;
 				half4 outline = 0;
 				bool hasOutline = false;
@@ -171,7 +175,7 @@ Shader "Hidden/OutlineEffect"
 				half4 sample2 = tex2D(_OutlineSource, uv + float2(-_LineThicknessX,0.0));
 				half4 sample3 = tex2D(_OutlineSource, uv + float2(.0,_LineThicknessY));
 				half4 sample4 = tex2D(_OutlineSource, uv + float2(.0,-_LineThicknessY));
-				
+
 				bool outside = outlineSource.a < h;
 				bool outsideDark = outside && _Dark;
 
@@ -237,17 +241,18 @@ Shader "Hidden/OutlineEffect"
 
 					if (!outside)
 						outline *= _FillAmount;
-				}					
-					
+				}
+
 				//return outlineSource;		
 				if (hasOutline)
 					return lerp(originalPixel + outline, outline, _FillAmount);
 				else
 					return originalPixel;
 			}
-			
+
 			ENDCG
 		}
-	} 
+	}
+	
 	FallBack "Diffuse"
 }

@@ -19,6 +19,7 @@ Shader "Sprites/SpriteOutline"
 			"PreviewType"="Plane"
 			"CanUseSpriteAtlas"="True"
 		}
+
         Cull Off
 		Lighting Off
 		ZWrite Off
