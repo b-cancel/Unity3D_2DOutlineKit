@@ -28,6 +28,10 @@ using System.Collections.Generic;
 
 namespace cakeslice
 {
+    [ExecuteInEditMode]
+    [ImageEffectAllowedInSceneView]
+    [DisallowMultipleComponent]
+
     [RequireComponent(typeof(Renderer))]
     public class Outline : MonoBehaviour
     {

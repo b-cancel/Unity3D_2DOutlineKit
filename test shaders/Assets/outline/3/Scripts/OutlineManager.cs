@@ -62,7 +62,7 @@ public class OutlineManager : MonoBehaviour
         return m;
     }
 
-    void Start()
+    void Awake()
     {
 		//get the original screen orientation when game start, if it change, we will reload the second camera to fit the original
 		vWidth = Screen.width;
@@ -98,6 +98,19 @@ public class OutlineManager : MonoBehaviour
 		foreach (Outline vCurOutline in (Outline[])FindObjectsOfType(typeof(Outline))) {
 			vCurOutline.Initialise ();
 		}
+
+        //-----
+
+        //check if Screen has been resized (Potrait, Landscrap)
+        if (vWidth != Screen.width || vHeight != Screen.height)
+        {
+            vWidth = Screen.width;
+            vHeight = Screen.height;
+
+            UpdateOutlineCameraFromSource();
+            renderTexture = new RenderTexture(MCamera.pixelWidth, MCamera.pixelHeight, 16, RenderTextureFormat.Default);
+            OCamera.targetTexture = renderTexture;
+        }
     }
 
     void OnDestroy()

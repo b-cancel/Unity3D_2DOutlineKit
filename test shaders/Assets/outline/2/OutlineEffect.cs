@@ -27,7 +27,10 @@ using System.Collections.Generic;
 
 namespace cakeslice
 {
+    [ExecuteInEditMode]
+    [ImageEffectAllowedInSceneView]
     [DisallowMultipleComponent]
+
     [RequireComponent(typeof(Camera))]
     public class OutlineEffect : MonoBehaviour
     {
@@ -51,7 +54,7 @@ namespace cakeslice
 
         [Range(1.0f, 6.0f)]
         public float lineThickness = 1.25f;
-        [Range(0, 1)]
+        [Range(0, 10)]
         public float lineIntensity = .5f;
         [Range(0, 1)]
         public float fillAmount = 0.2f;
@@ -140,6 +143,7 @@ namespace cakeslice
                 GameObject cameraGameObject = new GameObject("Outline Camera");
                 cameraGameObject.transform.parent = sourceCamera.transform;
                 outlineCamera = cameraGameObject.AddComponent<Camera>();
+                outlineCamera.enabled = false;
             }
 
             renderTexture = new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 16, RenderTextureFormat.Default);
@@ -169,12 +173,16 @@ namespace cakeslice
 
         void OnPreRender()
         {
-            if(renderTexture.width != sourceCamera.pixelWidth || renderTexture.height != sourceCamera.pixelHeight)
+            if(renderTexture != null) //when we run in edit mode we dont have a renderTexture
             {
-                renderTexture = new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 16, RenderTextureFormat.Default);
-                extraRenderTexture = new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 16, RenderTextureFormat.Default);
-                outlineCamera.targetTexture = renderTexture;
+                if (renderTexture.width != sourceCamera.pixelWidth || renderTexture.height != sourceCamera.pixelHeight)
+                {
+                    renderTexture = new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 16, RenderTextureFormat.Default);
+                    extraRenderTexture = new RenderTexture(sourceCamera.pixelWidth, sourceCamera.pixelHeight, 16, RenderTextureFormat.Default);
+                    outlineCamera.targetTexture = renderTexture;
+                }
             }
+            
             UpdateMaterialsPublicProperties();
             UpdateOutlineCameraFromSource();
 
@@ -355,7 +363,7 @@ namespace cakeslice
             outlineCamera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
             outlineCamera.clearFlags = CameraClearFlags.SolidColor;
             outlineCamera.rect = new Rect(0, 0, 1, 1);
-            outlineCamera.enabled = true;
+
             outlineCamera.cullingMask = 1 << outlineLayer; // UI layer
             outlineCamera.targetTexture = renderTexture;
         }

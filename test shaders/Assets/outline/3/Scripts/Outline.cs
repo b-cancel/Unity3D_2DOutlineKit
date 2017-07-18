@@ -20,6 +20,7 @@ public class Outline : MonoBehaviour
 	public OutlineType vOutlineType = OutlineType.OFF;		//by default, it will be OFF 
 	public bool eraseRenderer;
 	public bool ShowOutline = true;
+	public bool OutlineAllChild = true;
 	private bool IsChild = false;
 
 	[HideInInspector]
@@ -97,24 +98,29 @@ public class Outline : MonoBehaviour
 		foreach (SpriteRenderer vCurRenderer in GetComponentsInChildren<SpriteRenderer> ().OfType<SpriteRenderer> ().ToList ())
 			sprites.Add (vCurRenderer);
 
-		foreach (SpriteRenderer vRenderer in sprites) {
-			//try to get this component
-			Outline vOutline = vRenderer.GetComponent<Outline> (); 
+		if (OutlineAllChild) {
+			foreach (SpriteRenderer vRenderer in sprites) {
+				//try to get this component
+				Outline vOutline = vRenderer.GetComponent<Outline> (); 
 
-			//if doesn't exist, create it
-			if (vOutline == null) {
-				vOutline = vRenderer.gameObject.AddComponent<Outline> ();
-				vOutline.vOutlineManager = vOutlineManager;
-				vOutline.color = color;
-				vOutline.vOutlineType = vOutlineType;
+				//if doesn't exist, create it
+				if (vOutline == null) {
+					vOutline = vRenderer.gameObject.AddComponent<Outline> ();
+					vOutline.vOutlineManager = vOutlineManager;
+					vOutline.color = color;
+					vOutline.vOutlineType = vOutlineType;
 
-				//save master for this once
-				vOutline.SetMasterOutline (this);
+					//save master for this once
+					vOutline.SetMasterOutline (this);
+				}
+
+				//start them all
+				vOutline.StartOutline ();
 			}
-
-			//start them all
-			vOutline.StartOutline ();
 		}
+		else
+			//start the outline
+			StartOutline ();
 	}
 
 	//save the master outline here
@@ -128,6 +134,10 @@ public class Outline : MonoBehaviour
 		//get all outlines child
 		if (MasterOutline != null) {
 			Outline[] Outlines = MasterOutline.GetComponentsInChildren<Outline> ();
+
+			//if we want to ONlY have this sprite and not all the sub component to have a outline, we just get the main sprite.
+			if (!OutlineAllChild)
+				Outlines = new Outline[] {GetComponent<Outline>()};
 
 			//add/remove them all
 			foreach (Outline vCurOutline in Outlines) {
