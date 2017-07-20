@@ -9,6 +9,11 @@ public class ultimate_2D_script : MonoBehaviour {
 
     private SpriteRenderer spriteRenderer;
 
+    /*
+     * alpha cut off var between 0 and 1
+     * in pass "AlphaTest Greater [_Cutoff]"
+     */
+
     [Header("Overides to Shader Tags")] //does so by overide the render order on the material
 
     [Tooltip("Overlay(4,000) | Transparent(3,000) | AlphaTest(2,450) | Geometry(2,000) | Background(1,000)")]
