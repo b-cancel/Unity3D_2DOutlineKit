@@ -177,10 +177,10 @@ MonoBehaviour:
     y: 0
     width: 1365
     height: 587
-  m_MinSize: {x: 302, y: 221}
-  m_MaxSize: {x: 8002, y: 4021}
+  m_MinSize: {x: 306, y: 221}
+  m_MaxSize: {x: 8006, y: 4021}
   vertical: 0
-  controlID: 46
+  controlID: 12
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -374,8 +374,8 @@ MonoBehaviour:
     m_VAllowExceedBaseRangeMin: 1
     m_VAllowExceedBaseRangeMax: 1
     m_ScaleWithWindow: 0
-    m_HSlider: 0
-    m_VSlider: 0
+    m_HSlider: 1
+    m_VSlider: 1
     m_IgnoreScrollWheelUntilClicked: 0
     m_EnableMouseInput: 1
     m_EnableSliderZoom: 0
@@ -387,7 +387,7 @@ MonoBehaviour:
       y: 17
       width: 685
       height: 549
-    m_Scale: {x: 0.35677084, y: 0.35677084}
+    m_Scale: {x: 0.5662927, y: 0.5662927}
     m_Translation: {x: 342.5, y: 274.5}
     m_MarginLeft: 0
     m_MarginRight: 0
@@ -395,10 +395,10 @@ MonoBehaviour:
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -960
-      y: -769.4014
-      width: 1920
-      height: 1538.8029
+      x: -604.8109
+      y: -484.73166
+      width: 1209.6218
+      height: 969.4633
     m_MinimalGUI: 1
   m_defaultScale: 0.35677084
   m_TargetTexture: {fileID: 0}
@@ -439,9 +439,9 @@ MonoBehaviour:
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -2.452456, y: -1.0142207, z: 0.009033203}
+    m_Target: {x: -5.6443048, y: 0.04972496, z: 0.0078125}
     speed: 2
-    m_Value: {x: -2.452456, y: -1.0142207, z: 0.009033203}
+    m_Value: {x: -5.6443048, y: 0.04972496, z: 0.0078125}
   m_RenderMode: 31
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -468,9 +468,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 1.2446487
+    m_Target: 5.882567
     speed: 2
-    m_Value: 1.2446487
+    m_Value: 5.882567
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -511,7 +511,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: b8270000
     m_LastClickedID: 10168
-    m_ExpandedIDs: 86bcffffa2bcffff1afcffff00000000b8270000
+    m_ExpandedIDs: 1afcffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -719,7 +719,7 @@ MonoBehaviour:
     y: 92
     width: 553
     height: 926
-  m_ScrollPosition: {x: 0, y: 0}
+  m_ScrollPosition: {x: 0, y: 72.95508}
   m_InspectorMode: 0
   m_PreviewResizer:
     m_CachedPref: 182

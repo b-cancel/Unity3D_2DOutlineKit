@@ -35,6 +35,10 @@ public class outline2D : MonoBehaviour {
     public Color color_AS;
     public int outlineSortingLayer;
 
+    [Header("For Best Result -> (parentsScale.x == parentsScale.y)")]
+    [Header("Works IFF (customOutlineAroundSprite = false)")]
+    public bool scaleWithParent;
+
     [Header("Works IFF (customOutlineAroundSprite = false)")]
     public float size_AS; //NOTE: this refers to the distance in world space between the sprite edge and the outlines furthest edge
 
@@ -48,7 +52,15 @@ public class outline2D : MonoBehaviour {
 
     [Header("Performance Drop -> (depend on edge Count)---")]
     [Header("Works IFF (outlineAroundSprite = true)")]
-    public bool customOutlineAroundSprite; 
+    public bool customOutlineAroundSprite;
+
+    [Header("For Best Result -> (parentsScale.x == parentsScale.y)")]
+    [Header("Works IFF (outlineAroundSprite = true)")]
+    public bool customScaleWithParent;
+
+    [Header("-----Edges && Displacement Vectors-----")]
+
+    public List<Vector2> ChangeVector_ctrl_GO_Displace;
 
     //---private
 
@@ -61,14 +73,19 @@ public class outline2D : MonoBehaviour {
 
         //Outline Folder
         outlineGameObjectsFolder = new GameObject("outLineGOs");
+        copyOriginalGO_Transforms(outlineGameObjectsFolder);
         outlineGameObjectsFolder.transform.parent = this.transform;
-        outlineGameObjectsFolder.transform.position = this.transform.position; //TODO... should happen auto
+
+        //Outline Around Sprite Object Folder
+        aroundSpriteFolder = new GameObject();
+        copyOriginalGO_Transforms(aroundSpriteFolder);
+        aroundSpriteFolder.transform.parent = outlineGameObjectsFolder.transform;
 
         //Sprite Mask
         spriteMaskGO = new GameObject();
         spriteMaskGO.AddComponent<SpriteMask>();
+        copyOriginalGO_Transforms(spriteMaskGO);
         spriteMaskGO.transform.parent = outlineGameObjectsFolder.transform;
-        spriteMaskGO.transform.position = outlineGameObjectsFolder.transform.position; //TODO... should happen auto
 
         //--- global defaults
 
@@ -81,11 +98,15 @@ public class outline2D : MonoBehaviour {
 
         color_AS = Color.blue;
         outlineSortingLayer = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //outline is behind our sprite
+        scaleWithParent = false;
         size_AS = .1f;
 
         clipCenter_AS = false;
         cornerOutlineAroundSprite = false;
         customOutlineAroundSprite = false;
+        customScaleWithParent = false;
+
+        ChangeVector_ctrl_GO_Displace = new List<Vector2>();
 
         //--- STANDARD directions (will be used if we are not using a custom outline)
 
@@ -108,6 +129,8 @@ public class outline2D : MonoBehaviour {
         };
     }
 
+    bool PREVcustomOutlineAroundSprite;
+
     void Update()
     {
         //--- toggle seeing the objects that create our outline in hierarchy
@@ -121,16 +144,6 @@ public class outline2D : MonoBehaviour {
 
         if (outlineAroundSprite)
         {
-            //----- Handle Edges Folder
-
-            if (aroundSpriteFolder == null)
-            {
-                aroundSpriteFolder = new GameObject();
-                aroundSpriteFolder.transform.parent = outlineGameObjectsFolder.transform;
-                aroundSpriteFolder.transform.position = outlineGameObjectsFolder.transform.position; //TODO... should happen auto
-            }
-            //ELSE... object folder already exists
-
             //----- Handle Sprite Mask
 
             if (clipCenter_AS)
@@ -143,17 +156,20 @@ public class outline2D : MonoBehaviour {
 
             if (!customOutlineAroundSprite) //whatever Outline edges are currently exist will be used
             {
-                //TODO... optimize code below without causing erros 
-
-                clearEdgesAroundSprite();
-
                 if (outlineAroundSprite)
-                    foreach (var item in stdShiftDirections)
-                        addOutline(item);
-
+                    if(edgesAroundSprite.Count != 4 || (PREVcustomOutlineAroundSprite != customOutlineAroundSprite))
+                    {
+                        clearEdgesAroundSprite();
+                        foreach (var item in stdShiftDirections)
+                            addOutline(item);
+                    }
+                        
                 if (cornerOutlineAroundSprite)
-                    foreach (var item in stdCornerShiftDirections)
-                        addOutline(item);
+                    if(edgesAroundSprite.Count != 8 || (PREVcustomOutlineAroundSprite != customOutlineAroundSprite))
+                    {
+                        foreach (var item in stdCornerShiftDirections)
+                            addOutline(item);
+                    }        
             }
             //ELSE... we are using a custom outline... we add and remove outlines from it manually... we also add and remove directions from it manually...
 
@@ -175,14 +191,29 @@ public class outline2D : MonoBehaviour {
                 entry.Key.GetComponent<SpriteRenderer>().sortingOrder = outlineSortingLayer;
 
                 //--- set position 
-                if(customOutlineAroundSprite)
-                    entry.Key.transform.position = this.transform.position + (Vector3)entry.Value;
+                if (customOutlineAroundSprite)
+                {
+                    if(customScaleWithParent)
+                        entry.Key.transform.position = this.transform.position + (this.transform.rotation * ((Vector3)entry.Value * ( (this.transform.localScale.x + this.transform.localScale.y) / 2) ));
+                    else
+                        entry.Key.transform.position = this.transform.position + (this.transform.rotation * (Vector3)entry.Value);
+                }
                 else
                 {
                     if(tempIndex < 4) //0 -> 3 (Regular outline)
-                        entry.Key.transform.position = this.transform.position + (Vector3)(entry.Value.normalized * size_AS); //side of right triangle
+                    {  
+                        if (scaleWithParent)
+                            entry.Key.transform.position = this.transform.position + (this.transform.rotation * (Vector3)(entry.Value.normalized * (size_AS * ((this.transform.localScale.x + this.transform.localScale.y) / 2)))); //side of right triangle
+                        else
+                            entry.Key.transform.position = this.transform.position + (this.transform.rotation * (Vector3)(entry.Value.normalized * size_AS)); //side of right triangle
+                    }
                     else // 4 -> 7 (corner outlines)
-                        entry.Key.transform.position = this.transform.position + (Vector3)(entry.Value.normalized * Mathf.Sqrt(2 * size_AS * size_AS)); //hypotenuse
+                    {
+                        if(scaleWithParent)
+                            entry.Key.transform.position = this.transform.position + (this.transform.rotation * (Vector3)(entry.Value.normalized * (Mathf.Sqrt(2 * size_AS * size_AS) * ((this.transform.localScale.x + this.transform.localScale.y) / 2)))); //hypotenuse
+                        else
+                            entry.Key.transform.position = this.transform.position + (this.transform.rotation * (Vector3)(entry.Value.normalized * Mathf.Sqrt(2 * size_AS * size_AS))); //hypotenuse
+                    }
                 }
 
                 //--- set color
@@ -196,13 +227,10 @@ public class outline2D : MonoBehaviour {
             if (spriteMaskGO != null)
                 spriteMaskGO.GetComponent<SpriteMask>().enabled = false;
 
-            if (aroundSpriteFolder != null) //remove ALL Outline Data
-            {
-                Destroy(aroundSpriteFolder);
-                clearEdgesAroundSprite();
-            }
-            //ELSE... folder object already dead
+            clearEdgesAroundSprite();
         }
+
+        PREVcustomOutlineAroundSprite = customOutlineAroundSprite;
     }
 
     //-----------------------Helper Functions
@@ -216,9 +244,12 @@ public class outline2D : MonoBehaviour {
 
     void clearEdgesAroundSprite()
     {
-        foreach (KeyValuePair<GameObject, Vector2> entry in edgesAroundSprite)
-            Destroy(entry.Key);
-        edgesAroundSprite.Clear();
+        if (edgesAroundSprite.Count != 0)
+        {
+            foreach (KeyValuePair<GameObject, Vector2> entry in edgesAroundSprite)
+                Destroy(entry.Key);
+            edgesAroundSprite.Clear();
+        }
     }
 
     //NOTE: you only need to copy over a variable if its not its default value (for later optimization)
@@ -244,7 +275,9 @@ public class outline2D : MonoBehaviour {
             GameObject tempSpriteCopy = new GameObject();
             tempSpriteCopy.AddComponent<SpriteRenderer>();
 
-            //we are a child of our parent folder for easy access
+            copyOriginalGO_Transforms(tempSpriteCopy);
+
+            //assign our parent
             tempSpriteCopy.transform.parent = aroundSpriteFolder.transform;
 
             //use text shader so that we only conserve the silhouette of our sprite
@@ -257,6 +290,19 @@ public class outline2D : MonoBehaviour {
         }
         else
             return false;
+    }
+
+    void copyOriginalGO_Transforms(GameObject copierGO)
+    {
+        //place ourselves in the same place as our parent (for transform copying purposes...)
+        if (this.transform.parent != null)
+            copierGO.transform.parent = this.transform.parent.gameObject.transform;
+        //ELSE... our parent is in the root and currently so are we...
+
+        //copy over all transforms
+        copierGO.transform.localScale = this.transform.localScale;
+        copierGO.transform.localPosition = this.transform.localPosition;
+        copierGO.transform.localRotation = this.transform.localRotation;
     }
     
     public bool removeOutline(GameObject edgeGO)
