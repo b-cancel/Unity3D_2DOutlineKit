@@ -78,21 +78,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\inline\SpriteOutline.cs" />
-    <Compile Include="Assets\new\ultimate_2D_script.cs" />
     <Compile Include="Assets\objOutline\outline2D.cs" />
-    <Compile Include="Assets\outline\MOD\LinkedSet.cs" />
-    <Compile Include="Assets\outline\MOD\Outline.cs" />
-    <Compile Include="Assets\outline\MOD\OutlineManager.cs" />
-    <Compile Include="Assets\testing\duplicator.cs" />
+    <Compile Include="Assets\refOutline\MOD\LinkedSet.cs" />
+    <Compile Include="Assets\refOutline\MOD\Outline.cs" />
+    <Compile Include="Assets\refOutline\MOD\OutlineManager.cs" />
+    <Compile Include="Assets\shaderOutline\ultimate_2D_script.cs" />
+    <Compile Include="Assets\Testing Assets\duplicator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\inline\Sprites-Outline.shader" />
-    <None Include="Assets\inline\source.txt" />
-    <None Include="Assets\new\Ultimate_2D_Outline.shader" />
-    <None Include="Assets\outline\MOD\Resources\OutlineBufferCullOffShader.shader" />
-    <None Include="Assets\outline\MOD\Resources\OutlineBufferShader.shader" />
-    <None Include="Assets\outline\MOD\Resources\OutlineShader.shader" />
+    <None Include="Assets\refOutline\MOD\Resources\OutlineBufferCullOffShader.shader" />
+    <None Include="Assets\refOutline\MOD\Resources\OutlineBufferShader.shader" />
+    <None Include="Assets\refOutline\MOD\Resources\OutlineShader.shader" />
+    <None Include="Assets\shaderOutline\Ultimate_2D_Outline.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

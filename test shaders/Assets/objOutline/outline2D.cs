@@ -4,9 +4,16 @@ using UnityEngine;
 
 //NOTE: pay attention to the "HEADERS" and the NOTES in this document
 
-//[ExecuteInEditMode]
+/*
+ * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline and the overlay will also be semi transparent
+ * SOLUTION 1: use shader that grab the silhouette of the sprite as a solid color regardless of semi transparency and use that... (I wasn't able to find said shader... and I dont know HLSL)
+ * 
+ * LIMITATION 2: Cannot use in execute mode... there is a problem with use .material.shader... Unity suggest we use .sharedmaterial.shader but that messes up the code
+ * SOLUTION 2: Unknown
+ */ 
+
 public class outline2D : MonoBehaviour {
-   
+
     //-----Variables for entire Outline
 
     GameObject outlineGameObjectsFolder; 
@@ -60,7 +67,25 @@ public class outline2D : MonoBehaviour {
 
     [Header("-----Edges && Displacement Vectors-----")]
 
-    public List<Vector2> ChangeVector_ctrl_GO_Displace;
+    /*
+     * NOTE: this must be private... 
+     * if people are allowed to change the quantity of GOs...
+     * WITHOUT the proper functions
+     * you WILL create a massive memory leak
+     */ 
+    private List<GameObject> gameObject_to; 
+    public List<Vector2> to_vector;
+
+    //-----Overlay Variables
+
+    GameObject spriteOverlay;
+
+    [Header("-----Overlay Variables-----")]
+    public bool activeSpriteOverlay;
+    public int overlaySortingOrder;
+
+    [Header("Works IFF (tintOverSprite = true")]
+    public Color spriteOverlayColor;
 
     //---private
 
@@ -69,27 +94,45 @@ public class outline2D : MonoBehaviour {
 
     void Awake()
     {
+        //--- Cover Duplication Problem
+
+        Transform psblOF_T = this.transform.Find("Outline Folder");
+        if (psblOF_T != null) //transform found
+        {
+            GameObject psblOF_GO = psblOF_T.gameObject;
+            if (psblOF_GO.transform.parent.gameObject == gameObject) //gameobject ours
+                Destroy(psblOF_GO);
+        }
+
         //--- Object Instantiation
 
-        //Outline Folder
-        outlineGameObjectsFolder = new GameObject("outLineGOs");
+        //Outline Folder [MUST BE FIRST]
+        outlineGameObjectsFolder = new GameObject("Outline Folder");
         copyOriginalGO_Transforms(outlineGameObjectsFolder);
         outlineGameObjectsFolder.transform.parent = this.transform;
 
         //Outline Around Sprite Object Folder
-        aroundSpriteFolder = new GameObject();
+        aroundSpriteFolder = new GameObject("Outline Around Sprite Folder");
         copyOriginalGO_Transforms(aroundSpriteFolder);
         aroundSpriteFolder.transform.parent = outlineGameObjectsFolder.transform;
 
         //Sprite Mask
-        spriteMaskGO = new GameObject();
+        spriteMaskGO = new GameObject("Sprite Mask");
         spriteMaskGO.AddComponent<SpriteMask>();
         copyOriginalGO_Transforms(spriteMaskGO);
         spriteMaskGO.transform.parent = outlineGameObjectsFolder.transform;
 
+        //Sprite Overlay
+        spriteOverlay = new GameObject("Sprite Overlay");
+        spriteOverlay.AddComponent<SpriteRenderer>();
+        spriteOverlay.GetComponent<SpriteRenderer>().material.shader = Shader.Find("GUI/Text Shader");
+        copyOriginalGO_Transforms(spriteOverlay);
+        spriteOverlay.transform.parent = outlineGameObjectsFolder.transform;
+        //ELSE... we duplicated the object and awake ran again without really needing to...
+
         //--- global defaults
 
-        showAddedGameObjectsInHierarchy = false;
+        showAddedGameObjectsInHierarchy = true;
         outlineAroundSprite = true;
         spriteMaskGO_AlphaCutoff = .25f;
         edgesAroundSprite = new Dictionary<GameObject, Vector2>();
@@ -106,7 +149,14 @@ public class outline2D : MonoBehaviour {
         customOutlineAroundSprite = false;
         customScaleWithParent = false;
 
-        ChangeVector_ctrl_GO_Displace = new List<Vector2>();
+        gameObject_to = new List<GameObject>();
+        to_vector = new List<Vector2>();
+
+        //--- Sprite Overlay
+
+        activeSpriteOverlay = true;
+        overlaySortingOrder = this.GetComponent<SpriteRenderer>().sortingOrder + 1;
+        spriteOverlayColor = new Color(0, 0, 0, 0);
 
         //--- STANDARD directions (will be used if we are not using a custom outline)
 
@@ -133,6 +183,24 @@ public class outline2D : MonoBehaviour {
 
     void Update()
     {
+        //--- Take Care of Tint
+
+        if (activeSpriteOverlay)
+        {
+            spriteOverlay.SetActive(true);
+
+            //set sprite renderer data
+            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
+
+            //set sorting order
+            spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = overlaySortingOrder;
+
+            //set color
+            spriteOverlay.GetComponent<SpriteRenderer>().color = spriteOverlayColor;
+        }
+        else
+            spriteOverlay.SetActive(false);
+
         //--- toggle seeing the objects that create our outline in hierarchy
 
         if (showAddedGameObjectsInHierarchy)
