@@ -2,17 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//NOTE: pay attention to the "HEADERS" and the NOTES in this document
-
 /*
+ * Programmer: Bryan Cancel
+ * Last Updated: 7/22/17
+ * 
+ * NOTE: Duplication of the Object in (Edit -or- Play) Mode will create the object but with all the DEFAULT outline settings
+ * 
+ * NOTE: this Object "Executes In Edit Mode" For the Sole purpose of chossing your settings
+ *          HOWEVER... when you are actually using the asset you MUST change the variables from code
+ *          
+ *          REASON... this is because this object is [NOT SERIALIZABLE]... so unity will clone it and use its copy in game mode
+ *          REASON ITS NOT ADDED... its alot more trouble that its worth and can cause significant problems if not used properly
+ *         
+ * 
  * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline and the overlay will also be semi transparent
  * SOLUTION 1: use shader that grab the silhouette of the sprite as a solid color regardless of semi transparency and use that... (I wasn't able to find said shader... and I dont know HLSL)
- * 
- * LIMITATION 2: Cannot use in execute mode... there is a problem with use .material.shader... Unity suggest we use .sharedmaterial.shader but that messes up the code
- * SOLUTION 2: Unknown
- */ 
+ */
 
+[ExecuteInEditMode]
 public class outline2D : MonoBehaviour {
+
+    //-----Variables for Used in Awake-----
+
+    [Header("ONLY used in the Awake Function")]
+    [Header("Changing them will have an effect only when...")]
+    [Header("(1) ging between (Edit Mode) and (Play Mode)")]
+    [Header("(2) duplicating the Object in either mode")]
+    public bool copyVarsFromSource;
 
     //-----Variables for entire Outline
 
@@ -20,7 +36,7 @@ public class outline2D : MonoBehaviour {
 
     GameObject spriteMaskGO;
 
-    public bool showAddedGameObjectsInHierarchy;
+    public bool showGameObjectsInHierarchy;
 
     //NOTE: we delete and add MANY objets when we use this boolean
     //SO... to hide the outline temporarily its better to lower the color opacity instead of using this boolean
@@ -65,15 +81,16 @@ public class outline2D : MonoBehaviour {
     [Header("Works IFF (outlineAroundSprite = true)")]
     public bool customScaleWithParent;
 
-    [Header("-----Edges && Displacement Vectors-----")]
+    //-----Edges && Displacement Vectors
 
     /*
      * NOTE: this must be private... 
      * if people are allowed to change the quantity of GOs...
      * WITHOUT the proper functions
      * you WILL create a massive memory leak
-     */ 
-    private List<GameObject> gameObject_to; 
+     */
+    private List<GameObject> gameObject_to;
+    [Header("-----Edges && Displacement Vectors-----")]
     public List<Vector2> to_vector;
 
     //-----Overlay Variables
@@ -95,13 +112,13 @@ public class outline2D : MonoBehaviour {
     void Awake()
     {
         //--- Cover Duplication Problem
-
+        
         Transform psblOF_T = this.transform.Find("Outline Folder");
         if (psblOF_T != null) //transform found
         {
             GameObject psblOF_GO = psblOF_T.gameObject;
-            if (psblOF_GO.transform.parent.gameObject == gameObject) //gameobject ours
-                Destroy(psblOF_GO);
+            if (psblOF_GO.transform.parent.gameObject == gameObject) //this gameobject ours
+                DestroyImmediate(psblOF_GO);
         }
 
         //--- Object Instantiation
@@ -125,14 +142,17 @@ public class outline2D : MonoBehaviour {
         //Sprite Overlay
         spriteOverlay = new GameObject("Sprite Overlay");
         spriteOverlay.AddComponent<SpriteRenderer>();
-        spriteOverlay.GetComponent<SpriteRenderer>().material.shader = Shader.Find("GUI/Text Shader");
+        //---
+        var tempMaterial = new Material(spriteOverlay.GetComponent<SpriteRenderer>().sharedMaterial);
+        tempMaterial.shader = Shader.Find("GUI/Text Shader");
+        spriteOverlay.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+        //---
         copyOriginalGO_Transforms(spriteOverlay);
         spriteOverlay.transform.parent = outlineGameObjectsFolder.transform;
-        //ELSE... we duplicated the object and awake ran again without really needing to...
 
         //--- global defaults
 
-        showAddedGameObjectsInHierarchy = true;
+        showGameObjectsInHierarchy = false;
         outlineAroundSprite = true;
         spriteMaskGO_AlphaCutoff = .25f;
         edgesAroundSprite = new Dictionary<GameObject, Vector2>();
@@ -163,19 +183,19 @@ public class outline2D : MonoBehaviour {
         //n, e, s, w
         stdShiftDirections = new Vector2[4]
         {
-            Vector2.up,
-            Vector2.right,
-            Vector2.down,
-            Vector2.left
+                Vector2.up,
+                Vector2.right,
+                Vector2.down,
+                Vector2.left
         };
 
         //ne, se, sw, nw
         stdCornerShiftDirections = new Vector2[4]
         {
-            (Vector2.up + Vector2.right).normalized,
-            (Vector2.down + Vector2.right).normalized,
-            (Vector2.down + Vector2.left).normalized,
-            (Vector2.up + Vector2.left).normalized
+                (Vector2.up + Vector2.right).normalized,
+                (Vector2.down + Vector2.right).normalized,
+                (Vector2.down + Vector2.left).normalized,
+                (Vector2.up + Vector2.left).normalized
         };
     }
 
@@ -203,7 +223,7 @@ public class outline2D : MonoBehaviour {
 
         //--- toggle seeing the objects that create our outline in hierarchy
 
-        if (showAddedGameObjectsInHierarchy)
+        if (showGameObjectsInHierarchy)
             outlineGameObjectsFolder.hideFlags = HideFlags.None;
         else
             outlineGameObjectsFolder.hideFlags = HideFlags.HideInHierarchy;
@@ -315,7 +335,7 @@ public class outline2D : MonoBehaviour {
         if (edgesAroundSprite.Count != 0)
         {
             foreach (KeyValuePair<GameObject, Vector2> entry in edgesAroundSprite)
-                Destroy(entry.Key);
+                DestroyImmediate(entry.Key);
             edgesAroundSprite.Clear();
         }
     }
@@ -349,7 +369,9 @@ public class outline2D : MonoBehaviour {
             tempSpriteCopy.transform.parent = aroundSpriteFolder.transform;
 
             //use text shader so that we only conserve the silhouette of our sprite
-            tempSpriteCopy.GetComponent<SpriteRenderer>().material.shader = Shader.Find("GUI/Text Shader");
+            var tempMaterial = new Material(tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial);
+            tempMaterial.shader = Shader.Find("GUI/Text Shader");
+            tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
 
             //save our data
             edgesAroundSprite.Add(tempSpriteCopy, outlineDirection);
