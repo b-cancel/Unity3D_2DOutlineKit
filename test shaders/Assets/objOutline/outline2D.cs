@@ -44,7 +44,7 @@ public class outline2D : MonoBehaviour {
                                          //IMPORTANT NOTE: currently only one outline is supported
 
     [Header("*****Variables For ALL Outlines*****")]
-    public bool showOutline_GOs_InHierarchy; //show outline game objects in hierarchy
+    public bool showOutline_GOs_InHierarchy;
 
     //-----Sprite Mask->(SM)<-
 
@@ -74,15 +74,17 @@ public class outline2D : MonoBehaviour {
     [Header("-----For Regular or Custom Outline->B<-")]
     public Color color_1B;
     public int orderInLayer_1B;
+    [Range(0, 5)]
     public float size_1B;
     [Header("For Best Result -> (parentsScale.x == parentsScale.y)")]
     public bool scaleWithParent_1B;
     [Header("Performance Drop -> (depend on edge Count)---")]
-    public bool customOutline_1B;
+    public bool regularOutline;
 
     [Header("-----Works IF (CustomOutline = FALSE)->R<-")] //->R<-
-    [Header("Performance Drop -> (1/2)---")]
-    public bool cornerOutline_1R;
+    public int objsMakingOutline_R; //also the count of gameobjects that make up the outline
+    public float startAngle_R;
+    public bool radialPush_R; //push objs to edge of circle or to edge of box
 
     [Header("-----Works IF (CustomOutline = TRUE)->C<-")] //->C<-
     public bool stdSize_1C;
@@ -101,11 +103,6 @@ public class outline2D : MonoBehaviour {
     public bool active_SO;
     public int orderInLayer_SO;
     public Color color_SO;
-
-    //-----Contains Data to Create Our NON-Custom Outlines
-
-    Vector2[] stdShiftDirections;
-    Vector2[] stdCornerShiftDirections;
 
     void Awake()
     {
@@ -166,11 +163,13 @@ public class outline2D : MonoBehaviour {
 
         color_1B = Color.blue;
         orderInLayer_1B = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-            size_1B = .1f;
+        size_1B = .1f;
         scaleWithParent_1B = false;
-        customOutline_1B = false;
+        regularOutline = true;
 
-        cornerOutline_1R = false;
+        objsMakingOutline_R = 8;
+        startAngle_R = 0;
+        radialPush_R = true;
 
         stdSize_1C = false;
 
@@ -179,26 +178,6 @@ public class outline2D : MonoBehaviour {
         active_SO = true;
         orderInLayer_SO = this.GetComponent<SpriteRenderer>().sortingOrder + 1; //by default in front
         color_SO = new Color(0, 0, 0, 0);
-
-        //--- STANDARD directions (will be used if we are not using a custom outline)
-
-        //n, e, s, w
-        stdShiftDirections = new Vector2[4]
-        {
-                Vector2.up,
-                Vector2.right,
-                Vector2.down,
-                Vector2.left
-        };
-
-        //ne, se, sw, nw
-        stdCornerShiftDirections = new Vector2[4]
-        {
-                (Vector2.up + Vector2.right).normalized,
-                (Vector2.down + Vector2.right).normalized,
-                (Vector2.down + Vector2.left).normalized,
-                (Vector2.up + Vector2.left).normalized
-        };
     }
 
     bool PREVcustomOutline_1B;
@@ -244,26 +223,35 @@ public class outline2D : MonoBehaviour {
 
             //----- Create out Outline Edges IFF needed
 
-            if (!customOutline_1B) //whatever Outline edges are currently exist will be used
+            if (regularOutline)
             {
-                if (activeOutline_1)
-                    if(edges_1.Count != 4 || (PREVcustomOutline_1B != customOutline_1B))
-                    {
-                        clearEdgesAroundSprite();
-                        foreach (var item in stdShiftDirections)
-                            addOutline(item);
-                    }
-                        
-                if (cornerOutline_1R)
-                    if(edges_1.Count != 8 || (PREVcustomOutline_1B != customOutline_1B))
-                    {
-                        foreach (var item in stdCornerShiftDirections)
-                            addOutline(item);
-                    }        
+                //make sure we have our required ammount of outlines to RESIST CHANGE
+                if (edges_1.Count != objsMakingOutline_R)
+                {
+                    clearEdgesAroundSprite();
+                    for (int i = 0; i < objsMakingOutline_R; i++)
+                        addOutline(Vector2.up);
+                }
             }
             //ELSE... we are using a custom outline... we add and remove outlines from it manually... we also add and remove directions from it manually...
 
-            //----- Use Settings to make outline
+            //--- set our directions every frame to RESIST CHANGE
+            if (regularOutline)
+            {
+                //NOTE: only required if regular Outline = True
+                float rotation = startAngle_R;
+                float angleBetweenAllEdges = (objsMakingOutline_R == 0) ? 360 : 360 / objsMakingOutline_R;
+
+                List<GameObject> edgesKeys = new List<GameObject>(edges_1.Keys);
+                foreach (var aKey in edgesKeys)
+                {
+                    float oldMagnitude = edges_1[aKey].magnitude;
+                    Vector3 newDirection = Quaternion.AngleAxis(rotation, Vector3.forward) * Vector3.up;
+                    edges_1[aKey] = newDirection.normalized * oldMagnitude;
+
+                    rotation += angleBetweenAllEdges;
+                }
+            }
 
             int tempIndex = 0;
             foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
@@ -283,27 +271,37 @@ public class outline2D : MonoBehaviour {
                 //--- set position 
                 float averageScale = (this.transform.localScale.x + this.transform.localScale.y) / 2;
 
-                if (customOutline_1B)
-                {
-                    if (stdSize_1C)
-                        entry.Key.transform.position = entry.Value.normalized; //use ONLY vector (1) direction
-                    else
-                        entry.Key.transform.position = entry.Value; //use ONLY vector (1) direction (2) magnitude
-                }
-                else
+                if (regularOutline)
                 {
                     entry.Key.transform.position = entry.Value.normalized; //use ONLY vector (1) direction
 
-                    if (tempIndex < 4) //0 -> 3 (Regular outline) [side of right triangle]
-                            entry.Key.transform.position *= size_1B;
-                    else // 4 -> 7 (corner outlines) [hypotenuse of right triangle]
-                            entry.Key.transform.position *= Mathf.Sqrt(2 * size_1B * size_1B);
+                    if (radialPush_R)
+                        entry.Key.transform.position *= size_1B;
+                    else
+                    {
+                        float currRotation = Vector2.Angle(entry.Value, Vector2.up) % 90;
+
+                        float currSize;
+                        if(Mathf.Approximately(currRotation,0))
+                            currSize = size_1B;
+                        else
+                            currSize = Mathf.Abs(size_1B / Mathf.Cos(currRotation * Mathf.Deg2Rad));
+
+                        entry.Key.transform.position *= currSize;          
+                    }
+                }
+                else
+                {
+                    if (stdSize_1C) //STANDARD size for all vectors
+                        entry.Key.transform.position = entry.Value.normalized * size_1B; //use ONLY vector (1) direction
+                    else
+                        entry.Key.transform.position = entry.Value; //use ONLY vector (1) direction (2) magnitude
                 }
 
                 if (scaleWithParent_1B)
                     entry.Key.transform.position *= averageScale;
 
-                entry.Key.transform.position = this.transform.position + this.transform.rotation * entry.Key.transform.position;
+                entry.Key.transform.position = this.transform.position + (this.transform.rotation * entry.Key.transform.position);
 
                 //--- set color
                 entry.Key.GetComponent<SpriteRenderer>().color = color_1B;
@@ -319,7 +317,7 @@ public class outline2D : MonoBehaviour {
             clearEdgesAroundSprite();
         }
 
-        PREVcustomOutline_1B = customOutline_1B;
+        PREVcustomOutline_1B = regularOutline;
     }
 
     //-----------------------Helper Functions

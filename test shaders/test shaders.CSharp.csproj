@@ -78,6 +78,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\objOutline\changeOutline2DSettingInInspector.cs" />
     <Compile Include="Assets\objOutline\outline2D.cs" />
     <Compile Include="Assets\refOutline\MOD\LinkedSet.cs" />
     <Compile Include="Assets\refOutline\MOD\Outline.cs" />
