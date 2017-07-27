@@ -33,61 +33,187 @@ public class outline2D : MonoBehaviour {
 
     //-----Variables for Used in Awake-----
 
-    [Header("*****ONLY used in the Awake Function*****")]
-    [Header("Changing them will have an effect only when...")]
-    [Header("(1) going between (Edit Mode) and (Play Mode)")]
-    [Header("(2) duplicating the Object in either mode")]
-
     //-----Variables for ALL Outlines-----
 
     GameObject outlineGameObjectsFolder; //contains all the outlines
                                          //IMPORTANT NOTE: currently only one outline is supported
 
-    [Header("*****Variables For ALL Outlines*****")]
-    public bool showOutline_GOs_InHierarchy;
+    bool showOutline_GOs_InHierarchy;
+    public bool ShowOutline_GOs_InHierarchy
+    {
+        get { return showOutline_GOs_InHierarchy; }
+        set
+        {
+            if (value)
+                outlineGameObjectsFolder.hideFlags = HideFlags.None;
+            else
+                outlineGameObjectsFolder.hideFlags = HideFlags.HideInHierarchy;
+
+            showOutline_GOs_InHierarchy = value;
+        }
+    }
 
     //-----Sprite Mask->(SM)<-
 
     GameObject GO_with_SpriteMask; //gameobject with sprite mask
 
-    [Header("-----Use Masking To Clip Center->SM<-")]
-    [Header("Performance Drop -> (1/4)")]
-    public bool clipCenter_SM; //NOTE: Suggested TRUE when making an outline around Semi-Transparent Sprites
+    bool clipCenter_SM;
+    public bool ClipCenter_SM
+    {
+        get { return clipCenter_SM; }
+        set
+        {
+            if (clipCenter_SM != value) //NEW value
+            {
+                //enable or disable mask
+                GO_with_SpriteMask.GetComponent<SpriteMask>().enabled = value;
+
+                //update how our edge gameobjects interact with the mask
+                if (value == true)
+                {
+                    foreach (KeyValuePair<GameObject, Vector2> dictVal in edges_1)
+                        dictVal.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                }
+                else
+                {
+                    foreach (KeyValuePair<GameObject, Vector2> dictVal in edges_1)
+                        dictVal.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                }
+            }
+            else
+                ;// print("we should not have run");
+
+            clipCenter_SM = value;
+        }
+    } //NOTE: used in update function... doesnt have to do anyting special for get and set...
 
     [Range(0,1)]
-    public float alphaCutoff_SM;
+    float alphaCutoff_SM;
+    public float AlphaCutoff_SM
+    {
+        get { return alphaCutoff_SM; }
+        set
+        {
+            GO_with_SpriteMask.GetComponent<SpriteMask>().alphaCutoff = value;
 
-    public bool customRange_SM;
-    public int frontLayer_SM;
-    public int backLayer_SM;
+            alphaCutoff_SM = value;
+        }
+    }
+
+    bool customRange_SM;
+    public bool CustomRange_SM
+    {
+        get { return customRange_SM; }
+        set
+        {
+            GO_with_SpriteMask.GetComponent<SpriteMask>().isCustomRangeActive = value;
+
+            customRange_SM = value;
+        }
+    }
+
+    int frontLayer_SM;
+    public int FrontLayer_SM
+    {
+        get { return frontLayer_SM; }
+        set
+        {
+            GO_with_SpriteMask.GetComponent<SpriteMask>().frontSortingLayerID = value;
+
+            frontLayer_SM = value;
+        }
+    }
+
+    int backLayer_SM;
+    public int BackLayer_SM
+    {
+        get { return backLayer_SM; }
+        set
+        {
+            GO_with_SpriteMask.GetComponent<SpriteMask>().backSortingLayerID = value;
+
+            backLayer_SM = value;
+        }
+    }
 
     //-----Variables for Outline 1----->1<-
 
     GameObject folder_1; 
     Dictionary<GameObject, Vector2> edges_1;
 
-    [Header("-----Variables For ONE Outline----->1<-")]
-    public bool activeOutline_1; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+    bool activeOutline_1;
+    //NOTE: used in update function... doesnt have to do anyting special for get and set...
+    public bool ActiveOutline_1 { get { return activeOutline_1; } set { activeOutline_1 = value; } }  
 
     [Space(10)]
+    
+    Color color_1B;
+    public Color Color_1B
+    {
+        get { return color_1B; }
+        set
+        {
+            //update our edges with the new color
+            foreach (KeyValuePair<GameObject, Vector2> dictVal in edges_1)
+                dictVal.Key.GetComponent<SpriteRenderer>().color = value;
 
-    [Header("-----For Regular or Custom Outline->B<-")]
-    public Color color_1B;
-    public int orderInLayer_1B;
-    [Range(0, 5)]
-    public float size_1B;
-    [Header("For Best Result -> (parentsScale.x == parentsScale.y)")]
-    public bool scaleWithParent_1B;
-    [Header("Performance Drop -> (depend on edge Count)---")]
-    public bool regularOutline;
+            color_1B = value;
+        }
+    }
 
-    [Header("-----Works IF (CustomOutline = FALSE)->R<-")] //->R<-
-    public int objsMakingOutline_R; //also the count of gameobjects that make up the outline
-    public float startAngle_R;
-    public bool radialPush_R; //push objs to edge of circle or to edge of box
+    int orderInLayer_1B;
+    public int OrderInLayer_1B
+    {
+        get { return orderInLayer_1B; }
+        set
+        {
+            //update our edges with the new color
+            foreach (KeyValuePair<GameObject, Vector2> dictVal in edges_1)
+                dictVal.Key.GetComponent<SpriteRenderer>().sortingOrder = value;
 
-    [Header("-----Works IF (CustomOutline = TRUE)->C<-")] //->C<-
-    public bool stdSize_1C;
+            orderInLayer_1B = value;
+        }
+    }
+
+    float size_1B;
+    //NOTE: used in update function... doesnt have to do anyting special for get and set...
+    public float Size_1B { get { return size_1B; } set { size_1B = value; } }
+
+    bool scaleWithParent_1B;
+    //NOTE: used in update function... doesnt have to do anyting special for get and set...
+    public bool ScaleWithParent_1B { get { return scaleWithParent_1B; } set { scaleWithParent_1B = value; } }
+
+    bool regularOutline;
+    public bool RegularOutline
+    {
+        get { return regularOutline; }
+        set
+        {
+            if (regularOutline != value) //NEW value
+            {
+                if (regularOutline == true) //t -> f (KEEP regular outline data)
+                    ;
+                else //f -> t (CLEAR custom oultine data)
+                    clearEdgesAroundSprite();
+            }
+            else
+                ; // print("we should not have run");
+
+            regularOutline = value; //apply new value
+        }
+    }
+
+    int objsMakingOutline_R; //also the count of gameobjects that make up the outline
+    public int ObjsMakingOutline_R { get { return objsMakingOutline_R; } set { objsMakingOutline_R = value; } }
+
+    float startAngle_R;
+    public float StartAngle_R { get { return startAngle_R; } set { startAngle_R = value; } }
+
+    bool radialPush_R; //push objs to edge of circle or to edge of box
+    public bool RadialPush_R { get { return radialPush_R; } set { radialPush_R = value; } }
+
+    bool stdSize_1C;
+    public bool StdSize_1C { get { return stdSize_1C; } set { stdSize_1C = value; } }
 
     //-----Edges && Displacement Vectors
 
@@ -99,10 +225,41 @@ public class outline2D : MonoBehaviour {
 
     GameObject spriteOverlay;
 
-    [Header("*****Overlay Variables*****[SO]")]
-    public bool active_SO;
-    public int orderInLayer_SO;
-    public Color color_SO;
+    bool active_SO;
+    public bool Active_SO
+    {
+        get { return active_SO; }
+        set
+        {
+            spriteOverlay.SetActive(value);
+
+            active_SO = value;
+        }
+    }
+
+    int orderInLayer_SO;
+    public int OrderInLayer_SO
+    {
+        get { return orderInLayer_SO; }
+        set
+        {
+            spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = value;
+
+            orderInLayer_SO = value;
+        }
+    }
+
+    Color color_SO;
+    public Color Color_SO
+    {
+        get { return color_SO; }
+        set
+        {
+            spriteOverlay.GetComponent<SpriteRenderer>().color = value;
+
+            color_SO = value;
+        }
+    }
 
     void Awake()
     {
@@ -147,100 +304,75 @@ public class outline2D : MonoBehaviour {
 
         //--- global defaults
 
-        showOutline_GOs_InHierarchy = false;
-        clipCenter_SM = false; 
-        alphaCutoff_SM = .25f;
+        ShowOutline_GOs_InHierarchy = false;
+        ClipCenter_SM = false; 
+        AlphaCutoff_SM = .25f;
 
-        customRange_SM = false;
-        frontLayer_SM = 0;
-        backLayer_SM = 1;
+        CustomRange_SM = false;
+        FrontLayer_SM = 0; //by defaults maps to "default" layer
+        BackLayer_SM = 0; //by defaults maps to "default" layer
 
         //--- outside defaults
 
         edges_1 = new Dictionary<GameObject, Vector2>();
 
-        activeOutline_1 = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+        ActiveOutline_1 = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
 
-        color_1B = Color.blue;
-        orderInLayer_1B = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-        size_1B = .1f;
-        scaleWithParent_1B = false;
-        regularOutline = true;
+        Color_1B = Color.blue;
+        OrderInLayer_1B = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
+        Size_1B = .1f;
+        ScaleWithParent_1B = false;
+        RegularOutline = true;
 
-        objsMakingOutline_R = 8;
-        startAngle_R = 0;
-        radialPush_R = true;
+        ObjsMakingOutline_R = 8;
+        StartAngle_R = 0;
+        RadialPush_R = true;
 
-        stdSize_1C = false;
+        StdSize_1C = false;
 
         //--- Sprite Overlay
 
-        active_SO = true;
-        orderInLayer_SO = this.GetComponent<SpriteRenderer>().sortingOrder + 1; //by default in front
-        color_SO = new Color(0, 0, 0, 0);
+        Active_SO = true;
+        OrderInLayer_SO = this.GetComponent<SpriteRenderer>().sortingOrder + 1; //by default in front
+        Color_SO = new Color(0, 0, 0, 0);
     }
-
-    bool PREVcustomOutline_1B;
 
     void Update()
     {
         //--- Take Care of Overlay
 
-        if (active_SO)
-        {
-            spriteOverlay.SetActive(true);
-
-            //set color
-            spriteOverlay.GetComponent<SpriteRenderer>().color = color_SO;
-
-            //set sprite renderer data
+        if (Active_SO)
             copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
-
-            //set sorting order
-            spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_SO;
-        }
-        else
-            spriteOverlay.SetActive(false);
-
-        //--- toggle seeing the objects that create our outline in hierarchy
-
-        if (showOutline_GOs_InHierarchy)
-            outlineGameObjectsFolder.hideFlags = HideFlags.None;
-        else
-            outlineGameObjectsFolder.hideFlags = HideFlags.HideInHierarchy;
 
         //--- Outline Around Sprite
 
-        if (activeOutline_1)
+        if (ActiveOutline_1)
         {
-            //----- Handle Sprite Mask
-
-            if (clipCenter_SM)
-                updateSpriteMask();
-            else
-                if (GO_with_SpriteMask != null)
-                    GO_with_SpriteMask.GetComponent<SpriteMask>().enabled = false;
+            //TODO... we might not need to check this every frame... maybe manually call an update?
+            GO_with_SpriteMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite; 
 
             //----- Create out Outline Edges IFF needed
 
-            if (regularOutline)
+            if (RegularOutline)
             {
                 //make sure we have our required ammount of outlines to RESIST CHANGE
-                if (edges_1.Count != objsMakingOutline_R)
+                if (edges_1.Count != ObjsMakingOutline_R)
                 {
-                    clearEdgesAroundSprite();
-                    for (int i = 0; i < objsMakingOutline_R; i++)
+                    if(edges_1.Count != 0)
+                        clearEdgesAroundSprite();
+
+                    for (int i = 0; i < ObjsMakingOutline_R; i++)
                         addOutline(Vector2.up);
                 }
             }
             //ELSE... we are using a custom outline... we add and remove outlines from it manually... we also add and remove directions from it manually...
 
             //--- set our directions every frame to RESIST CHANGE
-            if (regularOutline)
+            if (RegularOutline)
             {
                 //NOTE: only required if regular Outline = True
-                float rotation = startAngle_R;
-                float angleBetweenAllEdges = (objsMakingOutline_R == 0) ? 360 : 360 / objsMakingOutline_R;
+                float rotation = StartAngle_R;
+                float angleBetweenAllEdges = (ObjsMakingOutline_R == 0) ? 360 : 360 / ObjsMakingOutline_R;
 
                 List<GameObject> edgesKeys = new List<GameObject>(edges_1.Keys);
                 foreach (var aKey in edgesKeys)
@@ -259,78 +391,54 @@ public class outline2D : MonoBehaviour {
                 //--- set sprite renderer data
                 copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
 
-                //--- set masking
-                if (clipCenter_SM)
-                    entry.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
-                else
-                    entry.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
-
-                //--- set sorting order
-                entry.Key.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_1B;
-
                 //--- set position 
                 float averageScale = (this.transform.localScale.x + this.transform.localScale.y) / 2;
 
-                if (regularOutline)
+                if (RegularOutline)
                 {
                     entry.Key.transform.position = entry.Value.normalized; //use ONLY vector (1) direction
 
-                    if (radialPush_R)
-                        entry.Key.transform.position *= size_1B;
+                    if (RadialPush_R)
+                        entry.Key.transform.position *= Size_1B;
                     else
                     {
                         float currRotation = Vector2.Angle(entry.Value, Vector2.up) % 90;
 
                         float currSize;
                         if(Mathf.Approximately(currRotation,0))
-                            currSize = size_1B;
+                            currSize = Size_1B;
                         else
-                            currSize = Mathf.Abs(size_1B / Mathf.Cos(currRotation * Mathf.Deg2Rad));
+                            currSize = Mathf.Abs(Size_1B / Mathf.Cos(currRotation * Mathf.Deg2Rad));
 
                         entry.Key.transform.position *= currSize;          
                     }
                 }
                 else
                 {
-                    if (stdSize_1C) //STANDARD size for all vectors
-                        entry.Key.transform.position = entry.Value.normalized * size_1B; //use ONLY vector (1) direction
+                    if (StdSize_1C) //STANDARD size for all vectors
+                        entry.Key.transform.position = entry.Value.normalized * Size_1B; //use ONLY vector (1) direction
                     else
                         entry.Key.transform.position = entry.Value; //use ONLY vector (1) direction (2) magnitude
                 }
 
-                if (scaleWithParent_1B)
+                if (ScaleWithParent_1B)
                     entry.Key.transform.position *= averageScale;
 
                 entry.Key.transform.position = this.transform.position + (this.transform.rotation * entry.Key.transform.position);
-
-                //--- set color
-                entry.Key.GetComponent<SpriteRenderer>().color = color_1B;
 
                 tempIndex++;
             }
         }
         else //we dont want AROUND outline
         {
-            if (GO_with_SpriteMask != null)
+            if (GO_with_SpriteMask.GetComponent<SpriteMask>().enabled == true)
                 GO_with_SpriteMask.GetComponent<SpriteMask>().enabled = false;
 
             clearEdgesAroundSprite();
         }
-
-        PREVcustomOutline_1B = regularOutline;
     }
 
     //-----------------------Helper Functions
-
-    void updateSpriteMask()
-    {
-        GO_with_SpriteMask.GetComponent<SpriteMask>().enabled = true; //if we want to update it we can imply that we want it on...
-        GO_with_SpriteMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
-        GO_with_SpriteMask.GetComponent<SpriteMask>().alphaCutoff = alphaCutoff_SM;
-        GO_with_SpriteMask.GetComponent<SpriteMask>().isCustomRangeActive = customRange_SM;
-        GO_with_SpriteMask.GetComponent<SpriteMask>().frontSortingLayerID = frontLayer_SM;
-        GO_with_SpriteMask.GetComponent<SpriteMask>().backSortingLayerID = backLayer_SM;
-    }
 
     void clearEdgesAroundSprite()
     {
@@ -374,6 +482,18 @@ public class outline2D : MonoBehaviour {
             var tempMaterial = new Material(tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial);
             tempMaterial.shader = Shader.Find("GUI/Text Shader");
             tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+
+            //how we interact with the mask
+            if (ClipCenter_SM == true)
+                tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+            else
+                tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+
+            //set color
+            tempSpriteCopy.GetComponent<SpriteRenderer>().color = Color_1B;
+
+            //set sorting layer
+            tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_1B;
 
             //save our data
             edges_1.Add(tempSpriteCopy, outlineDirection);
