@@ -14,147 +14,184 @@ public class changeOutline2DSettingInInspector : MonoBehaviour {
     [Header("(2) duplicating the Object in either mode")]
     */
 
-    //-----Variables for ALL Outlines-----
+    //-----Debugging Variables
 
-    [Header("*****Variables For ALL Outlines*****")]
-    public bool showOutline_GOs_InHierarchy;
+    [Header("*****Debugging Variables*****[D]")]
+    public bool showOutline_GOs_InHierarchy_D;
 
-    //-----Sprite Mask->(SM)<-
-    [Header("-----Use Masking To Clip Center->SM<-")]
-    [Header("Performance Drop -> (1/4)")]
-    [Header("Suggested TRUE when making an outline around Semi-Transparent Sprites")]
-    public bool clipCenter_SM; 
+    //-----Sprite Overlay Variables
 
-    [Range(0, 1)]
-    public float alphaCutoff_SM;
-
-    public bool customRange_SM;
-    public int frontLayer_SM;
-    public int backLayer_SM;
-
-    [Header("-----Variables For ONE Outline----->1<-")]
-    public bool activeOutline_1;
-
-    [Header("-----For Regular or Custom Outline->B<-")]
-    public Color color_1B;
-    public int orderInLayer_1B;
-    [Range(0,5)]
-    public float size_1B;
-    [Header("For Best Result -> (parentsScale.x == parentsScale.y)")]
-    public bool scaleWithParent_1B;
-
-    [Header("Performance Drop -> (depend on edge Count)---")]
-    public bool regularOutline;
-
-    [Header("-----Works IF (CustomOutline = FALSE)->R<-")] //->R<-
-    public int objsMakingOutline_R; //also the count of gameobjects that make up the outline
-    public float startAngle_R;
-    public bool radialPush_R; //push objs to edge of circle or to edge of box
-
-    [Header("-----Works IF (CustomOutline = TRUE)->C<-")] //->C<-
-    public bool stdSize_1C;
-
-    [Header("*****Overlay Variables*****[SO]")]
+    [Header("*****Sprite Overlay Variables*****[SO]")]
     public bool active_SO;
     public int orderInLayer_SO;
     public Color color_SO;
+
+    //-----Clipping Mask Variables
+
+    [Header("*****Clipping Mask Variables*****[CM]")]
+    [Header("Performance Drop -> (1/4)")]
+    [Header("Suggested TRUE when (1) Semi-Transparent Sprites (2) Inline Instead of Outline")]
+    public bool clipCenter_CM; 
+
+    [Range(0, 1)]
+    public float alphaCutoff_CM;
+
+    public bool customRange_CM;
+    public int frontLayer_CM;
+    public int backLayer_CM;
+
+    [Header("*****Outline Variables*****[O]")]
+    public bool active_O;
+
+    public Color color_O;
+    public int orderInLayer_O;
+    [Range(0, 5)]
+    public float size_O; //NOTE: size is handled differently depending on your "outlineType_Scaling_or_Pushing"
+    public bool scaleWithParentX_O;
+    public bool scaleWithParentY_O;
+
+    public bool outlineType_Scaling_or_Pushing_O;
+
+    [Header("***Scaling Type Options[S]")]
+    //NOTE: this would let you create inlines if desired
+    public float ClippingMaskScale_OS; //TODO... 
+
+    [Header("***Pushing Type Options[P]")]
+    [Header("More Edges -> Less Performace")]
+    public bool pushType_Regular_or_Custom_OP;
+
+    [Header("*Regular Push[R]")] //->R<-
+    public int objsMakingOutline_OPR; //also the count of gameobjects that make up the outline
+    public float startAngle_OPR;
+    public bool radialPush_OPR; //push objs to edge of circle or to edge of box
+
+    [Header("*Custom Push[C]")] //->C<-
+    public bool stdSize_OPC;
 
     void Start() //using Start() because this must run after Awake() of "outline2D"
     {
         //--- Grab Defaults Set in the Master Outline Script
 
-        //Variables for ALL Outlines-----
+        //Debugging Variables
 
-        showOutline_GOs_InHierarchy = gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy;
+        showOutline_GOs_InHierarchy_D = gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy_D;
 
-        //Sprite Mask->(SM)<-
+        //Sprite Overlay Variables
 
-        clipCenter_SM = gameObject.GetComponent<outline2D>().ClipCenter_SM;
-        alphaCutoff_SM = gameObject.GetComponent<outline2D>().AlphaCutoff_SM;
-        customRange_SM = gameObject.GetComponent<outline2D>().CustomRange_SM;
-        frontLayer_SM = gameObject.GetComponent<outline2D>().FrontLayer_SM;
-        backLayer_SM = gameObject.GetComponent<outline2D>().BackLayer_SM;
+        active_SO = gameObject.GetComponent<outline2D>().Active_SO;
+        orderInLayer_SO = gameObject.GetComponent<outline2D>().OrderInLayer_SO;
+        color_SO = gameObject.GetComponent<outline2D>().Color_SO;
 
-        //Variables for Outline 1----->1<-
+        //Clipping Mask Variables
 
-        activeOutline_1 = gameObject.GetComponent<outline2D>().ActiveOutline_1;
+        clipCenter_CM = gameObject.GetComponent<outline2D>().ClipCenter_CM;
+        alphaCutoff_CM = gameObject.GetComponent<outline2D>().AlphaCutoff_CM;
+        customRange_CM = gameObject.GetComponent<outline2D>().CustomRange_CM;
+        frontLayer_CM = gameObject.GetComponent<outline2D>().FrontLayer_CM;
+        backLayer_CM = gameObject.GetComponent<outline2D>().BackLayer_CM;
 
-        color_1B = gameObject.GetComponent<outline2D>().Color_1B;
-        orderInLayer_1B = gameObject.GetComponent<outline2D>().OrderInLayer_1B;
-        size_1B = gameObject.GetComponent<outline2D>().Size_1B;
-        scaleWithParent_1B = gameObject.GetComponent<outline2D>().ScaleWithParent_1B;
+        //Outline Variables
 
-        regularOutline = gameObject.GetComponent<outline2D>().RegularOutline;
+        active_O = gameObject.GetComponent<outline2D>().Active_O;
 
-        objsMakingOutline_R = gameObject.GetComponent<outline2D>().ObjsMakingOutline_R;
-        startAngle_R = gameObject.GetComponent<outline2D>().StartAngle_R;
-        radialPush_R = gameObject.GetComponent<outline2D>().RadialPush_R;
+        color_O = gameObject.GetComponent<outline2D>().Color_O;
+        orderInLayer_O = gameObject.GetComponent<outline2D>().OrderInLayer_O;
+        size_O = gameObject.GetComponent<outline2D>().Size_O;
+        scaleWithParentX_O = gameObject.GetComponent<outline2D>().ScaleWithParentX_O;
+        scaleWithParentY_O = gameObject.GetComponent<outline2D>().ScaleWithParentY_O;
+        outlineType_Scaling_or_Pushing_O = gameObject.GetComponent<outline2D>().OutlineType_Scaling_or_Pushing_O;
 
-        stdSize_1C = gameObject.GetComponent<outline2D>().StdSize_1C;
+        pushType_Regular_or_Custom_OP = gameObject.GetComponent<outline2D>().RegularOutline;
+
+        objsMakingOutline_OPR = gameObject.GetComponent<outline2D>().ObjsMakingOutline_R;
+        startAngle_OPR = gameObject.GetComponent<outline2D>().StartAngle_R;
+        radialPush_OPR = gameObject.GetComponent<outline2D>().RadialPush_R;
+
+        stdSize_OPC = gameObject.GetComponent<outline2D>().StdSize_1C;
     }
 	
 	void Update () {
 
+        print("bounds x: " + gameObject.GetComponent<SpriteRenderer>().bounds.size.x);
+        print("bounds y: " + gameObject.GetComponent<SpriteRenderer>().bounds.size.y);
+
         //--- Check for a new value and react to it
 
-        //Variables for ALL Outlines-----
+        //Debugging Variables
 
-        if (showOutline_GOs_InHierarchy != gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy)
-            gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy = showOutline_GOs_InHierarchy;
+        if (showOutline_GOs_InHierarchy_D != gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy_D)
+            gameObject.GetComponent<outline2D>().ShowOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
 
-        //Sprite Mask->(SM)<-
+        //--- Sprite Overlay Variables
 
-        if (clipCenter_SM != gameObject.GetComponent<outline2D>().ClipCenter_SM)
-            gameObject.GetComponent<outline2D>().ClipCenter_SM = clipCenter_SM;
+        if (active_SO != gameObject.GetComponent<outline2D>().Active_SO)
+            gameObject.GetComponent<outline2D>().Active_SO = active_SO;
 
-        if (alphaCutoff_SM != gameObject.GetComponent<outline2D>().AlphaCutoff_SM)
-            gameObject.GetComponent<outline2D>().AlphaCutoff_SM = alphaCutoff_SM;
+        if (orderInLayer_SO != gameObject.GetComponent<outline2D>().OrderInLayer_SO)
+            gameObject.GetComponent<outline2D>().OrderInLayer_SO = orderInLayer_SO;
 
-        if (customRange_SM != gameObject.GetComponent<outline2D>().CustomRange_SM)
-            gameObject.GetComponent<outline2D>().CustomRange_SM = customRange_SM;
+        if (color_SO != gameObject.GetComponent<outline2D>().Color_SO)
+            gameObject.GetComponent<outline2D>().Color_SO = color_SO;
 
-        if (frontLayer_SM != gameObject.GetComponent<outline2D>().FrontLayer_SM)
-            gameObject.GetComponent<outline2D>().FrontLayer_SM = frontLayer_SM;
+        //--- Clipping Mask Variables
 
-        if (backLayer_SM != gameObject.GetComponent<outline2D>().BackLayer_SM)
-            gameObject.GetComponent<outline2D>().BackLayer_SM = backLayer_SM;
+        if (clipCenter_CM != gameObject.GetComponent<outline2D>().ClipCenter_CM)
+            gameObject.GetComponent<outline2D>().ClipCenter_CM = clipCenter_CM;
 
-        //Variables for Outline 1----->1<-
+        if (alphaCutoff_CM != gameObject.GetComponent<outline2D>().AlphaCutoff_CM)
+            gameObject.GetComponent<outline2D>().AlphaCutoff_CM = alphaCutoff_CM;
 
-        if (activeOutline_1 != gameObject.GetComponent<outline2D>().ActiveOutline_1)
-            gameObject.GetComponent<outline2D>().ActiveOutline_1 = activeOutline_1;
+        if (customRange_CM != gameObject.GetComponent<outline2D>().CustomRange_CM)
+            gameObject.GetComponent<outline2D>().CustomRange_CM = customRange_CM;
 
-        if (color_1B != gameObject.GetComponent<outline2D>().Color_1B)
-            gameObject.GetComponent<outline2D>().Color_1B = color_1B;
+        if (frontLayer_CM != gameObject.GetComponent<outline2D>().FrontLayer_CM)
+            gameObject.GetComponent<outline2D>().FrontLayer_CM = frontLayer_CM;
 
-        if (orderInLayer_1B != gameObject.GetComponent<outline2D>().OrderInLayer_1B)
-            gameObject.GetComponent<outline2D>().OrderInLayer_1B = orderInLayer_1B;
+        if (backLayer_CM != gameObject.GetComponent<outline2D>().BackLayer_CM)
+            gameObject.GetComponent<outline2D>().BackLayer_CM = backLayer_CM;
 
-        if (size_1B != gameObject.GetComponent<outline2D>().Size_1B)
-            gameObject.GetComponent<outline2D>().Size_1B = size_1B;
+        //----- Outline Variables
 
-        if (scaleWithParent_1B != gameObject.GetComponent<outline2D>().ScaleWithParent_1B)
-            gameObject.GetComponent<outline2D>().ScaleWithParent_1B = scaleWithParent_1B;
+        if (active_O != gameObject.GetComponent<outline2D>().Active_O)
+            gameObject.GetComponent<outline2D>().Active_O = active_O;
+
+        if (color_O != gameObject.GetComponent<outline2D>().Color_O)
+            gameObject.GetComponent<outline2D>().Color_O = color_O;
+
+        if (orderInLayer_O != gameObject.GetComponent<outline2D>().OrderInLayer_O)
+            gameObject.GetComponent<outline2D>().OrderInLayer_O = orderInLayer_O;
+
+        if (size_O != gameObject.GetComponent<outline2D>().Size_O)
+            gameObject.GetComponent<outline2D>().Size_O = size_O;
+
+        if (scaleWithParentX_O != gameObject.GetComponent<outline2D>().ScaleWithParentX_O)
+            gameObject.GetComponent<outline2D>().ScaleWithParentX_O = scaleWithParentX_O;
+
+        if (scaleWithParentY_O != gameObject.GetComponent<outline2D>().ScaleWithParentY_O)
+            gameObject.GetComponent<outline2D>().ScaleWithParentY_O = scaleWithParentY_O;
+
+        if (outlineType_Scaling_or_Pushing_O != gameObject.GetComponent<outline2D>().OutlineType_Scaling_or_Pushing_O)
+            gameObject.GetComponent<outline2D>().OutlineType_Scaling_or_Pushing_O = outlineType_Scaling_or_Pushing_O;
 
         //---
 
-        if (regularOutline != gameObject.GetComponent<outline2D>().RegularOutline)
-            gameObject.GetComponent<outline2D>().RegularOutline = regularOutline;
+        if (pushType_Regular_or_Custom_OP != gameObject.GetComponent<outline2D>().RegularOutline)
+            gameObject.GetComponent<outline2D>().RegularOutline = pushType_Regular_or_Custom_OP;
 
         //---R
 
-        if (objsMakingOutline_R != gameObject.GetComponent<outline2D>().ObjsMakingOutline_R)
-            gameObject.GetComponent<outline2D>().ObjsMakingOutline_R = objsMakingOutline_R;
+        if (objsMakingOutline_OPR != gameObject.GetComponent<outline2D>().ObjsMakingOutline_R)
+            gameObject.GetComponent<outline2D>().ObjsMakingOutline_R = objsMakingOutline_OPR;
 
-        if (startAngle_R != gameObject.GetComponent<outline2D>().StartAngle_R)
-            gameObject.GetComponent<outline2D>().StartAngle_R = startAngle_R;
+        if (startAngle_OPR != gameObject.GetComponent<outline2D>().StartAngle_R)
+            gameObject.GetComponent<outline2D>().StartAngle_R = startAngle_OPR;
 
-        if (radialPush_R != gameObject.GetComponent<outline2D>().RadialPush_R)
-            gameObject.GetComponent<outline2D>().RadialPush_R = radialPush_R;
+        if (radialPush_OPR != gameObject.GetComponent<outline2D>().RadialPush_R)
+            gameObject.GetComponent<outline2D>().RadialPush_R = radialPush_OPR;
 
         //---C
 
-        if (stdSize_1C != gameObject.GetComponent<outline2D>().StdSize_1C)
-            gameObject.GetComponent<outline2D>().StdSize_1C = stdSize_1C;
+        if (stdSize_OPC != gameObject.GetComponent<outline2D>().StdSize_1C)
+            gameObject.GetComponent<outline2D>().StdSize_1C = stdSize_OPC;
     }
 }
