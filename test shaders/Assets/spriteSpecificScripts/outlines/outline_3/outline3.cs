@@ -97,6 +97,8 @@ public class outline3 : MonoBehaviour {
             size_O = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().size_O = size_O;
+
+            UpdatepositionsOfEdges();
         }
     }
 
@@ -109,6 +111,8 @@ public class outline3 : MonoBehaviour {
             scaleWithParentX_O = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().scaleWithParentX_O = scaleWithParentX_O;
+
+            UpdatepositionsOfEdges();
         }
     }
 
@@ -121,6 +125,8 @@ public class outline3 : MonoBehaviour {
             scaleWithParentY_O = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().scaleWithParentY_O = scaleWithParentY_O;
+
+            UpdatepositionsOfEdges();
         }
     }
 
@@ -141,10 +147,15 @@ public class outline3 : MonoBehaviour {
             if (pushType_Regular_or_Custom_OP) //f -> t (CLEAR custom oultine data)
             {
                 destroyEdgesThatCreateOutline();
+
                 makeSureWeHaveCorrectNumberOfEdges();
+
+                updateNormalEdgeVectors();
             }
             else //t -> f (KEEP regular outline data)
                 ;
+
+            UpdatepositionsOfEdges();
         }
     }
 
@@ -160,6 +171,8 @@ public class outline3 : MonoBehaviour {
                 gameObject.GetComponent<inspectorForOutline3>().objsMakingOutline_OPR = objsMakingOutline_OPR;
 
             makeSureWeHaveCorrectNumberOfEdges();
+
+            updateNormalEdgeVectors();
         }
     }
 
@@ -171,6 +184,8 @@ public class outline3 : MonoBehaviour {
             startAngle_OPR = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().startAngle_OPR = startAngle_OPR;
+
+            updateNormalEdgeVectors();
         }
     }
 
@@ -182,6 +197,8 @@ public class outline3 : MonoBehaviour {
             radialPush_OPR = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().radialPush_OPR = radialPush_OPR;
+
+            UpdatepositionsOfEdges();
         }
     }
 
@@ -195,8 +212,14 @@ public class outline3 : MonoBehaviour {
             stdSize_OPC = value;//update local value
             if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                 gameObject.GetComponent<inspectorForOutline3>().stdSize_OPC = stdSize_OPC;
+
+            UpdatepositionsOfEdges();
         }
     }
+
+    //--- Optimization
+
+    bool updateSpriteEveryFrame;
 
     void Awake()
     {
@@ -253,67 +276,55 @@ public class outline3 : MonoBehaviour {
         //custom
 
         StdSize_OPC = false;
+
+        //--- Optimization
+
+        updateSpriteEveryFrame = true;
     }
 
     void Update()
     {
-        //--- set our directions every frame to RESIST CHANGE
+        if(updateSpriteEveryFrame)
+            if(edges_1 != null)
+                foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
+                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
+    }
+
+    void UpdatepositionsOfEdges()
+    {
+        if(edges_1 != null)
+            foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
+                UpdateEdgePosition(entry.Key, entry.Value);
+    }
+    
+    void UpdateEdgePosition(GameObject anEdge, Vector2 vect)
+    {
         if (PushType_Regular_or_Custom_OP)
         {
-            //NOTE: only required if regular Outline = True
-            float rotation = StartAngle_OPR;
-            float angleBetweenAllEdges = (ObjsMakingOutline_OPR == 0) ? 360 : 360 / ObjsMakingOutline_OPR;
+            anEdge.transform.position = vect.normalized; //use ONLY vector (1) direction
 
-            List<GameObject> edgesKeys = new List<GameObject>(edges_1.Keys);
-            foreach (var aKey in edgesKeys)
-            {
-                float oldMagnitude = edges_1[aKey].magnitude;
-                //NOTE: your direction is calculated from a compass (your obj rotation is not taken into consideration till later)
-                Vector3 newDirection = Quaternion.AngleAxis(rotation, Vector3.forward) * Vector3.up;
-
-                edges_1[aKey] = newDirection.normalized * oldMagnitude;
-
-                rotation += angleBetweenAllEdges;
-            }
+            if (RadialPush_OPR) //Radial Push
+                anEdge.transform.position *= Size_O;
+            else //Square Push
+                anEdge.transform.position *= Mathf.Abs(Size_O / Mathf.Cos((Vector2.Angle(vect, Vector2.up) % 90) * Mathf.Deg2Rad));
         }
-
-        int tempIndex = 0;
-        foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
+        else
         {
-            //--- set sprite renderer data
-            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
-
-            //--- set position 
-            if (PushType_Regular_or_Custom_OP)
-            {
-                entry.Key.transform.position = entry.Value.normalized; //use ONLY vector (1) direction
-
-                if (RadialPush_OPR) //Radial Push
-                    entry.Key.transform.position *= Size_O;
-                else //Square Push
-                    entry.Key.transform.position *= Mathf.Abs(Size_O / Mathf.Cos((Vector2.Angle(entry.Value, Vector2.up) % 90) * Mathf.Deg2Rad));
-            }
+            if (StdSize_OPC) //STANDARD size for all vectors
+                anEdge.transform.position = vect.normalized * Size_O; //use ONLY vector (1) direction
             else
-            {
-                if (StdSize_OPC) //STANDARD size for all vectors
-                    entry.Key.transform.position = entry.Value.normalized * Size_O; //use ONLY vector (1) direction
-                else
-                    entry.Key.transform.position = entry.Value; //use ONLY vector (1) direction (2) magnitude
-            }
-
-            //NOTE: as of now our position is still on a compass in the (0,0,0) position
-
-            if (ScaleWithParentX_O)
-                entry.Key.transform.position = new Vector2(entry.Key.transform.position.x * this.transform.localScale.x, entry.Key.transform.position.y);
-
-            if (ScaleWithParentY_O)
-                entry.Key.transform.position = new Vector2(entry.Key.transform.position.x, entry.Key.transform.position.y * this.transform.localScale.y);
-
-            entry.Key.transform.position = this.transform.position + (this.transform.rotation * entry.Key.transform.position);
-
-            tempIndex++;
+                anEdge.transform.position = vect; //use ONLY vector (1) direction (2) magnitude
         }
 
+        //NOTE: as of now our position is still on a compass in the (0,0,0) position
+
+        if (ScaleWithParentX_O)
+            anEdge.transform.position = new Vector2(anEdge.transform.position.x * this.transform.localScale.x, anEdge.transform.position.y);
+
+        if (ScaleWithParentY_O)
+            anEdge.transform.position = new Vector2(anEdge.transform.position.x, anEdge.transform.position.y * this.transform.localScale.y);
+
+        anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
     }
 
     //--- Outline Edge List Edits
@@ -348,8 +359,14 @@ public class outline3 : MonoBehaviour {
                 //set sorting layer
                 tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
 
+                //set sprite renderer data
+                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), tempSpriteCopy.GetComponent<SpriteRenderer>());
+
                 //save our data
                 edges_1.Add(tempSpriteCopy, outlineDirection);
+
+                //update position that is affected by... size, scale par x, scale par y
+                UpdateEdgePosition(tempSpriteCopy, outlineDirection);
 
                 return true;
             }
@@ -455,7 +472,7 @@ public class outline3 : MonoBehaviour {
                 if (edges_1.Count < ObjsMakingOutline_OPR)
                 {
                     for (int i = 0; i < iterations; i++)
-                        addOutline(Vector2.up, true);
+                        addOutline(Vector2.up, true); //NOTE: the lines will update with a simply Vector3.Up... BUT after this we update our directions and then update all of the lines directions... then all the positions...
                 }
                 else
                 {
@@ -468,6 +485,32 @@ public class outline3 : MonoBehaviour {
                 ; //we are good to go
         }
         else
-            ; //there are no correct ammount of edges... this is a custom outline
+            ; //follow custom outline rules
+    }
+
+    void updateNormalEdgeVectors()
+    {
+        if (PushType_Regular_or_Custom_OP)
+        {
+            //NOTE: only required if regular Outline = True
+            float rotation = StartAngle_OPR;
+            float angleBetweenAllEdges = (ObjsMakingOutline_OPR == 0) ? 360 : 360 / ObjsMakingOutline_OPR;
+
+            List<GameObject> edgesKeys = new List<GameObject>(edges_1.Keys);
+            foreach (var aKey in edgesKeys)
+            {
+                float oldMagnitude = edges_1[aKey].magnitude;
+                //NOTE: your direction is calculated from a compass (your obj rotation is not taken into consideration till later)
+                Vector3 newDirection = Quaternion.AngleAxis(rotation, Vector3.forward) * Vector3.up;
+
+                edges_1[aKey] = newDirection.normalized * oldMagnitude;
+
+                rotation += angleBetweenAllEdges;
+            }
+
+            UpdatepositionsOfEdges(); //we have new directions so we must recalculate our positions because they are based on our directions
+        }
+        else
+            ; //follow custom outline rules
     }
 }
