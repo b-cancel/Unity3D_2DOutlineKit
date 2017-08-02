@@ -78,12 +78,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\changeValues.cs" />
     <Compile Include="Assets\objOutline\changeOutline2DSettingInInspector.cs" />
     <Compile Include="Assets\objOutline\outline2D.cs" />
     <Compile Include="Assets\refOutline\MOD\LinkedSet.cs" />
     <Compile Include="Assets\refOutline\MOD\Outline.cs" />
     <Compile Include="Assets\refOutline\MOD\OutlineManager.cs" />
     <Compile Include="Assets\shaderOutline\ultimate_2D_script.cs" />
+    <Compile Include="Assets\spriteSpecificScripts\outlines\outline_3\inspectorForOutline3.cs" />
+    <Compile Include="Assets\spriteSpecificScripts\outlines\outline_3\outline3.cs" />
     <Compile Include="Assets\Testing Assets\duplicator.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,29 +5,31 @@ using UnityEngine;
 public class duplicator : MonoBehaviour {
 
     public GameObject objToDuplicate;
+    int duplicateQuantity;
 
 	// Use this for initialization
-	void Start () {
-        StartCoroutine("testing");
+	void Awake () {
+        duplicateQuantity = 0;
 	}
-
-    IEnumerator testing()
-    {
-        int duplicateQuantity = 0;
-
-        while( 1 == 1)
-        {
-            Instantiate(objToDuplicate);
-
-            yield return new WaitForEndOfFrame();
-            duplicateQuantity++;
-
-            print("count: " + duplicateQuantity);
-        }
-    }
 
     void Update()
     {
-        print("fps: " + 1.0f / Time.deltaTime);
+        if(objToDuplicate != null)
+        {
+            float fps = 1.0f / Time.deltaTime;
+            if (fps < 5)
+                print("fps: " + fps + "----------!");
+            else
+                print("fps: " + fps);
+
+            if (Input.GetKey(KeyCode.Space) == false)
+            {
+                print(duplicateQuantity);
+
+                Instantiate(objToDuplicate);
+
+                duplicateQuantity++;
+            }
+        }
     }
 }
