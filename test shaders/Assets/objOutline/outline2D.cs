@@ -31,6 +31,9 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class outline2D : MonoBehaviour {
 
+    //-----Parent Child Relationship
+    public GameObject parentGOWithScript;
+
     //-----Variables for Used in Awake----- (currently NONE)
 
     //-----Variables for ALL Outlines-----

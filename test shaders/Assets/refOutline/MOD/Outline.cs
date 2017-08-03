@@ -7,7 +7,6 @@ using System.Linq;
 [DisallowMultipleComponent]
 
 [RequireComponent(typeof(Renderer))]
-
 public class Outline : MonoBehaviour
 {
     //--- references

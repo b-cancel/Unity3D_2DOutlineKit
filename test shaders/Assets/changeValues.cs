@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using objOutlines;
+
 public class changeValues : MonoBehaviour {
 
 	// Use this for initialization

@@ -78,6 +78,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\2DOutline\Scripts\AlwaysRotate.cs" />
+    <Compile Include="Assets\2DOutline\Scripts\AnimateSprite.cs" />
+    <Compile Include="Assets\2DOutline\Scripts\demo1.cs" />
+    <Compile Include="Assets\2DOutline\Scripts\Outline.cs" />
+    <Compile Include="Assets\2DOutline\Scripts\OutlineManager.cs" />
+    <Compile Include="Assets\AnimatedGifPlayer\Examples\Code Example\CodeExample.cs" />
+    <Compile Include="Assets\AnimatedGifPlayer\Examples\Mesh Renderer Example\MeshRendererExample.cs" />
+    <Compile Include="Assets\AnimatedGifPlayer\Scripts\AnimatedGifDecoder.cs" />
+    <Compile Include="Assets\AnimatedGifPlayer\Scripts\AnimatedGifPlayer.cs" />
     <Compile Include="Assets\changeValues.cs" />
     <Compile Include="Assets\objOutline\changeOutline2DSettingInInspector.cs" />
     <Compile Include="Assets\objOutline\outline2D.cs" />
@@ -90,6 +99,9 @@
     <Compile Include="Assets\Testing Assets\duplicator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\2DOutline\Resources\Mats\OutlineBufferShader.shader" />
+    <None Include="Assets\2DOutline\Resources\Mats\OutlineShader.shader" />
+    <None Include="Assets\AnimatedGifPlayer\readme.txt" />
     <None Include="Assets\refOutline\MOD\Resources\OutlineBufferCullOffShader.shader" />
     <None Include="Assets\refOutline\MOD\Resources\OutlineBufferShader.shader" />
     <None Include="Assets\refOutline\MOD\Resources\OutlineShader.shader" />
