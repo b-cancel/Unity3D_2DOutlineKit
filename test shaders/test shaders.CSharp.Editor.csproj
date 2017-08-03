@@ -138,8 +138,6 @@
     <Compile Include="Assets\AnimatedGifPlayer\Editor\AnimatedGifPlayerEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\2DOutline\Resources\Mats\OutlineBufferShader.shader" />
-    <None Include="Assets\2DOutline\Resources\Mats\OutlineShader.shader" />
     <None Include="Assets\AnimatedGifPlayer\readme.txt" />
     <None Include="Assets\refOutline\MOD\Resources\OutlineBufferCullOffShader.shader" />
     <None Include="Assets\refOutline\MOD\Resources\OutlineBufferShader.shader" />
