@@ -441,6 +441,7 @@ namespace objOutlines
         {
             if (updateSpriteEveryFrame)
             {
+                //update sprite overlay
                 copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
 
                 if (edges_1 != null)

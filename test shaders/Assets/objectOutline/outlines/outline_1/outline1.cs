@@ -10,7 +10,7 @@ namespace objOutlines
         GameObject Outline;
 
         [Range(1,2.5f)]
-        public float size;
+        public float size; //NOTE: this size is NOT world Space Size but rather scale applied to out "Outline" gameobject
 
         public bool followParent;
 

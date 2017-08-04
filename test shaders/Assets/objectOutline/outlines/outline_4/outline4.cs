@@ -297,7 +297,7 @@ namespace objOutlines
             }
         }
 
-        float size_O;
+        float size_O; //NOTE: this size refers to the world space thickness of the outline
         //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public float Size_O
         {
@@ -727,9 +727,6 @@ namespace objOutlines
             to.flipY = from.flipY;
             //MASK INTERACTION -> set elsewhere
             to.size = from.size;
-
-            print("x: " + to.size.x + " y: " + to.size.y);
-
             to.sprite = from.sprite;
             to.tileMode = from.tileMode;
 
