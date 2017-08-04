@@ -299,7 +299,8 @@ namespace objOutlines
             get { return objsMakingOutline_OPR; }
             set
             {
-                objsMakingOutline_OPR = (value >= 0) ? value : 0;//update local value
+                value = (value >= 0) ? value : 0;
+                objsMakingOutline_OPR = value;//update local value
                 if (gameObject.GetComponent<inspectorForOutline3>() != null)//update inspector value
                     gameObject.GetComponent<inspectorForOutline3>().objsMakingOutline_OPR = objsMakingOutline_OPR;
 

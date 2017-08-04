@@ -43,7 +43,7 @@ MonoBehaviour:
     y: 0
     width: 1920
     height: 997
-  m_MinSize: {x: 950, y: 300}
+  m_MinSize: {x: 950, y: 542}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &3
 MonoBehaviour:
@@ -105,10 +105,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 709, y: 492}
-  m_MaxSize: {x: 18004, y: 14042}
+  m_MinSize: {x: 713, y: 492}
+  m_MaxSize: {x: 18008, y: 14042}
   vertical: 1
-  controlID: 43
+  controlID: 9
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -129,10 +129,10 @@ MonoBehaviour:
     y: 0
     width: 1920
     height: 947
-  m_MinSize: {x: 709, y: 492}
-  m_MaxSize: {x: 18004, y: 14042}
+  m_MinSize: {x: 713, y: 492}
+  m_MaxSize: {x: 18008, y: 14042}
   vertical: 0
-  controlID: 44
+  controlID: 10
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -153,10 +153,10 @@ MonoBehaviour:
     y: 0
     width: 1324
     height: 947
-  m_MinSize: {x: 434, y: 492}
-  m_MaxSize: {x: 14004, y: 14042}
+  m_MinSize: {x: 436, y: 492}
+  m_MaxSize: {x: 14006, y: 14042}
   vertical: 1
-  controlID: 45
+  controlID: 11
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_MinSize: {x: 306, y: 221}
   m_MaxSize: {x: 8006, y: 4021}
   vertical: 0
-  controlID: 46
+  controlID: 12
 --- !u!114 &9
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -199,8 +199,8 @@ MonoBehaviour:
     y: 0
     width: 631
     height: 587
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 221}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
@@ -224,8 +224,8 @@ MonoBehaviour:
     y: 0
     width: 693
     height: 587
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 104, y: 121}
+  m_MaxSize: {x: 4004, y: 4021}
   m_ActualView: {fileID: 15}
   m_Panes:
   - {fileID: 15}
@@ -251,8 +251,8 @@ MonoBehaviour:
     y: 587
     width: 1324
     height: 360
-  m_MinSize: {x: 434, y: 271}
-  m_MaxSize: {x: 14004, y: 10021}
+  m_MinSize: {x: 436, y: 271}
+  m_MaxSize: {x: 14006, y: 10021}
   vertical: 0
   controlID: 70
 --- !u!114 &12
@@ -273,8 +273,8 @@ MonoBehaviour:
     y: 0
     width: 399
     height: 360
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 202, y: 221}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -324,8 +324,8 @@ MonoBehaviour:
     y: 0
     width: 596
     height: 947
-  m_MinSize: {x: 275, y: 50}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 277, y: 71}
+  m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 20}
   m_Panes:
   - {fileID: 20}
@@ -511,7 +511,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: cc60ffff1afcffff000000005e28000082280000
+    m_ExpandedIDs: 9e64feff1afcffff00000000f8270000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -572,19 +572,19 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/objectOutline/outlines/outline_3
+    - Assets/objectOutline/outlines/outline_4
   m_ViewMode: 1
   m_StartGridSize: 70
   m_LastFolders:
-  - Assets/objectOutline/outlines/outline_3
+  - Assets/objectOutline/outlines/outline_4
   m_LastFoldersGridSize: 70
   m_LastProjectPath: D:\GitHub\UnityOutline2DShaders\test shaders
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 8e270000
-    m_LastClickedID: 10126
-    m_ExpandedIDs: 000000006a2700007e270000882700009427000098270000c2280000c4280000c6280000c8280000ca280000cc280000ce280000d0280000d2280000d4280000d6280000d8280000da280000dc280000de280000e0280000e2280000e4280000e6280000e8280000ea280000ec280000ee280000f0280000f2280000f4280000f6280000f8280000fa280000fc280000fe280000002900000229000000ca9a3bffffff7f
+    m_SelectedIDs: 72270000
+    m_LastClickedID: 10098
+    m_ExpandedIDs: 000000006227000076270000802700008c27000090270000be280000c0280000c2280000c4280000c6280000c8280000ca280000cc280000ce280000d0280000d2280000d4280000d6280000d8280000da280000dc280000de280000e0280000e2280000e4280000e6280000e8280000ea280000ec280000ee280000f0280000f2280000f4280000f6280000f8280000fa280000fc280000fe28000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -612,7 +612,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000006a2700007e270000882700009427000098270000c2280000c4280000c6280000c8280000ca280000cc280000ce280000d0280000d2280000d4280000d6280000d8280000da280000dc280000de280000e0280000e2280000e4280000e6280000e8280000ea280000ec280000ee280000f0280000f2280000f4280000f6280000f8280000fa280000fc280000fe2800000029000002290000
+    m_ExpandedIDs: 000000006227000076270000802700008c27000090270000be280000c0280000c2280000c4280000c6280000c8280000ca280000cc280000ce280000d0280000d2280000d4280000d6280000d8280000da280000dc280000de280000e0280000e2280000e4280000e6280000e8280000ea280000ec280000ee280000f0280000f2280000f4280000f6280000f8280000fa280000fc280000fe280000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
