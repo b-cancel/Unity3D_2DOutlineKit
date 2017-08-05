@@ -13,6 +13,9 @@ using UnityEngine;
  *      OVERLAP -> IF obj A and obj B have oultines with Masks that affect different layers
  *          (and ofcourse the outlines are being clipped within their own perspective range)
  *          outline A will overlap outline B [If (outline A orderInLayer) > (outline B orderInLayer)]
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
  * 
  * NOTE: Duplication of the Object in (Edit -or- Play) Mode will create the object but with all the DEFAULT outline settings
  * 
@@ -29,9 +32,16 @@ using UnityEngine;
  * NOTE: use the code sniplet below if you want to pass other variables to your children
  * Currently we only pass (1) Sprite Overlay, AND, (2) Basic Outline Data 
  * 
-    //TODO... reconfigure to work with any of our 6 scripts
-        foreach (GameObject child in children)
-            child.GetComponent<outline3>().PropertyFromChild = variableFromParent;
+    for (int i = 0; i < children.Count; i++)
+    {
+        if (children[i] != null)
+            children[i].GetComponent<outline4>().Active_SO = active_SO;
+        else
+        {
+            children.RemoveAt(i);
+            i--;
+        }
+    }
  * 
  * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline then the overlay will also be semi transparent
  *               in areas where the outline is semitransparent the opacities might no be the same
@@ -463,9 +473,13 @@ namespace objOutlines
 
             //---Children
             children = new List<GameObject>();
-            if(parentGOWithScript != null)
-                if (parentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<outline3>().children.Add(this.gameObject);
+            if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
+            {
+                if (parentGOWithScript.GetComponent<outline4>().children.Contains(this.gameObject) == false)
+                    parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);
+            }
+            else
+                parentGOWithScript = null;
 
             //*****Set Variable Defaults*****
 
@@ -543,7 +557,7 @@ namespace objOutlines
                         prevParentGOWithScript.GetComponent<outline3>().children.Remove(this.gameObject);
 
                 //make ties with new parent
-                if (parentGOWithScript != null)
+                if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
                 {
                     if (parentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == false)
                     {
@@ -551,6 +565,8 @@ namespace objOutlines
                         parentGOWithScript.GetComponent<outline3>().updateUniversalVars();
                     }
                 }
+                else
+                    parentGOWithScript = null;
             }
             prevParentGOWithScript = parentGOWithScript;
         }

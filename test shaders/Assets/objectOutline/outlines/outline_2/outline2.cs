@@ -2,6 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/*
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
+ 
+    for (int i = 0; i < children.Count; i++)
+    {
+        if (children[i] != null)
+            children[i].GetComponent<outline4>().Active_SO = active_SO;
+        else
+        {
+            children.RemoveAt(i);
+            i--;
+        }
+    }
+ */
+
 namespace objOutlines
 {
     [ExecuteInEditMode]
@@ -421,11 +438,15 @@ namespace objOutlines
             clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
             clippingMask.transform.parent = outlineGameObjectsFolder.transform;
 
-            //-----Children
+            //---Children
             children = new List<GameObject>();
-            if (parentGOWithScript != null)
-                if (parentGOWithScript.GetComponent<outline2>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<outline2>().children.Add(this.gameObject);
+            if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
+            {
+                if (parentGOWithScript.GetComponent<outline4>().children.Contains(this.gameObject) == false)
+                    parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);
+            }
+            else
+                parentGOWithScript = null;
 
             //*****Set Variable Defaults*****
 
@@ -498,14 +519,16 @@ namespace objOutlines
                         prevParentGOWithScript.GetComponent<outline2>().children.Remove(this.gameObject);
 
                 //make ties with new parent
-                if (parentGOWithScript != null)
+                if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
                 {
                     if (parentGOWithScript.GetComponent<outline2>().children.Contains(this.gameObject) == false)
                     {
-                        parentGOWithScript.GetComponent<outline1>().children.Add(this.gameObject);
+                        parentGOWithScript.GetComponent<outline2>().children.Add(this.gameObject);
                         parentGOWithScript.GetComponent<outline2>().updateUniversalVars();
                     }
                 }
+                else
+                    parentGOWithScript = null;
             }
             prevParentGOWithScript = parentGOWithScript;
         }

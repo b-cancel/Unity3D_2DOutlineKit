@@ -33,9 +33,16 @@ using UnityEngine;
  * NOTE: use the code sniplet below if you want to pass other variables to your children
  * Currently we only pass (1) Sprite Overlay, AND, (2) Basic Outline Data 
  * 
-    //TODO... reconfigure to work with any of our 6 scripts
-        foreach (GameObject child in children)
-            child.GetComponent<outline4>().PropertyFromChild = variableFromParent;
+    for (int i = 0; i < children.Count; i++)
+    {
+        if (children[i] != null)
+            children[i].GetComponent<outline4>().Active_SO = active_SO;
+        else
+        {
+            children.RemoveAt(i);
+            i--;
+        }
+    } 
  * 
  * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline then the overlay will also be semi transparent
  *               in areas where the outline is semitransparent the opacities might no be the same
