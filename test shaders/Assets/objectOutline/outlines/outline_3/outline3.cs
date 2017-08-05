@@ -96,8 +96,16 @@ namespace objOutlines
                 spriteOverlay.SetActive(active_SO);
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().Active_SO = active_SO;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().Active_SO = active_SO;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -114,8 +122,16 @@ namespace objOutlines
                 spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_SO;
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().OrderInLayer_SO = orderInLayer_SO;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().OrderInLayer_SO = orderInLayer_SO;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -132,8 +148,16 @@ namespace objOutlines
                 spriteOverlay.GetComponent<SpriteRenderer>().color = color_SO;
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().Color_SO = color_SO;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().Color_SO = color_SO;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -158,8 +182,16 @@ namespace objOutlines
                         entry.Key.SetActive(active_O);
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().Active_O = active_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().Active_O = active_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -181,8 +213,16 @@ namespace objOutlines
                         dictVal.Key.GetComponent<SpriteRenderer>().color = color_O;
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().Color_O = color_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().Color_O = color_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -202,8 +242,16 @@ namespace objOutlines
                         dictVal.Key.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().OrderInLayer_O = orderInLayer_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().OrderInLayer_O = orderInLayer_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -221,8 +269,16 @@ namespace objOutlines
                 UpdatepositionsOfEdges();
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().Size_O = size_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().Size_O = size_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -240,8 +296,16 @@ namespace objOutlines
                 UpdatepositionsOfEdges();
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().ScaleWithParentX_O = scaleWithParentX_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().ScaleWithParentX_O = scaleWithParentX_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -259,8 +323,16 @@ namespace objOutlines
                 UpdatepositionsOfEdges();
 
                 //TODO... reconfigure to work with any of our 6 scripts
-                foreach (GameObject child in children)
-                    child.GetComponent<outline3>().ScaleWithParentY_O = scaleWithParentY_O;
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                        children[i].GetComponent<outline3>().ScaleWithParentY_O = scaleWithParentY_O;
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
         }
 
@@ -450,21 +522,54 @@ namespace objOutlines
                         copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
             }
 
-            //--- parent child relationship
+            //---Clear Children we no longer need
 
-            if(parentGOWithScript != prevParentGOWithScript) //if we change parents
+            for (int i = 0; i < children.Count; i++)
+            {
+                if (children[i] == null)
+                {
+                    children.RemoveAt(i);
+                    i--;
+                }
+            }
+
+            //---parent child relationship
+
+            if (parentGOWithScript != prevParentGOWithScript) //if we change parents
             {
                 //TODO... reconfigure to work with any of our 6 scripts
-                if (parentGOWithScript != null) //If we had a parent... break all ties with them
-                    if(prevParentGOWithScript != null)
-                        if (prevParentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == true)
-                            prevParentGOWithScript.GetComponent<outline3>().children.Remove(this.gameObject);
+                if (prevParentGOWithScript != null) //If we had a parent... break all ties with them
+                    if (prevParentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == true)
+                        prevParentGOWithScript.GetComponent<outline3>().children.Remove(this.gameObject);
 
                 //make ties with new parent
-                if (parentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<outline3>().children.Add(this.gameObject);
+                if (parentGOWithScript != null)
+                {
+                    if (parentGOWithScript.GetComponent<outline3>().children.Contains(this.gameObject) == false)
+                    {
+                        parentGOWithScript.GetComponent<outline3>().children.Add(this.gameObject);
+                        parentGOWithScript.GetComponent<outline3>().updateUniversalVars();
+                    }
+                }
             }
             prevParentGOWithScript = parentGOWithScript;
+        }
+
+        //Update the Variables shared by all outline types
+        public void updateUniversalVars()
+        {
+            //--- Sprite Overlay
+            Active_SO = Active_SO;
+            OrderInLayer_SO = OrderInLayer_SO;
+            Color_SO = Color_SO;
+
+            //----- Outline
+            Active_O = Active_O;
+            Color_O = Color_O;
+            OrderInLayer_O = OrderInLayer_O; //by default behind
+            Size_O = Size_O;
+            ScaleWithParentX_O = ScaleWithParentX_O;
+            ScaleWithParentY_O = ScaleWithParentY_O;
         }
 
         void UpdatepositionsOfEdges()

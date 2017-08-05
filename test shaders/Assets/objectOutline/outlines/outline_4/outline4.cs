@@ -13,6 +13,10 @@ using UnityEngine;
  *      OVERLAP -> IF obj A and obj B have oultines with Masks that affect different layers
  *          (and ofcourse the outlines are being clipped within their own perspective range)
  *          outline A will overlap outline B [If (outline A orderInLayer) > (outline B orderInLayer)]
+ *          
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
  * 
  * NOTE: Duplication of the Object in (Edit -or- Play) Mode will create the object but with all the DEFAULT outline settings
  * 
@@ -561,9 +565,13 @@ namespace objOutlines
 
             //---Children
             children = new List<GameObject>();
-            if (parentGOWithScript != null)
+            if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
+            {
                 if (parentGOWithScript.GetComponent<outline4>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);    
+                    parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);
+            }
+            else
+                parentGOWithScript = null;
 
             //*****Set Variable Defaults*****
 
@@ -655,14 +663,16 @@ namespace objOutlines
                         prevParentGOWithScript.GetComponent<outline4>().children.Remove(this.gameObject);
 
                 //make ties with new parent
-                if (parentGOWithScript != null)
+                if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
                 {
                     if (parentGOWithScript.GetComponent<outline4>().children.Contains(this.gameObject) == false)
                     {
                         parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);
                         parentGOWithScript.GetComponent<outline4>().updateUniversalVars();
-                    }    
-                }  
+                    }
+                }
+                else
+                    parentGOWithScript = null;  
             }
             prevParentGOWithScript = parentGOWithScript;
         }
