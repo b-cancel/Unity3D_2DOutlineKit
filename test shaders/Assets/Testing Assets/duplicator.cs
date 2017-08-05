@@ -7,28 +7,46 @@ public class duplicator : MonoBehaviour {
     public GameObject objToDuplicate;
     int duplicateQuantity;
 
+    int counter;
+
 	// Use this for initialization
 	void Awake () {
+        counter = 0;
         duplicateQuantity = 0;
 	}
 
+    
     void Update()
     {
         if(objToDuplicate != null)
         {
-            float fps = 1.0f / Time.deltaTime;
-            if (fps < 5)
-                print("fps: " + fps + "----------!");
-            else
-                print("fps: " + fps);
-
-            if (Input.GetKey(KeyCode.Space) == false)
+            if (counter < 15)
             {
-                print(duplicateQuantity);
+                float fps = 1.0f / Time.deltaTime;
+                if (fps < 15)
+                {
+                    print("fps: " + fps + "----------!");
+                    counter++;
+                }
+                else
+                {
+                    print("fps: " + fps);
+                    counter = 0;
+                }
 
-                Instantiate(objToDuplicate);
+                if (Input.GetKey(KeyCode.Space) == false)
+                {
+                    print(duplicateQuantity);
 
-                duplicateQuantity++;
+                    Instantiate(objToDuplicate);
+
+                    duplicateQuantity++;
+                }
+            }
+            else
+            {
+                print("done with: " + duplicateQuantity);
+                Time.timeScale = 0;
             }
         }
     }

@@ -85,21 +85,16 @@
     <Compile Include="Assets\2DOutline\Scripts\OutlineManager.cs" />
     <Compile Include="Assets\anims\Scripts\SpriteOutline.cs" />
     <Compile Include="Assets\Multi-part Outline\Plugins\SpriteOutline\SpriteOutline.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_1\inspectorForOutline1.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_1\outline1.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_2\inspectorForOutline2.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_2\outline2.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_3\inspectorForOutline3.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_3\outline3.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_4\inspectorForOutline4.cs" />
-    <Compile Include="Assets\objectOutline\outlines\outline_4\outline4.cs" />
+    <Compile Include="Assets\objectOutline\outlines\ConcaveSpriteOutline\concaveOutline.cs" />
+    <Compile Include="Assets\objectOutline\outlines\ConcaveSpriteOutline\inspectorForConcaveOutline.cs" />
+    <Compile Include="Assets\objectOutline\outlines\ConvexSpriteOutline\convexOutline.cs" />
+    <Compile Include="Assets\objectOutline\outlines\ConvexSpriteOutline\inspectorForConvexOutline.cs" />
     <Compile Include="Assets\OutlineEffect\Demo\OutlineAnimation.cs" />
     <Compile Include="Assets\OutlineEffect\Demo\Rotate.cs" />
     <Compile Include="Assets\OutlineEffect\Demo\Toggle.cs" />
     <Compile Include="Assets\OutlineEffect\LinkedSet.cs" />
     <Compile Include="Assets\OutlineEffect\Outline.cs" />
     <Compile Include="Assets\OutlineEffect\OutlineEffect.cs" />
-    <Compile Include="Assets\Testing Assets\changeValues.cs" />
     <Compile Include="Assets\Testing Assets\duplicator.cs" />
   </ItemGroup>
   <ItemGroup>

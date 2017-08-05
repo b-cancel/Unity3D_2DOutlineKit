@@ -22,7 +22,7 @@ using UnityEngine;
 namespace objOutlines
 {
     [ExecuteInEditMode]
-    public class outline2 : MonoBehaviour
+    public class convexOutline : MonoBehaviour
     {
         //-----parent child reltionship
 
@@ -50,8 +50,8 @@ namespace objOutlines
             set
             {
                 showOutline_GOs_InHierarchy_D = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().showOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().showOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
 
                 if (showOutline_GOs_InHierarchy_D)
                     outlineGameObjectsFolder.hideFlags = HideFlags.None;
@@ -71,8 +71,8 @@ namespace objOutlines
             set
             {
                 active_SO = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().active_SO = active_SO;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().active_SO = active_SO;
 
                 spriteOverlay.SetActive(active_SO);
 
@@ -80,7 +80,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().Active_SO = active_SO;
+                        children[i].GetComponent<convexOutline>().Active_SO = active_SO;
                     else
                     {
                         children.RemoveAt(i);
@@ -97,8 +97,8 @@ namespace objOutlines
             set
             {
                 orderInLayer_SO = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().orderInLayer_SO = orderInLayer_SO;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().orderInLayer_SO = orderInLayer_SO;
 
                 spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_SO;
 
@@ -106,7 +106,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().OrderInLayer_SO = orderInLayer_SO;
+                        children[i].GetComponent<convexOutline>().OrderInLayer_SO = orderInLayer_SO;
                     else
                     {
                         children.RemoveAt(i);
@@ -123,8 +123,8 @@ namespace objOutlines
             set
             {
                 color_SO = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().color_SO = color_SO;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().color_SO = color_SO;
 
                 spriteOverlay.GetComponent<SpriteRenderer>().color = color_SO;
 
@@ -132,7 +132,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().Color_SO = color_SO;
+                        children[i].GetComponent<convexOutline>().Color_SO = color_SO;
                     else
                     {
                         children.RemoveAt(i);
@@ -153,8 +153,8 @@ namespace objOutlines
             set
             {
                 clipCenter_CM = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline4>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline4>().clipCenter_CM = clipCenter_CM;
+                if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConcaveOutline>().clipCenter_CM = clipCenter_CM;
 
                 //enable or disable mask
                 clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
@@ -174,8 +174,8 @@ namespace objOutlines
             set
             {
                 alphaCutoff_CM = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline4>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline4>().alphaCutoff_CM = alphaCutoff_CM;
+                if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConcaveOutline>().alphaCutoff_CM = alphaCutoff_CM;
 
                 clippingMask.GetComponent<SpriteMask>().alphaCutoff = alphaCutoff_CM;
             }
@@ -188,8 +188,8 @@ namespace objOutlines
             set
             {
                 customRange_CM = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline4>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline4>().customRange_CM = customRange_CM;
+                if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConcaveOutline>().customRange_CM = customRange_CM;
 
                 clippingMask.GetComponent<SpriteMask>().isCustomRangeActive = customRange_CM;
             }
@@ -202,8 +202,8 @@ namespace objOutlines
             set
             {
                 frontLayer_CM = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline4>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline4>().frontLayer_CM = frontLayer_CM;
+                if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConcaveOutline>().frontLayer_CM = frontLayer_CM;
 
                 clippingMask.GetComponent<SpriteMask>().frontSortingLayerID = frontLayer_CM;
             }
@@ -216,8 +216,8 @@ namespace objOutlines
             set
             {
                 backLayer_CM = value; //update local value
-                if (gameObject.GetComponent<inspectorForOutline4>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline4>().backLayer_CM = backLayer_CM;
+                if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConcaveOutline>().backLayer_CM = backLayer_CM;
 
                 clippingMask.GetComponent<SpriteMask>().backSortingLayerID = backLayer_CM;
             }
@@ -235,8 +235,8 @@ namespace objOutlines
             set
             {
                 active_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().active_O = active_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().active_O = active_O;
 
                 outlineGO.SetActive(active_O);
 
@@ -244,7 +244,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().Active_O = active_O;
+                        children[i].GetComponent<convexOutline>().Active_O = active_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -263,8 +263,8 @@ namespace objOutlines
             set
             {
                 color_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().color_O = color_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().color_O = color_O;
 
                 outlineGO.GetComponent<SpriteRenderer>().color = color_O;
 
@@ -272,7 +272,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().Color_O = color_O;
+                        children[i].GetComponent<convexOutline>().Color_O = color_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -289,8 +289,8 @@ namespace objOutlines
             set
             {
                 orderInLayer_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().orderInLayer_O = orderInLayer_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().orderInLayer_O = orderInLayer_O;
 
                 outlineGO.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
 
@@ -298,7 +298,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().OrderInLayer_O = orderInLayer_O;
+                        children[i].GetComponent<convexOutline>().OrderInLayer_O = orderInLayer_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -317,8 +317,8 @@ namespace objOutlines
             {
                 value = (value >= 1) ? value : 1;
                 size_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().size_O = size_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().size_O = size_O;
 
                 updateOutline();
 
@@ -326,7 +326,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().Size_O = size_O;
+                        children[i].GetComponent<convexOutline>().Size_O = size_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -344,8 +344,8 @@ namespace objOutlines
             set
             {
                 scaleWithParentX_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().scaleWithParentX_O = scaleWithParentX_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().scaleWithParentX_O = scaleWithParentX_O;
 
                 updateOutline();
 
@@ -353,7 +353,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().ScaleWithParentX_O = scaleWithParentX_O;
+                        children[i].GetComponent<convexOutline>().ScaleWithParentX_O = scaleWithParentX_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -371,8 +371,8 @@ namespace objOutlines
             set
             {
                 scaleWithParentY_O = value;//update local value
-                if (gameObject.GetComponent<inspectorForOutline2>() != null)//update inspector value
-                    gameObject.GetComponent<inspectorForOutline2>().scaleWithParentY_O = scaleWithParentY_O;
+                if (gameObject.GetComponent<inspectorForConvexOutline>() != null)//update inspector value
+                    gameObject.GetComponent<inspectorForConvexOutline>().scaleWithParentY_O = scaleWithParentY_O;
 
                 updateOutline();
 
@@ -380,7 +380,7 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<outline2>().ScaleWithParentY_O = scaleWithParentY_O;
+                        children[i].GetComponent<convexOutline>().ScaleWithParentY_O = scaleWithParentY_O;
                     else
                     {
                         children.RemoveAt(i);
@@ -442,8 +442,8 @@ namespace objOutlines
             children = new List<GameObject>();
             if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
             {
-                if (parentGOWithScript.GetComponent<outline4>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<outline4>().children.Add(this.gameObject);
+                if (parentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == false)
+                    parentGOWithScript.GetComponent<concaveOutline>().children.Add(this.gameObject);
             }
             else
                 parentGOWithScript = null;
@@ -460,13 +460,13 @@ namespace objOutlines
 
             //--- Sprite Overlay
 
-            Active_SO = true;
+            Active_SO = false;
             OrderInLayer_SO = this.GetComponent<SpriteRenderer>().sortingOrder + 1; //by default in front
             Color_SO = new Color(0, 0, 1, .5f);
 
             //--- Clipping Mask
 
-            ClipCenter_CM = true;
+            ClipCenter_CM = false;
             AlphaCutoff_CM = .25f;
 
             CustomRange_CM = false;
@@ -515,16 +515,16 @@ namespace objOutlines
             {
                 //TODO... reconfigure to work with any of our 6 scripts
                 if (prevParentGOWithScript != null) //If we had a parent... break all ties with them
-                    if (prevParentGOWithScript.GetComponent<outline2>().children.Contains(this.gameObject) == true)
-                        prevParentGOWithScript.GetComponent<outline2>().children.Remove(this.gameObject);
+                    if (prevParentGOWithScript.GetComponent<convexOutline>().children.Contains(this.gameObject) == true)
+                        prevParentGOWithScript.GetComponent<convexOutline>().children.Remove(this.gameObject);
 
                 //make ties with new parent
                 if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
                 {
-                    if (parentGOWithScript.GetComponent<outline2>().children.Contains(this.gameObject) == false)
+                    if (parentGOWithScript.GetComponent<convexOutline>().children.Contains(this.gameObject) == false)
                     {
-                        parentGOWithScript.GetComponent<outline2>().children.Add(this.gameObject);
-                        parentGOWithScript.GetComponent<outline2>().updateUniversalVars();
+                        parentGOWithScript.GetComponent<convexOutline>().children.Add(this.gameObject);
+                        parentGOWithScript.GetComponent<convexOutline>().updateUniversalVars();
                     }
                 }
                 else
