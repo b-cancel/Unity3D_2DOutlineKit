@@ -86,17 +86,11 @@
     <Compile Include="Assets\objectOutline\outlines\outline_3\outline3.cs" />
     <Compile Include="Assets\objectOutline\outlines\outline_4\inspectorForOutline4.cs" />
     <Compile Include="Assets\objectOutline\outlines\outline_4\outline4.cs" />
-    <Compile Include="Assets\refSHADERoutline\MOD\LinkedSet.cs" />
-    <Compile Include="Assets\refSHADERoutline\MOD\Outline.cs" />
-    <Compile Include="Assets\refSHADERoutline\MOD\OutlineManager.cs" />
     <Compile Include="Assets\shaderOutline\ultimate_2D_script.cs" />
     <Compile Include="Assets\Testing Assets\changeValues.cs" />
     <Compile Include="Assets\Testing Assets\duplicator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\refSHADERoutline\MOD\Resources\OutlineBufferCullOffShader.shader" />
-    <None Include="Assets\refSHADERoutline\MOD\Resources\OutlineBufferShader.shader" />
-    <None Include="Assets\refSHADERoutline\MOD\Resources\OutlineShader.shader" />
     <None Include="Assets\shaderOutline\Ultimate_2D_Outline.shader" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

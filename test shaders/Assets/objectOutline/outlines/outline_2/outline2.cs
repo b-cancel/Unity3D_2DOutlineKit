@@ -305,7 +305,7 @@ namespace objOutlines
         {
             //----------Cover Duplication Problem
 
-            Transform psblOF_T = this.transform.Find("Our Outline");
+            Transform psblOF_T = this.transform.Find("Outline Folder");
             if (psblOF_T != null) //transform found
             {
                 GameObject psblOF_GO = psblOF_T.gameObject;
@@ -373,7 +373,7 @@ namespace objOutlines
 
             //--- Clipping Mask
 
-            ClipCenter_CM = false;
+            ClipCenter_CM = true;
             AlphaCutoff_CM = .25f;
 
             CustomRange_CM = false;
@@ -386,7 +386,7 @@ namespace objOutlines
 
             Color_O = Color.blue;
             OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-            Size_O = .1f;
+            Size_O = 1.25f;
             ScaleWithParentX_O = false;
             ScaleWithParentY_O = false;
         }

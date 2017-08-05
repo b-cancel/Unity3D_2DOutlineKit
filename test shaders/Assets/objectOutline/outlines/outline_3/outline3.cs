@@ -429,9 +429,9 @@ namespace objOutlines
 
             //regular
 
-            ObjsMakingOutline_OPR = 4;
+            ObjsMakingOutline_OPR = 8;
             StartAngle_OPR = 0;
-            RadialPush_OPR = true;
+            RadialPush_OPR = false;
 
             //custom
 
