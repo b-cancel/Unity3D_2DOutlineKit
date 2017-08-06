@@ -8,6 +8,8 @@ namespace objOutlines
     [ExecuteInEditMode]
     public class inspectorForConvexOutline : MonoBehaviour
     {
+        [Header("Do you Change Sprite Setting In Runtime?")]
+        public bool updateSpriteEveryFrame;
 
         //-----Variables for Used in Awake-----
 
@@ -60,6 +62,8 @@ namespace objOutlines
         {
             //--- Grab Defaults Set in the Master Outline Script
 
+            updateSpriteEveryFrame = gameObject.GetComponent<convexOutline>().UpdateSpriteEveryFrame;
+
             //---Debugging Variables
 
             showOutline_GOs_InHierarchy_D = gameObject.GetComponent<convexOutline>().ShowOutline_GOs_InHierarchy_D;
@@ -91,6 +95,9 @@ namespace objOutlines
 
         void Update()
         {
+            if (updateSpriteEveryFrame != gameObject.GetComponent<convexOutline>().UpdateSpriteEveryFrame)
+                gameObject.GetComponent<convexOutline>().UpdateSpriteEveryFrame = updateSpriteEveryFrame;
+
             //---Debugging Variables
 
             if (showOutline_GOs_InHierarchy_D != gameObject.GetComponent<convexOutline>().ShowOutline_GOs_InHierarchy_D)

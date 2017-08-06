@@ -3,6 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
+ 
+    //TODO... reconfigure to work with any of our 6 scripts
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().Active_SO = active_SO;
+                    }
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
+                }
+ */
+
+/*
  * Programmer: Bryan Cancel
  * Last Updated: 8/3/17
  * 
@@ -64,8 +87,12 @@ namespace objOutlines
 
         //--- Optimization
 
-        [Header("Suggested Off Unless you switch the sprite on runtime (animations do this)")]
-        public bool updateSpriteEveryFrame;
+        bool updateSpriteEveryFrame;
+        public bool UpdateSpriteEveryFrame
+        {
+            get { return updateSpriteEveryFrame; }
+            set { updateSpriteEveryFrame = value; }
+        }
 
         //-----Variables for Used in Awake----- (currently NONE)
 
@@ -111,7 +138,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
+                    {
+                        if(children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().Active_SO = active_SO;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -137,7 +169,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().OrderInLayer_SO = orderInLayer_SO;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().OrderInLayer_SO = orderInLayer_SO;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().OrderInLayer_SO = orderInLayer_SO;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -163,7 +200,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().Color_SO = color_SO;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().Color_SO = color_SO;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().Color_SO = color_SO;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -202,6 +244,23 @@ namespace objOutlines
                     if (edges_1 != null)
                         foreach (KeyValuePair<GameObject, Vector2> dictVal in edges_1)
                             dictVal.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                }
+
+                //TODO... reconfigure to work with any of our 6 scripts
+                for (int i = 0; i < children.Count; i++)
+                {
+                    if (children[i] != null)
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().ClipCenter_CM = clipCenter_CM;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().ClipCenter_CM = clipCenter_CM;
+                    }
+                    else
+                    {
+                        children.RemoveAt(i);
+                        i--;
+                    }
                 }
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
@@ -287,7 +346,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().Active_O = active_O;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().Active_O = active_O;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().Active_O = active_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -318,7 +382,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().Color_O = color_O;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().Color_O = color_O;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().Color_O = color_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -347,7 +416,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().OrderInLayer_O = orderInLayer_O;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().OrderInLayer_O = orderInLayer_O;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().OrderInLayer_O = orderInLayer_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -364,6 +438,9 @@ namespace objOutlines
             get { return size_O; }
             set
             {
+                float oldSize = size_O;
+
+                value = (value >= 0) ? value : 1;
                 size_O = value;//update local value
                 if (gameObject.GetComponent<inspectorForConcaveOutline>() != null)//update inspector value
                     gameObject.GetComponent<inspectorForConcaveOutline>().size_O = size_O;
@@ -374,7 +451,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().Size_O = size_O;
+                    {
+                        if (children[i].GetComponent<convexOutline>() != null) //different outline type
+                            children[i].GetComponent<convexOutline>().Size_O = (oldSize * size_O) / children[i].GetComponent<convexOutline>().Size_O;
+                        else if (children[i].GetComponent<concaveOutline>() != null) //same outline type
+                            children[i].GetComponent<concaveOutline>().Size_O = size_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -401,7 +483,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().ScaleWithParentX_O = scaleWithParentX_O;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().ScaleWithParentX_O = scaleWithParentX_O;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().ScaleWithParentX_O = scaleWithParentX_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -428,7 +515,12 @@ namespace objOutlines
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] != null)
-                        children[i].GetComponent<concaveOutline>().ScaleWithParentY_O = scaleWithParentY_O;
+                    {
+                        if (children[i].GetComponent<concaveOutline>() != null)
+                            children[i].GetComponent<concaveOutline>().ScaleWithParentY_O = scaleWithParentY_O;
+                        if (children[i].GetComponent<convexOutline>() != null)
+                            children[i].GetComponent<convexOutline>().ScaleWithParentY_O = scaleWithParentY_O;
+                    }
                     else
                     {
                         children.RemoveAt(i);
@@ -574,8 +666,16 @@ namespace objOutlines
             children = new List<GameObject>();
             if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
             {
-                if (parentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == false)
-                    parentGOWithScript.GetComponent<concaveOutline>().children.Add(this.gameObject);
+                if (parentGOWithScript.GetComponent<concaveOutline>() != null)
+                {
+                    if (parentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == false)
+                        parentGOWithScript.GetComponent<concaveOutline>().children.Add(this.gameObject);
+                }
+                else if (parentGOWithScript.GetComponent<convexOutline>() != null)
+                {
+                    if (parentGOWithScript.GetComponent<convexOutline>().children.Contains(this.gameObject) == false)
+                        parentGOWithScript.GetComponent<convexOutline>().children.Add(this.gameObject);
+                }
             }
             else
                 parentGOWithScript = null;
@@ -584,7 +684,7 @@ namespace objOutlines
 
             //--- Optimization
 
-            updateSpriteEveryFrame = true;
+            UpdateSpriteEveryFrame = true;
 
             //----- Debugging
 
@@ -636,7 +736,7 @@ namespace objOutlines
         {
             //---Sprite Updating
 
-            if (updateSpriteEveryFrame)
+            if (UpdateSpriteEveryFrame)
             {
                 //update sprite overlay
                 copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
@@ -666,20 +766,43 @@ namespace objOutlines
             {
                 //TODO... reconfigure to work with any of our 6 scripts
                 if (prevParentGOWithScript != null) //If we had a parent... break all ties with them
-                    if (prevParentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == true)
-                        prevParentGOWithScript.GetComponent<concaveOutline>().children.Remove(this.gameObject);
+                {
+                    if (parentGOWithScript.GetComponent<convexOutline>() != null)
+                    {
+                        if (prevParentGOWithScript.GetComponent<convexOutline>().children.Contains(this.gameObject) == true)
+                            prevParentGOWithScript.GetComponent<convexOutline>().children.Remove(this.gameObject);
+                    }
+                    else if (parentGOWithScript.GetComponent<concaveOutline>() != null)
+                    {
+                        if (prevParentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == true)
+                            prevParentGOWithScript.GetComponent<concaveOutline>().children.Remove(this.gameObject);
+                    }
+                }
 
                 //make ties with new parent
                 if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
                 {
-                    if (parentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == false)
+                    if (parentGOWithScript.GetComponent<concaveOutline>() != null)
                     {
-                        parentGOWithScript.GetComponent<concaveOutline>().children.Add(this.gameObject);
-                        parentGOWithScript.GetComponent<concaveOutline>().updateUniversalVars();
+                        if (parentGOWithScript.GetComponent<concaveOutline>().children.Contains(this.gameObject) == false)
+                        {
+                            parentGOWithScript.GetComponent<concaveOutline>().children.Add(this.gameObject);
+                            parentGOWithScript.GetComponent<concaveOutline>().updateUniversalVars();
+                        }
+
+                    }
+                    else if (parentGOWithScript.GetComponent<convexOutline>() != null)
+                    {
+                        if (parentGOWithScript.GetComponent<convexOutline>().children.Contains(this.gameObject) == false)
+                        {
+                            parentGOWithScript.GetComponent<convexOutline>().children.Add(this.gameObject);
+                            parentGOWithScript.GetComponent<convexOutline>().updateUniversalVars();
+                        }
+
                     }
                 }
                 else
-                    parentGOWithScript = null;  
+                    parentGOWithScript = null;
             }
             prevParentGOWithScript = parentGOWithScript;
         }
