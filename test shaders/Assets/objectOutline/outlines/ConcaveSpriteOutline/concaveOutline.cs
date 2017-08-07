@@ -1,31 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-/*
- * NOTE: 
- * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
- * [ELSE] (dont let them because you are their parent)
- 
-    //TODO... reconfigure to work with any of our 6 scripts
-                for (int i = 0; i < children.Count; i++)
-                {
-                    if (children[i] != null)
-                    {
-                        if (children[i].GetComponent<concaveOutline>() != null)
-                            children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
-                        if (children[i].GetComponent<convexOutline>() != null)
-                            children[i].GetComponent<convexOutline>().Active_SO = active_SO;
-                    }
-                    else
-                    {
-                        children.RemoveAt(i);
-                        i--;
-                    }
-                }
- */
-
-/*
+﻿/*
  * Programmer: Bryan Cancel
  * Last Updated: 8/3/17
  * 
@@ -53,24 +26,41 @@ using UnityEngine;
  *          
  * NOTE: children must not have an inspector helper script... or they will not follow their parent properly     
  * 
- * NOTE: use the code sniplet below if you want to pass other variables to your children
- * Currently we only pass (1) Sprite Overlay, AND, (2) Basic Outline Data 
- * 
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
+ *
+ * Currently we only pass (1) Sprite Overlay, AND, (2) Basic Outline Data (3) Clipping Mask [on/off] to our children
+ * NOTE: use code sniplet below in variable set area to pass that variable value to your children
+ *          Keep in Mind the Concave and Convex Outline Types dont share all the variables
+ *          I Considered most of the settings they dont share sprite specific
+    
     for (int i = 0; i < children.Count; i++)
     {
         if (children[i] != null)
-            children[i].GetComponent<outline4>().Active_SO = active_SO;
+        {
+            if (children[i].GetComponent<concaveOutline>() != null)
+                children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
+            if (children[i].GetComponent<convexOutline>() != null)
+                children[i].GetComponent<convexOutline>().Active_SO = active_SO;
+        }
         else
         {
             children.RemoveAt(i);
             i--;
         }
-    } 
+    }
+ * 
+ * NOTE: for the outline to work properly with an animation, you must set the "Animator" "Update Mode" to "Animate Physics"
  * 
  * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline then the overlay will also be semi transparent
  *               in areas where the outline is semitransparent the opacities might no be the same
  * SOLUTION 1: use shader that grabs the silhouette of the sprite as a solid color regardless of semi transparency and use that... (I wasn't able to find said shader... and I dont know HLSL)
  */
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace objOutlines
 {

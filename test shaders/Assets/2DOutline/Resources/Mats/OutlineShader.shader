@@ -6,7 +6,6 @@ Shader "Hidden/OutlineEffect"
 	{
 		_MainTex ("Base (RGB)", 2D) = "white" {}
 		_LineColor ("Line Color", Color) = (1,1,1,.5)
-		
 	}
 	SubShader 
 	{

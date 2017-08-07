@@ -1,29 +1,66 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-/*
+﻿/*
+ * Programmer: Bryan Cancel
+ * Last Updated: 8/3/17
+ * 
+ * FUSE -vs- OVERLAP
+ *      *This Refers to object A and object B that have their own respective outlines
+ *      FUSE -> by DEFAULT outline A will "Interact" with outline B... 
+ *          so it seems like object A and object B are merging into 1 sprite
+ *      OVERLAP -> IF obj A and obj B have oultines with Masks that affect different layers
+ *          (and ofcourse the outlines are being clipped within their own perspective range)
+ *          outline A will overlap outline B [If (outline A orderInLayer) > (outline B orderInLayer)]
+ *          
  * NOTE: 
  * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
  * [ELSE] (dont let them because you are their parent)
- 
-    //TODO... reconfigure to work with any of our 6 scripts
-                for (int i = 0; i < children.Count; i++)
-                {
-                    if (children[i] != null)
-                    {
-                        if (children[i].GetComponent<concaveOutline>() != null)
-                            children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
-                        if (children[i].GetComponent<convexOutline>() != null)
-                            children[i].GetComponent<convexOutline>().Active_SO = active_SO;
-                    }
-                    else
-                    {
-                        children.RemoveAt(i);
-                        i--;
-                    }
-                }
+ * 
+ * NOTE: Duplication of the Object in (Edit -or- Play) Mode will create the object but with all the DEFAULT outline settings
+ * 
+ * NOTE: this Object "Executes In Edit Mode" For the Sole purpose of chossing your settings
+ *          HOWEVER... when you are actually using the asset you MUST change the variables from code
+ *          
+ *          REASON... this is because this object is [NOT SERIALIZABLE]... so unity will clone it and use its copy in game mode
+ *          REASON ITS NOT ADDED... its alot more trouble that its worth and can cause significant problems if not used properly
+ *          
+ *          I created the inspector Script for each outline type to help easily make changes without the need for your own code while in both modes
+ *          
+ * NOTE: children must not have an inspector helper script... or they will not follow their parent properly     
+ * 
+ * NOTE: 
+ * [IF] someone wants to be our parent -AND- they are not already our child -> (Let Them be your parent) 
+ * [ELSE] (dont let them because you are their parent)
+ *
+ * Currently we only pass (1) Sprite Overlay, AND, (2) Basic Outline Data (3) Clipping Mask [on/off] to our children
+ * NOTE: use code sniplet below in variable set area to pass that variable value to your children
+ *          Keep in Mind the Concave and Convex Outline Types dont share all the variables
+ *          I Considered most of the settings they dont share sprite specific
+    
+    for (int i = 0; i < children.Count; i++)
+    {
+        if (children[i] != null)
+        {
+            if (children[i].GetComponent<concaveOutline>() != null)
+                children[i].GetComponent<concaveOutline>().Active_SO = active_SO;
+            if (children[i].GetComponent<convexOutline>() != null)
+                children[i].GetComponent<convexOutline>().Active_SO = active_SO;
+        }
+        else
+        {
+            children.RemoveAt(i);
+            i--;
+        }
+    }
+ * 
+ * NOTE: for the outline to work properly with an animation, you must set the "Animator" "Update Mode" to "Animate Physics"
+ * 
+ * LIMITATION 1: since I am using the sprite to create an outline... if the sprite SOURCE is semi transparent then the outline then the overlay will also be semi transparent
+ *               in areas where the outline is semitransparent the opacities might no be the same
+ * SOLUTION 1: use shader that grabs the silhouette of the sprite as a solid color regardless of semi transparency and use that... (I wasn't able to find said shader... and I dont know HLSL)
  */
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace objOutlines
 {
