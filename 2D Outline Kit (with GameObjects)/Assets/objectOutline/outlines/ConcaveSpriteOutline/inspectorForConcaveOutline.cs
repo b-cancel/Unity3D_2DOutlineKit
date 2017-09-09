@@ -71,7 +71,7 @@ namespace objOutlines
         public float startAngle_OPR;
         public bool radialPush_OPR; //push objs to edge of circle or to edge of box
 
-        //---custom
+        //---custom...
 
         [Header("*Custom Push[C]")] //->C<-
         public bool stdSize_OPC;
