@@ -52,16 +52,16 @@ public class crazySettings : MonoBehaviour {
 
             float startRotZ = anim.transform.rotation.eulerAngles.z;
 
-            Color startSOcolor = anim.GetComponent<concaveOutline>().Color_SO;
-            Color startOColor = anim.GetComponent<concaveOutline>().Color_O;
-            float startSize = anim.GetComponent<concaveOutline>().Size_O; //0 -> 2
+            Color startSOcolor = anim.GetComponent<concaveOutlineV4>().Color_SO;
+            Color startOColor = anim.GetComponent<concaveOutlineV4>().Color_O;
+            float startSize = anim.GetComponent<concaveOutlineV4>().Size_O; //0 -> 2
 
             //non lerping vars
-            anim.GetComponent<concaveOutline>().Active_SO = !anim.GetComponent<concaveOutline>().Active_SO;
-            anim.GetComponent<concaveOutline>().ScaleWithParentX_O = !anim.GetComponent<concaveOutline>().ScaleWithParentX_O;
-            anim.GetComponent<concaveOutline>().ScaleWithParentY_O = !anim.GetComponent<concaveOutline>().ScaleWithParentY_O;
-            anim.GetComponent<concaveOutline>().RadialPush_OPR = !anim.GetComponent<concaveOutline>().RadialPush_OPR;
-            anim.GetComponent<concaveOutline>().ObjsMakingOutline_OPR = Random.Range(1, 12);
+            anim.GetComponent<concaveOutlineV4>().Active_SO = !anim.GetComponent<concaveOutlineV4>().Active_SO;
+            anim.GetComponent<concaveOutlineV4>().ScaleWithParentX_O = !anim.GetComponent<concaveOutlineV4>().ScaleWithParentX_O;
+            anim.GetComponent<concaveOutlineV4>().ScaleWithParentY_O = !anim.GetComponent<concaveOutlineV4>().ScaleWithParentY_O;
+            anim.GetComponent<concaveOutlineV4>().RadialPush_OPR = !anim.GetComponent<concaveOutlineV4>().RadialPush_OPR;
+            anim.GetComponent<concaveOutlineV4>().ObjsMakingOutline_OPR = Random.Range(1, 12);
 
             //---Start to Target Lerp
 
@@ -86,9 +86,9 @@ public class crazySettings : MonoBehaviour {
                 anim.transform.rotation = newRot;
 
                 //lerping vars
-                anim.GetComponent<concaveOutline>().Color_O = Color.Lerp(startOColor, targetOcolor, lerpValue);
-                anim.GetComponent<concaveOutline>().Color_SO = Color.Lerp(startSOcolor, targetSOcolor, lerpValue);
-                anim.GetComponent<concaveOutline>().Size_O = Mathf.Lerp(startSize, targetSize, lerpValue);
+                anim.GetComponent<concaveOutlineV4>().Color_O = Color.Lerp(startOColor, targetOcolor, lerpValue);
+                anim.GetComponent<concaveOutlineV4>().Color_SO = Color.Lerp(startSOcolor, targetSOcolor, lerpValue);
+                anim.GetComponent<concaveOutlineV4>().Size_O = Mathf.Lerp(startSize, targetSize, lerpValue);
 
                 yield return new WaitForEndOfFrame();
 
