@@ -291,23 +291,23 @@ namespace object2DOutlines
 
         void Update()
         {
-            //---Sprite Updating
-
             if (UpdateSpriteEveryFrame)
-            {
-                print("cave updating sprite every frame");
+                updateSpriteData();
+        }
 
-                //update sprite overlay
-                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
+        //update (1) Sprite (2) DrawMode - of sprite renderer
+        public void updateSpriteData()
+        {
+            //update sprite overlay
+            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
 
-                //update clipping mask
-                clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
+            //update clipping mask
+            clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
 
-                //update outline
-                if (edges_1 != null)
-                    foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
-                        copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
-            }
+            //update outline
+            if (edges_1 != null)
+                foreach (KeyValuePair<GameObject, Vector2> entry in edges_1)
+                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
         }
 
         void UpdatepositionsOfEdges()

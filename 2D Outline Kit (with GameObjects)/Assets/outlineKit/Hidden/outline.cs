@@ -3,6 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//be careful when changing the setting of the source sprite listed below
+//(sprite, flip, and draw mode)
+//sprite --> repair by updating the sprite data when we change sprites
+//draw mode --> repair by recalculation size after draw mode change
+//flip --> repair by instead changing the roation of the sprite mask
+
+//CHECK... sprite overlay, clipping mask, outline objects
+
+
 namespace object2DOutlines
 {
     //---This Enum makes it easier for us to pass our variables to our children (helps keep code clean)

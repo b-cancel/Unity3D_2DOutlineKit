@@ -187,18 +187,19 @@ namespace object2DOutlines
         void Update()
         {
             if (UpdateSpriteEveryFrame)
-            {
-                print("vex updating sprite every frame");
+                updateSpriteData();
+        }
 
-                //update sprite overlay
-                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
+        public void updateSpriteData()
+        {
+            //update sprite overlay
+            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
 
-                //update clipping mask
-                clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
+            //update clipping mask
+            clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
 
-                //update outline
-                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());
-            }
+            //update outline
+            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());
         }
 
         void updateOutline()
