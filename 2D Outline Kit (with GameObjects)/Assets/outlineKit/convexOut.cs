@@ -59,15 +59,15 @@ namespace object2DOutlines
 
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
-                    outline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                    thisOutline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
                 else
-                    outline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                    thisOutline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
 
         //-----Outline Variables-----
 
-        GameObject outline;
+        GameObject thisOutline;
 
         [Space(10)]
         [Header("Outline Variables")]
@@ -81,7 +81,7 @@ namespace object2DOutlines
             {
                 active_O = value;//update local value
 
-                outline.SetActive(active_O);
+                thisOutline.SetActive(active_O);
             }
         }
 
@@ -94,7 +94,7 @@ namespace object2DOutlines
             {
                 color_O = value;//update local value
 
-                outline.GetComponent<SpriteRenderer>().color = color_O;
+                thisOutline.GetComponent<SpriteRenderer>().color = color_O;
             }
         }
 
@@ -107,7 +107,7 @@ namespace object2DOutlines
             {
                 orderInLayer_O = value;//update local value
 
-                outline.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
+                thisOutline.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
         }
 
@@ -158,51 +158,11 @@ namespace object2DOutlines
         {
             awakeFinished_VEX = false;
 
-            //----------Cover Duplication Problem
-
-            Transform psblOF_T = this.transform.Find("Outline Folder");
-            if (psblOF_T != null) //transform found
-            {
-                GameObject psblOF_GO = psblOF_T.gameObject;
-                if (psblOF_GO.transform.parent.gameObject == gameObject) //this gameobject ours
-                    DestroyImmediate(psblOF_GO);
-            }
-
-            //----------Object Instantiation
-
-            //-----Outline Folder [MUST BE FIRST]
-            outlineGameObjectsFolder = new GameObject("Outline Folder");
-            copyTransform(gameObject, outlineGameObjectsFolder);
-            outlineGameObjectsFolder.transform.parent = this.transform;
-
-            //-----Outline GameObject
-
-            outline = new GameObject("The Outline");
-            outline.transform.parent = outlineGameObjectsFolder.transform;
-            copyTransform(gameObject, outline);
-            outline.AddComponent<SpriteRenderer>();
-            var tempMaterial = new Material(outline.GetComponent<SpriteRenderer>().sharedMaterial);
-            tempMaterial.shader = Shader.Find("GUI/Text Shader");
-
-            //different ABOVE
-            outline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial; //text shader to get silhouette of our sprite
-            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), outline.GetComponent<SpriteRenderer>());
-            //different BELOW
-
-            //-----Sprite Overlay
-            spriteOverlay = new GameObject("Sprite Overlay");
-            spriteOverlay.AddComponent<SpriteRenderer>();
-            spriteOverlay.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
-            copyTransform(gameObject, spriteOverlay);
-            spriteOverlay.transform.parent = outlineGameObjectsFolder.transform;
-            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
-
-            //-----Sprite Mask
-            clippingMask = new GameObject("Sprite Mask");
-            clippingMask.AddComponent<SpriteMask>();
-            copyTransform(gameObject, clippingMask);
-            clippingMask.transform.parent = outlineGameObjectsFolder.transform;
-            clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
+            thisOutline = new GameObject("The Outline");
+            Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
+            thisOutline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial; //DIFFERENT
+            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
+            initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
             //----------Variable Inits
 
@@ -237,7 +197,7 @@ namespace object2DOutlines
                 clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
 
                 //update outline
-                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), outline.GetComponent<SpriteRenderer>());
+                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());
             }
         }
 
@@ -261,7 +221,7 @@ namespace object2DOutlines
             else
                 localSizeY = adjustedSize / this.transform.localScale.y;
 
-            outline.transform.localScale = new Vector3(localSizeX, localSizeY, 1);
+            thisOutline.transform.localScale = new Vector3(localSizeX, localSizeY, 1);
         }
     }
 }

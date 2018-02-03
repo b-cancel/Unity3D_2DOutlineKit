@@ -89,7 +89,7 @@ namespace object2DOutlines
             {
                 active_SO = value; //update local value
 
-                spriteOverlay.SetActive(active_SO);
+                spriteOverlay.GetComponent<SpriteRenderer>().enabled = active_SO;
             }
         }
 
@@ -200,6 +200,53 @@ namespace object2DOutlines
         //--------------------------------------------------STATIC FUNCTIONS--------------------------------------------------
 
         //-------------------------Used By All Outlines-------------------------
+
+        public static Material initPart1(GameObject main, ref GameObject thisOutline, ref GameObject folder)
+        {
+            //----------Cover Duplication Problem
+
+            Transform psblOF_T = main.transform.Find("Outline Folder");
+            if (psblOF_T != null) //transform found
+            {
+                GameObject psblOF_GO = psblOF_T.gameObject;
+                if (psblOF_GO.transform.parent.gameObject == main) //this gameobject ours
+                    DestroyImmediate(psblOF_GO);
+            }
+
+            //----------Object Instantiation
+
+            //-----Outline Folder [MUST BE FIRST]
+            folder = new GameObject("Outline Folder");
+            copyTransform(main, folder);
+            folder.transform.parent = main.transform;
+
+            //-----Outline GameObject
+            thisOutline.transform.parent = folder.transform;
+            copyTransform(main, thisOutline);
+            thisOutline.AddComponent<SpriteRenderer>();
+            var tempMaterial = new Material(thisOutline.GetComponent<SpriteRenderer>().sharedMaterial);
+            tempMaterial.shader = Shader.Find("GUI/Text Shader");
+
+            return tempMaterial;
+        }
+
+        public static void initPart2(GameObject main, ref GameObject folder, ref GameObject overlay, ref GameObject clipMask, ref Material tempMaterial)
+        {
+            //-----Sprite Overlay
+            overlay = new GameObject("Sprite Overlay");
+            overlay.AddComponent<SpriteRenderer>();
+            overlay.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+            copyTransform(main, overlay);
+            overlay.transform.parent = folder.transform;
+            copySpriteRendererData(main.GetComponent<SpriteRenderer>(), overlay.GetComponent<SpriteRenderer>());
+
+            //-----Sprite Mask
+            clipMask = new GameObject("Sprite Mask");
+            clipMask.AddComponent<SpriteMask>();
+            copyTransform(main, clipMask);
+            clipMask.transform.parent = folder.transform;
+            clipMask.GetComponent<SpriteMask>().sprite = main.GetComponent<SpriteRenderer>().sprite;
+        }
 
         public static void copyTransform(GameObject original, GameObject copy)
         {
