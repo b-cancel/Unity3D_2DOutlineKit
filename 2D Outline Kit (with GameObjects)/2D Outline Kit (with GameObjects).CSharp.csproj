@@ -312,16 +312,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\EX SCRIPTS\LookAtPoint.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\EX SCRIPTS\LookAtPointEditor.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\NEW SCRIPTS\Editor Scripts\convexNCeditor.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\NEW SCRIPTS\Game Scripts\convexC.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\NEW SCRIPTS\Game Scripts\convexNC.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\OLD SCRIPTS\concaveOutlineV1.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\OLD SCRIPTS\concaveOutlineV3.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\OLD SCRIPTS\convexOutlineV1.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\OLD SCRIPTS\convexOutlineV3.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\BASE.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\concaveOutlineV1.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\Editor Scripts\customInspector\convexCeditor.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\Editor Scripts\customInspector\convexNCeditor.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\Game Scripts\convex\convexC.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\Game Scripts\convex\convexNC.cs" />
     <Compile Include="Assets\2D_OutlineKit_withGameObjects\demo\scripts\crazySettings.cs" />
+    <Compile Include="Assets\EX SCRIPTS\LookAtPoint.cs" />
+    <Compile Include="Assets\EX SCRIPTS\LookAtPointEditor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\codeRequiredToHaveChildren.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
