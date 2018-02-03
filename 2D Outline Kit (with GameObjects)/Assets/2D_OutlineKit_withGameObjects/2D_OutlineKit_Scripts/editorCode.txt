@@ -1,0 +1,39 @@
+bool awakeFinished;
+
+void OnValidate()
+{
+    if (awakeFinished)
+    {
+        //Optimization
+        UpdateSpriteEveryFrame = updateSpriteEveryFrame;
+
+        //Debugging
+        ShowOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
+
+        //Sprite Outline
+        Active_SO = active_SO;
+        OrderInLayer_SO = orderInLayer_SO;
+        Color_SO = color_SO;
+
+        //Clipping Mask
+        ClipCenter_CM = clipCenter_CM;
+        AlphaCutoff_CM = alphaCutoff_CM;
+        CustomRange_CM = customRange_CM;
+        FrontLayer_CM = frontLayer_CM;
+        BackLayer_CM = backLayer_CM;
+
+        //Sprite Overlay
+        Active_O = active_O;
+        Color_O = color_O;
+        OrderInLayer_O = orderInLayer_O;
+        Size_O = size_O;
+        ScaleWithParentX_O = scaleWithParentX_O;
+        ScaleWithParentY_O = scaleWithParentY_O;
+    }
+}
+
+//awakeFinished then obviously does its thing within the awake function to avoid errors        
+
+
+[Header("Optimization Variables")] //for first var in set
+[SerializeField, HideInInspector] //for every var
