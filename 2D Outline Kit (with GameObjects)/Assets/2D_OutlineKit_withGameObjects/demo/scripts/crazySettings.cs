@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿/*
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,7 +15,7 @@ public class crazySettings : MonoBehaviour {
         StartCoroutine("crazyTransforms");
     }
 
-    /*IEnumerator crazyTransforms()
+    IEnumerator crazyTransforms()
     {
         while (1 == 1)
         {
@@ -98,5 +99,6 @@ public class crazySettings : MonoBehaviour {
 
             } while (lerpValue < 1);
         }
-    }*/
+    }
 }
+*/

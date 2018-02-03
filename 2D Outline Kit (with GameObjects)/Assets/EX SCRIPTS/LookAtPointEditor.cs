@@ -1,9 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-//C# Example (LookAtPointEditor.cs)
-using UnityEngine;
 using UnityEditor;
 
 [CustomEditor(typeof(LookAtPoint))]

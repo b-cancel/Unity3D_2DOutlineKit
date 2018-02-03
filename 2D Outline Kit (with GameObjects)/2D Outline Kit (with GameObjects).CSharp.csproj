@@ -312,16 +312,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\concaveOut.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\convexOut.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\outline.cs" />
     <Compile Include="Assets\2D_OutlineKit_withGameObjects\demo\scripts\crazySettings.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\concaveOut.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\convexOut.cs" />
+    <Compile Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\outline.cs" />
     <Compile Include="Assets\EX SCRIPTS\LookAtPoint.cs" />
     <Compile Include="Assets\EX SCRIPTS\LookAtPointEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\childrenCode.txt" />
-    <None Include="Assets\2D_OutlineKit_withGameObjects\2D_OutlineKit_Scripts\editorCode.txt" />
+    <None Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\childrenCode.txt" />
+    <None Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\editorCode.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

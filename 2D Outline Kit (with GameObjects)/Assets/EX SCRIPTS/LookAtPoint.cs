@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//C# Example (LookAtPoint.cs)
-using UnityEngine;
 [ExecuteInEditMode]
 public class LookAtPoint : MonoBehaviour
 {
