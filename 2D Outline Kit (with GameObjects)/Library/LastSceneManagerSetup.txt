@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/2D_OutlineKit_withGameObjects/demo/demo.unity
+- path: Assets/demo/demo.unity
   isLoaded: 1
   isActive: 1

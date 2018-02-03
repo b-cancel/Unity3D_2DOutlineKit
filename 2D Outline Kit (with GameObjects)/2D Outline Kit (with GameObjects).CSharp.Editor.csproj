@@ -304,12 +304,6 @@
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>Library\UnityAssemblies\UnityEngine.StandardEvents.dll</HintPath>
     </Reference>
-    <Reference Include="AssetStoreTools">
-      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreTools.dll</HintPath>
-    </Reference>
-    <Reference Include="AssetStoreToolsExtra">
-      <HintPath>Assets\AssetStoreTools\Editor\AssetStoreToolsExtra.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="2D Outline Kit (with GameObjects).CSharp.csproj">
@@ -318,12 +312,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\Editor\concaveOutEditor.cs" />
-    <Compile Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\Editor\convexOutEditor.cs" />
+    <Compile Include="Assets\outlineKit\Hidden\Editor\concaveOutEditor.cs" />
+    <Compile Include="Assets\outlineKit\Hidden\Editor\convexOutEditor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\childrenCode.txt" />
-    <None Include="Assets\2D_OutlineKit_withGameObjects\outlineKit\Hidden\editorCode.txt" />
+    <None Include="Assets\outlineKit\Hidden\childrenCode.txt" />
+    <None Include="Assets\outlineKit\Hidden\editorCode.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>
