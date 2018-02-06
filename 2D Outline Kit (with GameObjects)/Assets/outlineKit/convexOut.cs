@@ -119,7 +119,7 @@ namespace object2DOutlines
             get { return size_O; }
             set
             {
-                value = (value >= .1f) ? value : .1f; //since our childrens' size depends on our porportion with them we avoid our size being 0
+                value = (value >= 0) ? value : 0;
                 size_O = value; //update local value 
 
                 updateOutline();

@@ -42,7 +42,7 @@ namespace object2DOutlines
         //ONLY regular
         SerializedProperty objsMakingOutline_OPR;
         SerializedProperty startAngle_OPR;
-        SerializedProperty radialPush_OPR;
+        SerializedProperty pushPattern_OPR;
 
         //ONLY custom
         SerializedProperty stdSize_OPC;
@@ -82,7 +82,7 @@ namespace object2DOutlines
             //ONLY regular
             objsMakingOutline_OPR = serializedObject.FindProperty("objsMakingOutline_OPR");
             startAngle_OPR = serializedObject.FindProperty("startAngle_OPR");
-            radialPush_OPR = serializedObject.FindProperty("radialPush_OPR");
+            pushPattern_OPR = serializedObject.FindProperty("pushPattern_OPR");
 
             //ONLY custom
             stdSize_OPC = serializedObject.FindProperty("stdSize_OPC");
@@ -146,7 +146,7 @@ namespace object2DOutlines
             {
                 EditorGUILayout.PropertyField(objsMakingOutline_OPR, new GUIContent("   # Of Outline Objects"));
                 EditorGUILayout.PropertyField(startAngle_OPR, new GUIContent("   Start Angle For Pattern"));
-                EditorGUILayout.PropertyField(radialPush_OPR, new GUIContent("   Push Pattern"));
+                EditorGUILayout.PropertyField(pushPattern_OPR, new GUIContent("   Push Pattern"));
             }
             else
             {

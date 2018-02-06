@@ -40,9 +40,14 @@ namespace object2DOutlines
         OIL_O, //OrderInLayer_O
         S_O, //Size_O
         SWPX_O, //ScaleWithParentX_O
-        SWPY_O //ScaleWithParentY_O
+        SWPY_O, //ScaleWithParentY_O
 
         //----------Variables For ONLY (Concave/Push) Outline Type
+        PT_OP, //PushType_OP
+        OMO_OPR, //ObjsMakingOutline_OPR
+        SA_OPR, //StartAngle_OPR
+        PP_OPR, //PushPattern_OPR
+        SS_OPC //StdSize_OPC
 
         //NONE
     };
@@ -142,7 +147,7 @@ namespace object2DOutlines
             get { return alphaCutoff_CM; }
             set
             {
-                alphaCutoff_CM = value; //update local value
+                alphaCutoff_CM = Mathf.Clamp01(value); //update local value
 
                 clippingMask.GetComponent<SpriteMask>().alphaCutoff = alphaCutoff_CM;
             }
@@ -347,49 +352,171 @@ namespace object2DOutlines
         //-------------------------Used by Families-------------------------
 
         //NOTE: according to microsoft delegates are x8 time slower than methods... so eventually make sure that the switch isnt converting the code and using it as a sort of delegate
-        //I.O.W. make sure the switch case isnt become a dictionary from Enums -> Delegates when compiled... cuz that would be really slow
+        //TODO... I.O.W. make sure the switch case isnt become a dictionary from Enums -> Delegates when compiled... cuz that would be really slow
         public static void passToChildren(varToUpdate varEnum, GameObject parent, List<GameObject> children)
         {
-            for (int i = 0; i < children.Count; i++) //loop through all of our children
+            if(parent.GetComponent<convexOut>() != null)
             {
-                if (children[i] != null) //if this child still exists
+                for (int childID = 0; childID < children.Count; childID++)
                 {
-                    //TODO... make this work for both script convexOut -and- concaveOut
-
-                    if (children[i].GetComponent<convexOut>() != null)
+                    if (children[childID] != null)
                     {
-                        switch (varEnum)
-                        {
-                            //Optimization
-                            case varToUpdate.USEF: children[i].GetComponent<convexOut>().UpdateSprite = parent.GetComponent<convexOut>().UpdateSprite; break;
-                            //Debugging
-                            case varToUpdate.SOGIH: children[i].GetComponent<convexOut>().ShowOutline_GOs_InHierarchy_D = parent.GetComponent<convexOut>().ShowOutline_GOs_InHierarchy_D; break;
-                            //Sprite Overlay
-                            case varToUpdate.A_SO: children[i].GetComponent<convexOut>().Active_SO = parent.GetComponent<convexOut>().Active_SO; break;
-                            case varToUpdate.OIL_SO: children[i].GetComponent<convexOut>().OrderInLayer_SO = parent.GetComponent<convexOut>().OrderInLayer_SO; break;
-                            case varToUpdate.C_SO: children[i].GetComponent<convexOut>().Color_SO = parent.GetComponent<convexOut>().Color_SO; break;
-                            //Clipping Mask
-                            case varToUpdate.CC_CM: children[i].GetComponent<convexOut>().ClipCenter_CM = parent.GetComponent<convexOut>().ClipCenter_CM; break;
-                            case varToUpdate.AC_CM: children[i].GetComponent<convexOut>().AlphaCutoff_CM = parent.GetComponent<convexOut>().AlphaCutoff_CM; break;
-                            case varToUpdate.CR_CM: children[i].GetComponent<convexOut>().CustomRange_CM = parent.GetComponent<convexOut>().CustomRange_CM; break;
-                            case varToUpdate.FL_CM: children[i].GetComponent<convexOut>().FrontLayer_CM = parent.GetComponent<convexOut>().FrontLayer_CM; break;
-                            case varToUpdate.BL_CM: children[i].GetComponent<convexOut>().BackLayer_CM = parent.GetComponent<convexOut>().BackLayer_CM; break;
-                            //Sprite Outline
-                            case varToUpdate.A_O: children[i].GetComponent<convexOut>().Active_O = parent.GetComponent<convexOut>().Active_O; break;
-                            case varToUpdate.C_O: children[i].GetComponent<convexOut>().Color_O = parent.GetComponent<convexOut>().Color_O; break;
-                            case varToUpdate.OIL_O: children[i].GetComponent<convexOut>().OrderInLayer_O = parent.GetComponent<convexOut>().OrderInLayer_O; break;
-                            case varToUpdate.S_O: children[i].GetComponent<convexOut>().Size_O = parent.GetComponent<convexOut>().Size_O; break;
-                            case varToUpdate.SWPX_O: children[i].GetComponent<convexOut>().ScaleWithParentX_O = parent.GetComponent<convexOut>().ScaleWithParentX_O; break;
-                            case varToUpdate.SWPY_O: children[i].GetComponent<convexOut>().ScaleWithParentY_O = parent.GetComponent<convexOut>().ScaleWithParentY_O; break;
-                        };
+                        if (children[childID].GetComponent<convexOut>() != null)
+                            convexSwitch(varEnum, parent.GetComponent<convexOut>(), children[childID].GetComponent<convexOut>()); //convex, convex
+                        else if (children[childID].GetComponent<concaveOut>() != null)
+                            convexParent_concaveChild_Switch(varEnum, parent.GetComponent<convexOut>(), children[childID].GetComponent<concaveOut>()); //convex, concave
+                        //ELSE... child has no data to receive
+                    }
+                    else
+                    {
+                        children.RemoveAt(childID);
+                        childID--;
                     }
                 }
-                else
+
+            }
+            else if(parent.GetComponent<concaveOut>() != null)
+            {
+
+                for (int childID = 0; childID < children.Count; childID++)
                 {
-                    children.RemoveAt(i);
-                    i--;
+                    if (children[childID] != null)
+                    {
+                        if (children[childID].GetComponent<convexOut>() != null)
+                            concaveParent_convexChild_Switch(varEnum, parent.GetComponent<concaveOut>(), children[childID].GetComponent<convexOut>()); //concave, convex
+                        else if (children[childID].GetComponent<concaveOut>() != null)
+                            concaveSwitch(varEnum, parent.GetComponent<concaveOut>(), children[childID].GetComponent<concaveOut>()); //concave, concave
+                        //ELSE... child has no data to receive
+                    }
+                    else
+                    {
+                        children.RemoveAt(childID);
+                        childID--;
+                    } 
                 }
             }
+            //ELSE... parent has no data to pass
+        }
+
+        //-------------------------Switch Cases For Every Combination Of Parent And Children
+
+        public static void convexSwitch(varToUpdate varEnum, convexOut par, convexOut child)
+        {
+            switch (varEnum)
+            {
+                //Optimization
+                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
+                //Debugging
+                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
+                //Sprite Overlay
+                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
+                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
+                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
+                //Clipping Mask
+                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
+                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
+                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
+                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
+                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
+                //Sprite Outline
+                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
+                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
+                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
+                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
+                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+            };
+        }
+
+        public static void concaveSwitch(varToUpdate varEnum, concaveOut par, concaveOut child)
+        {
+            switch (varEnum)
+            {
+                //Optimization
+                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
+                //Debugging
+                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
+                //Sprite Overlay
+                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
+                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
+                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
+                //Clipping Mask
+                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
+                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
+                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
+                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
+                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
+                //Sprite Outline
+                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
+                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
+                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
+                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
+                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+
+                //---ONLY push type
+                case varToUpdate.PT_OP: child.PushType_OP = par.PushType_OP; break;
+                case varToUpdate.OMO_OPR: child.ObjsMakingOutline_OPR = par.ObjsMakingOutline_OPR; break;
+                case varToUpdate.SA_OPR: child.StartAngle_OPR = par.StartAngle_OPR; break;
+                case varToUpdate.PP_OPR: child.PushPattern_OPR = par.PushPattern_OPR; break;
+                case varToUpdate.SS_OPC: child.StdSize_OPC = par.StdSize_OPC; break;
+            };
+        }
+
+        public static void concaveParent_convexChild_Switch(varToUpdate varEnum, concaveOut par, convexOut child)
+        {
+            switch (varEnum)
+            {
+                //Optimization
+                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
+                //Debugging
+                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
+                //Sprite Overlay
+                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
+                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
+                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
+                //Clipping Mask
+                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
+                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
+                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
+                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
+                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
+                //Sprite Outline
+                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
+                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
+                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
+                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
+                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+            };
+        }
+
+        public static void convexParent_concaveChild_Switch(varToUpdate varEnum, convexOut par, concaveOut child)
+        {
+            switch (varEnum)
+            {
+                //Optimization
+                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
+                //Debugging
+                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
+                //Sprite Overlay
+                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
+                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
+                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
+                //Clipping Mask
+                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
+                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
+                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
+                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
+                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
+                //Sprite Outline
+                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
+                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
+                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
+                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
+                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+            };
         }
     }
 }

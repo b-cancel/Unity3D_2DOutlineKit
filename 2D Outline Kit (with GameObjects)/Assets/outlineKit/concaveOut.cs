@@ -41,6 +41,13 @@ namespace object2DOutlines
                 Size_O = size_O;
                 ScaleWithParentX_O = scaleWithParentX_O;
                 ScaleWithParentY_O = scaleWithParentY_O;
+
+                //ONLY push
+                PushType_OP = pushType_OP;
+                ObjsMakingOutline_OPR = objsMakingOutline_OPR;
+                StartAngle_OPR = startAngle_OPR;
+                PushPattern_OPR = pushPattern_OPR;
+                StdSize_OPC = stdSize_OPC;
             }
         }
 
@@ -139,7 +146,7 @@ namespace object2DOutlines
             get { return size_O; }
             set
             {
-                value = (value >= .1f) ? value : .1f; //since our childrens' size depends on our porportion with them we avoid our size being 0
+                value = (value >= 0) ? value : 0;
                 size_O = value;//update local value
 
                 updatePositionsOfEdges();
@@ -211,7 +218,7 @@ namespace object2DOutlines
             get { return objsMakingOutline_OPR; }
             set
             {
-                objsMakingOutline_OPR = (value >= 0) ? value : 0;//update local value
+                objsMakingOutline_OPR = (value >= 0) ? value : 0; //update local value
 
                 makeSureWeHaveCorrectNumberOfEdges();
 
@@ -233,13 +240,13 @@ namespace object2DOutlines
         }
 
         [SerializeField, HideInInspector]
-        pushPattern radialPush_OPR; //push objs to edge of circle or to edge of box
-        public pushPattern RadialPush_OPR
+        pushPattern pushPattern_OPR; //push objs to edge of circle or to edge of box
+        public pushPattern PushPattern_OPR
         {
-            get { return radialPush_OPR; }
+            get { return pushPattern_OPR; }
             set
             {
-                radialPush_OPR = value;//update local value
+                pushPattern_OPR = value;//update local value
 
                 updatePositionsOfEdges();
             }
@@ -288,7 +295,7 @@ namespace object2DOutlines
             //---Regular
             ObjsMakingOutline_OPR = 8;
             StartAngle_OPR = 0;
-            RadialPush_OPR = pushPattern.squarial;
+            PushPattern_OPR = pushPattern.squarial;
             //---Custom
             StdSize_OPC = false;
 
@@ -340,7 +347,7 @@ namespace object2DOutlines
             {
                 anEdge.transform.position = vect.normalized; //use ONLY vector (1) direction
 
-                if (RadialPush_OPR == pushPattern.radial) //Radial Push
+                if (PushPattern_OPR == pushPattern.radial) //Radial Push
                     anEdge.transform.position *= Size_O;
                 else //Square Push (note: SQUARE not RECTANGLE) [Hypotenuse = Adjecent / cos(theta)]
                     anEdge.transform.position *= Mathf.Abs(Size_O / (Mathf.Cos((Vector2.Angle(vect, Vector2.up) % 90) * Mathf.Deg2Rad)));
