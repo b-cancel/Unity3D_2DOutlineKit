@@ -3,14 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//be careful when changing the setting of the source sprite listed below
-//(sprite, flip, and draw mode)
-//sprite --> repair by updating the sprite data when we change sprites
-//draw mode --> repair by recalculation size after draw mode change
-//flip --> repair by instead changing the roation of the sprite mask
+//NOTE: "DRAW_MODE_SLICED" WON'T WORK (IF you require a sprite mask)
+//this is because the current unity sprite mask does not support the 9 slice system
 
-//CHECK... sprite overlay, clipping mask, outline objects
+//NOTE: "DRAW_MODE_TILED" WONT'T WORK 
+//this is because the current unity sprite mask does not support tiled draw mode
+//and
 
+//BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
+//NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
 namespace object2DOutlines
 {
@@ -46,18 +47,20 @@ namespace object2DOutlines
         //NONE
     };
 
+    public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
+
     [ExecuteInEditMode]
     public class outline : MonoBehaviour
     {
         //--- Optimization
 
-        [Header("Optimization Variables")]
+        [Header("OPTIMIZATION VARIABLES-----")]
         [SerializeField, HideInInspector]
-        internal bool updateSpriteEveryFrame;
-        public bool UpdateSpriteEveryFrame
+        internal spriteUpdateSetting updateSprite;
+        public spriteUpdateSetting UpdateSprite
         {
-            get { return updateSpriteEveryFrame; }
-            set { updateSpriteEveryFrame = value; }
+            get { return updateSprite; }
+            set { updateSprite = value; }
         }
 
         //-----Debugging Variables-----
@@ -66,7 +69,7 @@ namespace object2DOutlines
         internal GameObject outlineGameObjectsFolder; //contains all the outlines
 
         [Space(10)]
-        [Header("Debugging Variables")]
+        [Header("DEBUGGING VARIABLES-----")]
         [SerializeField, HideInInspector]
         internal bool showOutline_GOs_InHierarchy_D;
         public bool ShowOutline_GOs_InHierarchy_D
@@ -88,7 +91,7 @@ namespace object2DOutlines
         internal GameObject spriteOverlay;
 
         [Space(10)]
-        [Header("Sprite Overlay Variables")]
+        [Header("SPRITE OVERLAY VARIABLES-----")]
         [SerializeField, HideInInspector]
         internal bool active_SO;
         public bool Active_SO
@@ -189,7 +192,7 @@ namespace object2DOutlines
             //----------Variable Inits
 
             //--- Optimization
-            UpdateSpriteEveryFrame = true;
+            updateSprite = spriteUpdateSetting.AfterEveryChange;
 
             //----- Debugging
             ShowOutline_GOs_InHierarchy_D = false;
@@ -204,6 +207,40 @@ namespace object2DOutlines
             CustomRange_CM = false;
             FrontLayer_CM = 0; //by defaults maps to "default" layer
             BackLayer_CM = 0; //by defaults maps to "default" layer
+        }
+
+        Sprite prevSprite;
+        bool prevFlipX;
+        bool prevFlipY;
+        SpriteDrawMode prevDrawMode;
+        Vector2 prevSize;
+
+        //GIVEN THE NOTES BELOW: we only check if (1) sprite (2) flip X and flip Y changes (3) DrawMode (4) Size [for draw mode = tiled]
+        public bool spriteChanged(SpriteRenderer SR)
+        {
+            if (prevSprite != SR.sprite)
+                return updateAllPrevs(SR, true);
+            else if (prevFlipX != SR.flipX)
+                return updateAllPrevs(SR, true);
+            else if (prevFlipY != SR.flipY)
+                return updateAllPrevs(SR, true);
+            else if(prevDrawMode != SR.drawMode)
+                return updateAllPrevs(SR, true);
+            else if(prevSize != SR.size)
+                return updateAllPrevs(SR, true);
+            else
+                return updateAllPrevs(SR, false);
+        }
+
+        bool updateAllPrevs(SpriteRenderer SR, bool spriteChanged)
+        {
+            prevSprite = SR.sprite;
+            prevFlipX = SR.flipX;
+            prevFlipY = SR.flipY;
+            prevDrawMode = SR.drawMode;
+            prevSize = SR.size;
+
+            return spriteChanged;
         }
 
         //--------------------------------------------------STATIC FUNCTIONS--------------------------------------------------
@@ -230,8 +267,8 @@ namespace object2DOutlines
             folder.transform.parent = main.transform;
 
             //-----Outline GameObject
-            thisOutline.transform.parent = folder.transform;
             copyTransform(main, thisOutline);
+            thisOutline.transform.parent = folder.transform;
             thisOutline.AddComponent<SpriteRenderer>();
             var tempMaterial = new Material(thisOutline.GetComponent<SpriteRenderer>().sharedMaterial);
             tempMaterial.shader = Shader.Find("GUI/Text Shader");
@@ -270,20 +307,41 @@ namespace object2DOutlines
             copy.transform.localRotation = original.transform.localRotation;
         }
 
-        //NOTE: you only need to copy over a variable if its not its default value (for later optimization)
+        //NOTE: ONLY TESTED changing... sprite, FlipX and FlipY, DrawMode(Single), DrawMode(Sliced)
         public static void copySpriteRendererData(SpriteRenderer from, SpriteRenderer to)
         {
-            to.adaptiveModeThreshold = from.adaptiveModeThreshold;
-            //COLOR -> set elsewhere
-            to.drawMode = from.drawMode;
+            to.sprite = from.sprite;
             to.flipX = from.flipX;
             to.flipY = from.flipY;
-            //MASK INTERACTION -> set elsewhere
-            to.size = from.size;
-            to.sprite = from.sprite;
-            to.tileMode = from.tileMode;
+            to.drawMode = from.drawMode;
 
-            //NOTE: Inherited Members -> Properties... not currently being copied over
+            //---only if draw mode SLICED -or- TILED
+            to.size = from.size;
+
+            //---|---only if draw mode TILED
+            to.tileMode = from.tileMode;
+            
+            //---|---|only if TILE_MODE is Adaptive
+            to.adaptiveModeThreshold = from.adaptiveModeThreshold;
+
+            //(1) Color (2) Mask Interaction -> are set elsewhere
+        }
+
+        public static void copySpriteRendererDataToClipMask(GameObject SR, GameObject CM)
+        {
+            //update sprite
+            CM.GetComponent<SpriteMask>().sprite = SR.GetComponent<SpriteRenderer>().sprite;
+
+            //update the flip
+            if (SR.GetComponent<SpriteRenderer>().flipX == true)
+                CM.transform.rotation = Quaternion.Euler(CM.transform.rotation.eulerAngles.x, 180, 0);
+            else
+                CM.transform.rotation = Quaternion.Euler(CM.transform.rotation.eulerAngles.x, 0, 0);
+
+            if (SR.GetComponent<SpriteRenderer>().flipY == true)
+                CM.transform.rotation = Quaternion.Euler(180, CM.transform.rotation.eulerAngles.y, 0);
+            else
+                CM.transform.rotation = Quaternion.Euler(0, CM.transform.rotation.eulerAngles.y, 0);
         }
 
         //-------------------------Used by Families-------------------------
@@ -303,7 +361,7 @@ namespace object2DOutlines
                         switch (varEnum)
                         {
                             //Optimization
-                            case varToUpdate.USEF: children[i].GetComponent<convexOut>().UpdateSpriteEveryFrame = parent.GetComponent<convexOut>().UpdateSpriteEveryFrame; break;
+                            case varToUpdate.USEF: children[i].GetComponent<convexOut>().UpdateSprite = parent.GetComponent<convexOut>().UpdateSprite; break;
                             //Debugging
                             case varToUpdate.SOGIH: children[i].GetComponent<convexOut>().ShowOutline_GOs_InHierarchy_D = parent.GetComponent<convexOut>().ShowOutline_GOs_InHierarchy_D; break;
                             //Sprite Overlay

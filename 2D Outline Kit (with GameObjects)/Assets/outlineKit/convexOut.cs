@@ -5,7 +5,7 @@ using UnityEngine;
 namespace object2DOutlines
 {
     [ExecuteInEditMode]
-    public class convexOut : outline //this extends monobehavior because base extends monobehvaior
+    public class convexOut : outline
     {
         private bool awakeFinished_VEX;
 
@@ -14,7 +14,7 @@ namespace object2DOutlines
             if (awakeFinished_VEX)
             {
                 //Optimization
-                UpdateSpriteEveryFrame = updateSpriteEveryFrame;
+                UpdateSprite = updateSprite;
 
                 //Debugging
                 ShowOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
@@ -44,7 +44,7 @@ namespace object2DOutlines
         //-----Clipping Mask Variables
 
         [Space(10)]
-        [Header("Clipping Mask Variables")]
+        [Header("CLIPPING MASK VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool clipCenter_CM;
         public bool ClipCenter_CM
@@ -70,7 +70,7 @@ namespace object2DOutlines
         GameObject thisOutline;
 
         [Space(10)]
-        [Header("Outline Variables")]
+        [Header("OUTLINE VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool active_O;
         //NOTE: used in update function... doesnt have to do anyting special for get and set...
@@ -186,8 +186,14 @@ namespace object2DOutlines
 
         void Update()
         {
-            if (UpdateSpriteEveryFrame)
-                updateSpriteData();
+            switch (UpdateSprite)
+            {
+                case spriteUpdateSetting.EveryFrame: updateSpriteData(); break;
+                case spriteUpdateSetting.AfterEveryChange:
+                    if (spriteChanged(this.GetComponent<SpriteRenderer>()))
+                        updateSpriteData();
+                    break;
+            }
         }
 
         public void updateSpriteData()
@@ -196,7 +202,7 @@ namespace object2DOutlines
             copySpriteRendererData(this.GetComponent<SpriteRenderer>(), spriteOverlay.GetComponent<SpriteRenderer>());
 
             //update clipping mask
-            clippingMask.GetComponent<SpriteMask>().sprite = this.GetComponent<SpriteRenderer>().sprite;
+            copySpriteRendererDataToClipMask(this.gameObject, clippingMask);
 
             //update outline
             copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());

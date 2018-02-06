@@ -10,7 +10,7 @@ namespace object2DOutlines
     {
 
         //Optimization
-        SerializedProperty updateSpriteEveryFrame;
+        SerializedProperty updateSprite;
 
         //Debugging
         SerializedProperty showOutline_GOs_InHierarchy_D;
@@ -35,10 +35,22 @@ namespace object2DOutlines
         SerializedProperty scaleWithParentX_O;
         SerializedProperty scaleWithParentY_O;
 
+        //-------------------------Push Type Variables-------------------------
+
+        SerializedProperty pushType_OP;
+
+        //ONLY regular
+        SerializedProperty objsMakingOutline_OPR;
+        SerializedProperty startAngle_OPR;
+        SerializedProperty radialPush_OPR;
+
+        //ONLY custom
+        SerializedProperty stdSize_OPC;
+
         void OnEnable()
         {
             //Optimization
-            updateSpriteEveryFrame = serializedObject.FindProperty("updateSpriteEveryFrame");
+            updateSprite = serializedObject.FindProperty("updateSprite");
 
             //Debugging
             showOutline_GOs_InHierarchy_D = serializedObject.FindProperty("showOutline_GOs_InHierarchy_D");
@@ -62,37 +74,84 @@ namespace object2DOutlines
             size_O = serializedObject.FindProperty("size_O");
             scaleWithParentX_O = serializedObject.FindProperty("scaleWithParentX_O");
             scaleWithParentY_O = serializedObject.FindProperty("scaleWithParentY_O");
+
+            //-------------------------Push Type Variables-------------------------
+
+            pushType_OP = serializedObject.FindProperty("pushType_OP");
+
+            //ONLY regular
+            objsMakingOutline_OPR = serializedObject.FindProperty("objsMakingOutline_OPR");
+            startAngle_OPR = serializedObject.FindProperty("startAngle_OPR");
+            radialPush_OPR = serializedObject.FindProperty("radialPush_OPR");
+
+            //ONLY custom
+            stdSize_OPC = serializedObject.FindProperty("stdSize_OPC");
         }
 
         public override void OnInspectorGUI()
         {
+            concaveOut script = (concaveOut)target;
+
             serializedObject.Update();
 
             //Optimization
-            EditorGUILayout.PropertyField(updateSpriteEveryFrame);
+            EditorGUILayout.PropertyField(updateSprite, new GUIContent("We Update The Sprite"));
+
+
+            if (script.UpdateSprite == spriteUpdateSetting.Manually)
+                if (GUILayout.Button("Update Sprite"))
+                    script.updateSpriteData();
 
             //Debugging
-            EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy_D);
-
-            //Sprite Outline
-            EditorGUILayout.PropertyField(active_SO);
-            EditorGUILayout.PropertyField(orderInLayer_SO);
-            EditorGUILayout.PropertyField(color_SO);
-
-            //Clipping Mask
-            EditorGUILayout.PropertyField(clipCenter_CM);
-            EditorGUILayout.PropertyField(alphaCutoff_CM);
-            EditorGUILayout.PropertyField(customRange_CM);
-            EditorGUILayout.PropertyField(frontLayer_CM);
-            EditorGUILayout.PropertyField(backLayer_CM);
+            EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy_D, new GUIContent("Show Outline In Hierarchy"));
 
             //Sprite Overlay
-            EditorGUILayout.PropertyField(active_O);
-            EditorGUILayout.PropertyField(color_O);
-            EditorGUILayout.PropertyField(orderInLayer_O);
-            EditorGUILayout.PropertyField(size_O); //run update outline for everything below
-            EditorGUILayout.PropertyField(scaleWithParentX_O);
-            EditorGUILayout.PropertyField(scaleWithParentY_O);
+            EditorGUILayout.PropertyField(active_SO, new GUIContent("Activate Sprite Overlay"));
+            if (script.Active_SO)
+            {
+                EditorGUILayout.PropertyField(orderInLayer_SO, new GUIContent("   it's Order In Layer"));
+                EditorGUILayout.PropertyField(color_SO, new GUIContent("   it's Color"));
+            }
+
+            //Clipping Mask
+
+            EditorGUILayout.PropertyField(clipCenter_CM, new GUIContent("Support Semi-Transparency"));
+            if (script.ClipCenter_CM)
+            {
+                EditorGUILayout.PropertyField(alphaCutoff_CM, new GUIContent("   it's Alpha Cut-Off"));
+                EditorGUILayout.PropertyField(customRange_CM, new GUIContent("   Use A Custom Range"));
+                if (script.CustomRange_CM)
+                {
+                    EditorGUILayout.PropertyField(frontLayer_CM, new GUIContent("      it's Front Layer"));
+                    EditorGUILayout.PropertyField(backLayer_CM, new GUIContent("      it's Back Layer"));
+                }
+            }
+
+            //Sprite Outline
+            EditorGUILayout.PropertyField(active_O, new GUIContent("Active Sprite Outline"));
+            if (script.Active_O)
+            {
+                EditorGUILayout.PropertyField(color_O, new GUIContent("   it's Color"));
+                EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("   it's Order In Layer"));
+                EditorGUILayout.PropertyField(size_O, new GUIContent("   it's Size")); //run update outline for everything below
+                EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("   Follow Parent X Scale"));
+                EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("   Follow Parent Y Scale"));
+            }
+
+            //-------------------------Push Type Variables-------------------------
+
+            EditorGUILayout.PropertyField(pushType_OP, new GUIContent("Push With A"));
+
+            if(script.PushType_OP == push.regularPattern)
+            {
+                EditorGUILayout.PropertyField(objsMakingOutline_OPR, new GUIContent("   # Of Outline Objects"));
+                EditorGUILayout.PropertyField(startAngle_OPR, new GUIContent("   Start Angle For Pattern"));
+                EditorGUILayout.PropertyField(radialPush_OPR, new GUIContent("   Push Pattern"));
+            }
+            else
+            {
+                EditorGUILayout.PropertyField(stdSize_OPC, new GUIContent("   Should All Pushes Be A Standard Size"));
+            } 
 
             serializedObject.ApplyModifiedProperties();
         }
