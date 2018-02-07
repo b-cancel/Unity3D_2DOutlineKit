@@ -361,11 +361,17 @@ namespace object2DOutlines
                 {
                     if (children[childID] != null)
                     {
-                        if (children[childID].GetComponent<convexOut>() != null)
-                            convexSwitch(varEnum, parent.GetComponent<convexOut>(), children[childID].GetComponent<convexOut>()); //convex, convex
-                        else if (children[childID].GetComponent<concaveOut>() != null)
-                            convexParent_concaveChild_Switch(varEnum, parent.GetComponent<convexOut>(), children[childID].GetComponent<concaveOut>()); //convex, concave
-                        //ELSE... child has no data to receive
+                        convexOut[] convexOutlines = children[childID].GetComponents<convexOut>();
+                        concaveOut[] concaveOutlines = children[childID].GetComponents<concaveOut>();
+
+                        if (convexOutlines.Length != 0)
+                            for(int i=0; i<convexOutlines.Length; i++)
+                                convexSwitch(varEnum, parent.GetComponent<convexOut>(), convexOutlines[i]); //convex, convex
+                            
+                        if (concaveOutlines.Length != 0)
+                            for(int i=0; i<concaveOutlines.Length; i++)
+                                convexParent_concaveChild_Switch(varEnum, parent.GetComponent<convexOut>(), concaveOutlines[i]); //convex, concave
+                            
                     }
                     else
                     {
@@ -382,11 +388,16 @@ namespace object2DOutlines
                 {
                     if (children[childID] != null)
                     {
-                        if (children[childID].GetComponent<convexOut>() != null)
-                            concaveParent_convexChild_Switch(varEnum, parent.GetComponent<concaveOut>(), children[childID].GetComponent<convexOut>()); //concave, convex
-                        else if (children[childID].GetComponent<concaveOut>() != null)
-                            concaveSwitch(varEnum, parent.GetComponent<concaveOut>(), children[childID].GetComponent<concaveOut>()); //concave, concave
-                        //ELSE... child has no data to receive
+                        convexOut[] convexOutlines = children[childID].GetComponents<convexOut>();
+                        concaveOut[] concaveOutlines = children[childID].GetComponents<concaveOut>();
+
+                        if (convexOutlines.Length != 0)
+                            for (int i = 0; i < convexOutlines.Length; i++)
+                                concaveParent_convexChild_Switch(varEnum, parent.GetComponent<concaveOut>(), convexOutlines[i]); //concave, convex
+
+                        if (concaveOutlines.Length != 0)
+                            for (int i = 0; i < concaveOutlines.Length; i++)
+                                concaveSwitch(varEnum, parent.GetComponent<concaveOut>(), concaveOutlines[i]); //concave, concave
                     }
                     else
                     {
