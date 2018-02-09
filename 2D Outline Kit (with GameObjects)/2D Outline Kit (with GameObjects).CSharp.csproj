@@ -310,6 +310,8 @@
     <Compile Include="Assets\outlineKit\concaveOut.cs" />
     <Compile Include="Assets\outlineKit\convexOut.cs" />
     <Compile Include="Assets\outlineKit\Hidden\outline.cs" />
+    <Compile Include="Assets\outlineKit\SERIALIZATION TEST\testEditor.cs" />
+    <Compile Include="Assets\outlineKit\SERIALIZATION TEST\testOut.cs" />
     <Compile Include="Assets\ruler.cs" />
   </ItemGroup>
   <ItemGroup>

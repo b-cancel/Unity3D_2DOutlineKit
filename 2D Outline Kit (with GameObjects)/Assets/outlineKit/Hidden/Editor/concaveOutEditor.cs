@@ -90,6 +90,9 @@ namespace object2DOutlines
 
         public override void OnInspectorGUI()
         {
+            if (GUI.changed)
+                EditorUtility.SetDirty(target);
+
             concaveOut script = (concaveOut)target;
 
             serializedObject.Update();

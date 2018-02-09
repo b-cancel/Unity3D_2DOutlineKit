@@ -65,7 +65,10 @@ namespace object2DOutlines
 
         public override void OnInspectorGUI()
         {
-            convexOut script = (convexOut)target;
+            if (GUI.changed)
+                EditorUtility.SetDirty(target);
+
+           convexOut script = (convexOut)target;
 
             serializedObject.Update();
 

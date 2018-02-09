@@ -4,9 +4,10 @@ using UnityEngine;
 
 namespace object2DOutlines
 {
-    [ExecuteInEditMode]
+    [System.Serializable, ExecuteInEditMode]
     public class convexOut : outline
     {
+        [SerializeField, HideInInspector]
         private bool awakeFinished_VEX;
 
         void OnValidate()
@@ -67,6 +68,7 @@ namespace object2DOutlines
 
         //-----Outline Variables-----
 
+        [SerializeField, HideInInspector]
         GameObject thisOutline;
 
         [Space(10)]

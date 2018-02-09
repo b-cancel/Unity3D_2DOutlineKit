@@ -13,6 +13,28 @@ using UnityEngine;
 //BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
 //NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
+/*
+ * ---Other Resources
+ * https://answers.unity.com/questions/235595/custom-editor-losing-settings-on-play.html
+ * 
+ * ---Other Docs
+ * https://docs.unity3d.com/Manual/script-Serialization.html
+ * https://docs.unity3d.com/ScriptReference/EditorUtility.SetDirty.html
+ * 
+ * ---Unity Documentation
+ * UnityEditor.Build
+ * UnityEditor.Callbacks
+ * UnityEditor.EventSystems
+ * 
+ * UnityEditor.IOS
+ * 
+ * CHECK ALL CLASSES INBETWEEN FOR ANTHING USEFUL
+ * 
+ * Classes
+ * Enumerations
+ * Attributes
+ */
+
 namespace object2DOutlines
 {
     //---This Enum makes it easier for us to pass our variables to our children (helps keep code clean)
@@ -54,7 +76,7 @@ namespace object2DOutlines
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
 
-    [ExecuteInEditMode]
+    [System.Serializable, ExecuteInEditMode]
     public class outline : MonoBehaviour
     {
         //--- Optimization
@@ -71,6 +93,7 @@ namespace object2DOutlines
         //-----Debugging Variables-----
 
         //IMPORTANT NOTE: currently only one outline is supported
+        [SerializeField, HideInInspector]
         internal GameObject outlineGameObjectsFolder; //contains all the outlines
 
         [Space(10)]
@@ -93,6 +116,7 @@ namespace object2DOutlines
 
         //-----Overlay Variables-----
 
+        [SerializeField, HideInInspector]
         internal GameObject spriteOverlay;
 
         [Space(10)]
@@ -138,6 +162,7 @@ namespace object2DOutlines
 
         //-----Clipping Mask Variables
 
+        [SerializeField, HideInInspector]
         internal GameObject clippingMask; //gameobject with sprite mask
 
         [SerializeField, HideInInspector]
@@ -214,10 +239,15 @@ namespace object2DOutlines
             BackLayer_CM = 0; //by defaults maps to "default" layer
         }
 
+        [SerializeField, HideInInspector]
         Sprite prevSprite;
+        [SerializeField, HideInInspector]
         bool prevFlipX;
+        [SerializeField, HideInInspector]
         bool prevFlipY;
+        [SerializeField, HideInInspector]
         SpriteDrawMode prevDrawMode;
+        [SerializeField, HideInInspector]
         Vector2 prevSize;
 
         //GIVEN THE NOTES BELOW: we only check if (1) sprite (2) flip X and flip Y changes (3) DrawMode (4) Size [for draw mode = tiled]
@@ -255,7 +285,7 @@ namespace object2DOutlines
         public static Material initPart1(GameObject main, ref GameObject thisOutline, ref GameObject folder)
         {
             //----------Cover Duplication Problem
-
+            
             Transform psblOF_T = main.transform.Find("Outline Folder");
             if (psblOF_T != null) //transform found
             {
@@ -263,7 +293,7 @@ namespace object2DOutlines
                 if (psblOF_GO.transform.parent.gameObject == main) //this gameobject ours
                     DestroyImmediate(psblOF_GO);
             }
-
+            
             //----------Object Instantiation
 
             //-----Outline Folder [MUST BE FIRST]

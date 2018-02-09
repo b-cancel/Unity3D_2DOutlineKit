@@ -7,9 +7,10 @@ namespace object2DOutlines
     public enum push { regularPattern, customPattern }; //ONLY for concave outline
     public enum pushPattern { radial, squarial}; //ONLY for concave outline
 
-    [ExecuteInEditMode]
+    [System.Serializable, ExecuteInEditMode]
     public class concaveOut : outline
     {
+        [SerializeField, HideInInspector]
         private bool awakeFinished_CAVE;
 
         void OnValidate()
@@ -85,6 +86,7 @@ namespace object2DOutlines
 
         //-----Outline Variables-----
 
+        [SerializeField, HideInInspector]
         GameObject thisOutline;
 
         [Space(10)]
@@ -183,6 +185,7 @@ namespace object2DOutlines
 
         //-------------------------Push Type Variables-------------------------
 
+        [SerializeField, HideInInspector]
         Dictionary<GameObject, Vector2> outlineEdges;
 
         [Space(10)]
