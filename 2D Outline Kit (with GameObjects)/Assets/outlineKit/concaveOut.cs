@@ -78,14 +78,14 @@ namespace object2DOutlines
                 if (clipCenter_CM == true)
                 {
                     if (outlineEdges != null)
-                        foreach (KeyValuePair<GameObject, Vector2> dictVal in outlineEdges)
-                            dictVal.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                        foreach (var GameObject in outlineEdges.Keys)
+                            GameObject.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
                 }
                 else
                 {
                     if (outlineEdges != null)
-                        foreach (KeyValuePair<GameObject, Vector2> dictVal in outlineEdges)
-                            dictVal.Key.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                        foreach (var GameObject in outlineEdges.Keys)
+                            GameObject.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
                 }
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
@@ -108,8 +108,8 @@ namespace object2DOutlines
 
                 //all edges set active
                 if (outlineEdges != null)
-                    foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
-                        entry.Key.SetActive(active_O);
+                    foreach (var GameObject in outlineEdges.Keys)
+                        GameObject.SetActive(active_O);
             }
         }
 
@@ -124,8 +124,8 @@ namespace object2DOutlines
 
                 //update our edges with the new color
                 if (outlineEdges != null)
-                    foreach (KeyValuePair<GameObject, Vector2> dictVal in outlineEdges)
-                        dictVal.Key.GetComponent<SpriteRenderer>().color = color_O;
+                    foreach (var GameObject in outlineEdges.Keys)
+                        GameObject.GetComponent<SpriteRenderer>().color = color_O;
             }
         }
 
@@ -140,8 +140,8 @@ namespace object2DOutlines
 
                 //update our edges with the new color
                 if (outlineEdges != null)
-                    foreach (KeyValuePair<GameObject, Vector2> dictVal in outlineEdges)
-                        dictVal.Key.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
+                    foreach (var GameObject in outlineEdges.Keys)
+                        GameObject.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
         }
 
@@ -193,6 +193,9 @@ namespace object2DOutlines
         [SerializeField, HideInInspector]
         Dictionary<GameObject, Vector2> outlineEdges;
 
+        [SerializeField, HideInInspector]
+        private bool mustCallEdgeCount;
+
         [Space(10)]
         [Header("PUSH TYPE VARIABLES-----")]
         [SerializeField, HideInInspector]
@@ -202,15 +205,9 @@ namespace object2DOutlines
             get { return pushType_OP; }
             set
             {
-                if(pushType_OP != value)
-                {
-                    pushType_OP = value; //update local value
+                pushType_OP = value; //update local value
 
-                    if (value == push.regularPattern) //f -> t
-                        updateEdgeCount();
-                    else //t -> f
-                        updateEdgePositionsALL();
-                }
+                mustCallEdgeCount = true;
             }
         }
 
@@ -228,7 +225,7 @@ namespace object2DOutlines
             {
                 edgeCount_OPR = (value >= 0) ? value : 0; //update local value
 
-                updateEdgeCount();
+                mustCallEdgeCount = true;
             }
         }
 
@@ -241,7 +238,7 @@ namespace object2DOutlines
             {
                 startAngle_OPR = value; //update local value
 
-                updateEdgeRotations();
+                updateEdgeRotationsALL();
             }
         }
 
@@ -304,6 +301,7 @@ namespace object2DOutlines
                 //-----Push Type Vars
                 outlineEdges = new Dictionary<GameObject, Vector2>();
                 PushType_OP = push.regularPattern;
+
                 //---Regular
                 EdgeCount_OPR = 8;
                 StartAngle_OPR = 0;
@@ -337,6 +335,16 @@ namespace object2DOutlines
                         updateSpriteData();
                     break;
             }
+
+            //NOTE: this is a required "HACK"
+            //this is because this variables change might trigger a DestroyImmediate
+            //DestoryImmediate MUST be used when a script runs in edit mode... but it cant be called by OnValidate... 
+            //so this is a "HACK" to make it work without it (technically) being inside OnValidate()
+            if (mustCallEdgeCount)
+            {
+                updateEdgeCount();
+                mustCallEdgeCount = false;
+            }
         }
 
         public void updateSpriteData()
@@ -349,8 +357,8 @@ namespace object2DOutlines
 
             //update outline
             if (outlineEdges != null)
-                foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
-                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
+                foreach (var GameObject in outlineEdges.Keys)
+                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), GameObject.GetComponent<SpriteRenderer>());
         }
 
         //--------------------------------------------------SUPER DIFFERENT CODE--------------------------------------------------
@@ -383,7 +391,7 @@ namespace object2DOutlines
                             }     
                         }
 
-                        updateEdgeRotations(); //BECAUSE... the count of edges changed
+                        updateEdgeRotationsALL(); //BECAUSE... the count of edges changed
                     }
                     //ELSE... we have the correct number of edges
                 }
@@ -391,7 +399,7 @@ namespace object2DOutlines
             //ELSE... follow custom outline rules
         }
 
-        void updateEdgeRotations() //AUTOMATICALLY... calls updateEdgePositions()
+        void updateEdgeRotationsALL() //AUTOMATICALLY... calls updateEdgePositions()
         {
             if (PushType_OP == push.regularPattern)
             {
@@ -400,11 +408,12 @@ namespace object2DOutlines
                     float edgeRotation = StartAngle_OPR;
                     float angleBetweenAllEdges = (EdgeCount_OPR == 0) ? 0 : 360 / EdgeCount_OPR;
 
-                    foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
+                    List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
+                    foreach (var GameObject in GOs)
                     {
-                        float oldMagnitude = outlineEdges[entry.Key].magnitude;
+                        float oldMagnitude = outlineEdges[GameObject].magnitude;
                         Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                        editEdge(entry.Key, newDirection.normalized * oldMagnitude, true);
+                        editEdge(GameObject, newDirection.normalized * oldMagnitude, true);
 
                         edgeRotation += angleBetweenAllEdges;
                     }
@@ -421,8 +430,8 @@ namespace object2DOutlines
         void updateEdgePositionsALL()
         {
             if (outlineEdges != null)
-                foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
-                    updateEdgePosition(entry.Key, entry.Value);
+                foreach (var GameObject in outlineEdges.Keys)
+                    updateEdgePosition(GameObject, outlineEdges[GameObject]);
         }
 
         //USES...
