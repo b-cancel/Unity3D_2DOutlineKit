@@ -286,8 +286,6 @@ namespace object2DOutlines
 
         public static Material initPart1(GameObject main, ref GameObject thisOutline, ref GameObject folder)
         {
-            //----------Object Instantiation
-
             //-----Outline Folder [MUST BE FIRST]
             folder = new GameObject("Outline Folder");
             copyTransform(main, folder);
@@ -305,8 +303,6 @@ namespace object2DOutlines
 
         public static void initPart2(GameObject main, ref GameObject folder, ref GameObject overlay, ref GameObject clipMask, ref Material tempMaterial)
         {
-            //----------Object Connect To Script
-
             //-----Sprite Overlay
             overlay = new GameObject("Sprite Overlay");
             overlay.AddComponent<SpriteRenderer>();
@@ -322,10 +318,6 @@ namespace object2DOutlines
             clipMask.transform.parent = folder.transform;
             clipMask.GetComponent<SpriteMask>().sprite = main.GetComponent<SpriteRenderer>().sprite;
         }
-
-        //-------------------------Re-Inits (outlineGameObjectsFolder, spriteOverlay, clippingMask)
-
-        //TODO... fill this in
 
         //-------------------------Other
 
@@ -497,7 +489,7 @@ namespace object2DOutlines
 
                 //---ONLY push type
                 case varToUpdate.PT_OP: child.PushType_OP = par.PushType_OP; break;
-                case varToUpdate.OMO_OPR: child.ObjsMakingOutline_OPR = par.ObjsMakingOutline_OPR; break;
+                case varToUpdate.OMO_OPR: child.EdgeCount_OPR = par.EdgeCount_OPR; break;
                 case varToUpdate.SA_OPR: child.StartAngle_OPR = par.StartAngle_OPR; break;
                 case varToUpdate.PP_OPR: child.PushPattern_OPR = par.PushPattern_OPR; break;
                 case varToUpdate.SS_OPC: child.StdSize_OPC = par.StdSize_OPC; break;

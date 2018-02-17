@@ -197,7 +197,7 @@ namespace object2DOutlines
             awakeFinished_VEX = true;
         }
 
-        //-------------------------UNIQUE CODE-------------------------
+        //--------------------------------------------------SLIGHTLY DIFFERENT CODE--------------------------------------------------
 
         void Update()
         {
@@ -222,6 +222,8 @@ namespace object2DOutlines
             //update outline
             copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());
         }
+
+        //--------------------------------------------------SUPER DIFFERENT CODE--------------------------------------------------
 
         void updateOutline()
         {

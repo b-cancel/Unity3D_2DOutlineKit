@@ -40,7 +40,7 @@ namespace object2DOutlines
         SerializedProperty pushType_OP;
 
         //ONLY regular
-        SerializedProperty objsMakingOutline_OPR;
+        SerializedProperty edgeCount_OPR;
         SerializedProperty startAngle_OPR;
         SerializedProperty pushPattern_OPR;
 
@@ -80,7 +80,7 @@ namespace object2DOutlines
             pushType_OP = serializedObject.FindProperty("pushType_OP");
 
             //ONLY regular
-            objsMakingOutline_OPR = serializedObject.FindProperty("objsMakingOutline_OPR");
+            edgeCount_OPR = serializedObject.FindProperty("edgeCount_OPR");
             startAngle_OPR = serializedObject.FindProperty("startAngle_OPR");
             pushPattern_OPR = serializedObject.FindProperty("pushPattern_OPR");
 
@@ -146,7 +146,7 @@ namespace object2DOutlines
 
             if(script.PushType_OP == push.regularPattern)
             {
-                EditorGUILayout.PropertyField(objsMakingOutline_OPR, new GUIContent("   # Of Outline Objects"));
+                EditorGUILayout.PropertyField(edgeCount_OPR, new GUIContent("   # Of Outline Objects"));
                 EditorGUILayout.PropertyField(startAngle_OPR, new GUIContent("   Start Angle For Pattern"));
                 EditorGUILayout.PropertyField(pushPattern_OPR, new GUIContent("   Push Pattern"));
             }
