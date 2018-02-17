@@ -222,7 +222,7 @@ namespace object2DOutlines
             //----------Variable Inits
 
             //--- Optimization
-            updateSprite = spriteUpdateSetting.AfterEveryChange;
+            UpdateSprite = spriteUpdateSetting.AfterEveryChange;
 
             //----- Debugging
             ShowOutline_GOs_InHierarchy_D = false;
@@ -282,18 +282,10 @@ namespace object2DOutlines
 
         //-------------------------Used By All Outlines-------------------------
 
+        //-------------------------Inits
+
         public static Material initPart1(GameObject main, ref GameObject thisOutline, ref GameObject folder)
         {
-            //----------Cover Duplication Problem
-            
-            Transform psblOF_T = main.transform.Find("Outline Folder");
-            if (psblOF_T != null) //transform found
-            {
-                GameObject psblOF_GO = psblOF_T.gameObject;
-                if (psblOF_GO.transform.parent.gameObject == main) //this gameobject ours
-                    DestroyImmediate(psblOF_GO);
-            }
-            
             //----------Object Instantiation
 
             //-----Outline Folder [MUST BE FIRST]
@@ -313,6 +305,8 @@ namespace object2DOutlines
 
         public static void initPart2(GameObject main, ref GameObject folder, ref GameObject overlay, ref GameObject clipMask, ref Material tempMaterial)
         {
+            //----------Object Connect To Script
+
             //-----Sprite Overlay
             overlay = new GameObject("Sprite Overlay");
             overlay.AddComponent<SpriteRenderer>();
@@ -328,6 +322,12 @@ namespace object2DOutlines
             clipMask.transform.parent = folder.transform;
             clipMask.GetComponent<SpriteMask>().sprite = main.GetComponent<SpriteRenderer>().sprite;
         }
+
+        //-------------------------Re-Inits (outlineGameObjectsFolder, spriteOverlay, clippingMask)
+
+        //TODO... fill this in
+
+        //-------------------------Other
 
         public static void copyTransform(GameObject original, GameObject copy)
         {

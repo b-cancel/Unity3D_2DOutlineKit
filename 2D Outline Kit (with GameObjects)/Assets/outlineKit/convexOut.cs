@@ -160,26 +160,39 @@ namespace object2DOutlines
         {
             awakeFinished_VEX = false;
 
-            thisOutline = new GameObject("The Outline");
-            Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
-            thisOutline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial; //DIFFERENT
-            copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
-            initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
+            if (gameObject.transform.Find("Outline Folder") == null) //NOTE: will directly search children
+            {
+                //----------Objects Inits
 
-            //----------Variable Inits
+                thisOutline = new GameObject("The Outline");
+                Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
+                thisOutline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial; //DIFFERENT
+                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
+                initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
-            //---Clipping Mask Vars
-            ClipCenter_CM = true;
+                //----------Variable Inits
 
-            //---Outline Vars
-            Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
-            Color_O = Color.red;
-            OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-            Size_O = 2f;
-            ScaleWithParentX_O = true;
-            ScaleWithParentY_O = true;
+                //---Clipping Mask Vars
+                ClipCenter_CM = true;
 
-            base.Awake();
+                //---Outline Vars
+                Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+                Color_O = Color.red;
+                OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
+                Size_O = 2f;
+                ScaleWithParentX_O = true;
+                ScaleWithParentY_O = true;
+
+                //---Var Inits from base outline class
+                base.Awake();
+            }
+            else
+            {
+                outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
+                thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
+                spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
+                clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
+            }
 
             awakeFinished_VEX = true;
         }

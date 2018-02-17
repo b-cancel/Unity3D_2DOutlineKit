@@ -100,7 +100,6 @@ namespace object2DOutlines
             //Optimization
             EditorGUILayout.PropertyField(updateSprite, new GUIContent("We Update The Sprite"));
 
-
             if (script.UpdateSprite == spriteUpdateSetting.Manually)
                 if (GUILayout.Button("Update Sprite"))
                     script.updateSpriteData();

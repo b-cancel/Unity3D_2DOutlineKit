@@ -108,12 +108,12 @@ namespace object2DOutlines
 
             //---Outline Vars
             Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
-            Color_O = Color.red;
+            //Color_O = Color.red;
 
             //----------Variable Inits
 
             //--- Optimization
-            updateSprite = spriteUpdateSetting.AfterEveryChange;
+            //updateSprite = spriteUpdateSetting.AfterEveryChange;
 
             //----- Debugging
             ShowOutline_GOs_InHierarchy_D = false;

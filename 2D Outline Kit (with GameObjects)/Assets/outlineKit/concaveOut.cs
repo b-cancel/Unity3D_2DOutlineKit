@@ -93,7 +93,6 @@ namespace object2DOutlines
         [Header("OUTLINE VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool active_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool Active_O
         {
             get { return active_O; }
@@ -139,6 +138,8 @@ namespace object2DOutlines
                         dictVal.Key.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
         }
+
+        //*****CHECK CODE BELOW
 
         [SerializeField, HideInInspector]
         float size_O; //NOTE: this size refers to the world space thickness of the outline
@@ -229,6 +230,8 @@ namespace object2DOutlines
             }
         }
 
+        //****CHECK CODE ABOVE
+
         [SerializeField, HideInInspector]
         float startAngle_OPR;
         public float StartAngle_OPR
@@ -236,9 +239,9 @@ namespace object2DOutlines
             get { return startAngle_OPR; }
             set
             {
-                startAngle_OPR = value;//update local value
+                startAngle_OPR = value; //update local value
 
-                updatePositionsOfEdges();
+                updateNormalEdgeVectors();
             }
         }
 
@@ -249,7 +252,7 @@ namespace object2DOutlines
             get { return pushPattern_OPR; }
             set
             {
-                pushPattern_OPR = value;//update local value
+                pushPattern_OPR = value; //update local value
 
                 updatePositionsOfEdges();
             }
@@ -264,7 +267,7 @@ namespace object2DOutlines
             get { return stdSize_OPC; }
             set
             {
-                stdSize_OPC = value;//update local value
+                stdSize_OPC = value; //update local value
 
                 updatePositionsOfEdges();
             }
@@ -274,35 +277,48 @@ namespace object2DOutlines
         {
             awakeFinished_CAVE = false;
 
-            thisOutline = new GameObject("The Outline");
-            Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
-            DestroyImmediate(thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
-            initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
+            if (gameObject.transform.Find("Outline Folder") == null)
+            {
+                //----------Objects Inits
 
-            //----------Variable Inits
+                thisOutline = new GameObject("The Outline");
+                Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
+                DestroyImmediate(thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
+                initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
-            //---Clipping Mask Vars
-            ClipCenter_CM = true;
+                //----------Variable Inits
 
-            //---Outline Vars
-            Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
-            Color_O = Color.red;
-            OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-            Size_O = 2f;
-            ScaleWithParentX_O = true;
-            ScaleWithParentY_O = true;
+                //---Clipping Mask Vars
+                ClipCenter_CM = true;
 
-            //-----Push Type Vars
-            outlineEdges = new Dictionary<GameObject, Vector2>();
-            PushType_OP = push.regularPattern;
-            //---Regular
-            ObjsMakingOutline_OPR = 8;
-            StartAngle_OPR = 0;
-            PushPattern_OPR = pushPattern.squarial;
-            //---Custom
-            StdSize_OPC = false;
+                //---Outline Vars
+                Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+                Color_O = Color.red;
+                OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
+                Size_O = 2f;
+                ScaleWithParentX_O = true;
+                ScaleWithParentY_O = true;
 
-            base.Awake();
+                //-----Push Type Vars
+                outlineEdges = new Dictionary<GameObject, Vector2>();
+                PushType_OP = push.regularPattern;
+                //---Regular
+                ObjsMakingOutline_OPR = 8;
+                StartAngle_OPR = 0;
+                PushPattern_OPR = pushPattern.squarial;
+                //---Custom
+                StdSize_OPC = false;
+
+                //---Var Inits from base outline class
+                base.Awake();
+            }
+            else
+            {
+                outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
+                thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
+                spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
+                clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
+            }
 
             awakeFinished_CAVE = true;
         }
@@ -335,16 +351,26 @@ namespace object2DOutlines
                     copySpriteRendererData(this.GetComponent<SpriteRenderer>(), entry.Key.GetComponent<SpriteRenderer>());
         }
 
+        //****CHECK CODE BELOW
+
         //-------------------------ONLY PUSH TYPE OUTLINE-------------------------
 
+        //USES...
+        //(PushType_OP == regular)... use (PushPattern_OPR)
+        //(PushType_OP == custom)... use (StdSize_OPC) 
+        //(PushType_OP == either)... use (Size_O) (ScaleWithParentX_O) (ScaleWithParentY_O)
         void updatePositionsOfEdges()
         {
             if (outlineEdges != null)
                 foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
-                    UpdateEdgePosition(entry.Key, entry.Value);
+                    updateEdgePosition(entry.Key, entry.Value);
         }
 
-        void UpdateEdgePosition(GameObject anEdge, Vector2 vect)
+        //USES...
+        //(PushType_OP == regular)... use (PushPattern_OPR)
+        //(PushType_OP == custom)... use (StdSize_OPC) 
+        //(PushType_OP == either)... use (Size_O) (ScaleWithParentX_O) (ScaleWithParentY_O)
+        void updateEdgePosition(GameObject anEdge, Vector2 vect)
         {
             if (PushType_OP == push.regularPattern)
             {
@@ -376,18 +402,87 @@ namespace object2DOutlines
             anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
         }
 
-        //--- Outline Edge List Edits
+        //--- helper functions
+
+        void destroyEdgesThatCreateOutline()
+        {
+            if (outlineEdges != null) //precautionary check
+            {
+                foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
+                    DestroyImmediate(entry.Key);
+                outlineEdges.Clear();
+            }
+        }
+
+        void makeSureWeHaveCorrectNumberOfEdges()
+        {
+            if (PushType_OP == push.regularPattern)
+            {
+                if(outlineEdges != null) //precautionary check
+                {
+                    if (outlineEdges.Count != ObjsMakingOutline_OPR)
+                    {
+                        int iterations = Mathf.Abs(ObjsMakingOutline_OPR - outlineEdges.Count);
+
+                        if (outlineEdges.Count < ObjsMakingOutline_OPR)
+                        {
+                            for (int i = 0; i < iterations; i++)
+                                addOutline(Vector2.up, true); //NOTE: the lines will update with a simply Vector3.Up... BUT after this we update our directions and then update all of the lines directions... then all the positions...
+                        }
+                        else
+                        {
+                            List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys);
+                            for (int i = 0; i < iterations; i++)
+                                removeOutline(keyList[i], true);
+                        }
+                    }
+                    //ELSE... we have the correct number of edges
+                }
+            }
+            //ELSE... follow custom outline rules
+        }
+
+        void updateNormalEdgeVectors()
+        {
+            if (PushType_OP == push.regularPattern)
+            {
+                //NOTE: only required if regular Outline = True
+                float rotation = StartAngle_OPR;
+                float angleBetweenAllEdges = (ObjsMakingOutline_OPR == 0) ? 360 : 360 / ObjsMakingOutline_OPR;
+
+                if(outlineEdges != null) //precautionary check
+                {
+                    List<GameObject> edgesKeys = new List<GameObject>(outlineEdges.Keys);
+                    foreach (var aKey in edgesKeys)
+                    {
+                        float oldMagnitude = outlineEdges[aKey].magnitude;
+                        //NOTE: your direction is calculated from a compass (your obj rotation is not taken into consideration till later)
+                        Vector3 newDirection = Quaternion.AngleAxis(rotation, Vector3.forward) * Vector3.up;
+
+                        outlineEdges[aKey] = newDirection.normalized * oldMagnitude;
+
+                        rotation += angleBetweenAllEdges;
+                    }
+
+                    updatePositionsOfEdges(); //we have new directions so we must recalculate our positions because they are based on our directions
+                }
+            }
+            //ELSE... follow custom outline rules
+        }
+
+        //-------------------------Outline Edge List Edits-------------------------
 
         public bool addOutline(Vector2 outlineDirection)
         {
             return addOutline(outlineDirection, false);
         }
 
+        //USES... PushType_OP | Color_O | orderInLayer_O | ClipCenter_CM | Active_O
         bool addOutline(Vector2 outlineDirection, bool sudo)
         {
             if (PushType_OP == push.customPattern || sudo == true)
             {
-                if (thisOutline != null)
+                if (thisOutline != null) //precautionary check
                 {
                     //NOTE: here we must manually take into account, color, order in layer, activeness
 
@@ -408,13 +503,13 @@ namespace object2DOutlines
                     tempSpriteCopy.GetComponent<SpriteRenderer>().color = Color_O;
 
                     //set sorting layer
-                    tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
+                    tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = OrderInLayer_O;
 
                     //set sprite renderer data
                     copySpriteRendererData(this.GetComponent<SpriteRenderer>(), tempSpriteCopy.GetComponent<SpriteRenderer>());
 
                     //set interaction with mask
-                    if (clipCenter_CM)
+                    if (ClipCenter_CM)
                         tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
                     else
                         tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
@@ -423,7 +518,7 @@ namespace object2DOutlines
                     outlineEdges.Add(tempSpriteCopy, outlineDirection);
 
                     //update position that is affected by... size, scale par x, scale par y
-                    UpdateEdgePosition(tempSpriteCopy, outlineDirection);
+                    updateEdgePosition(tempSpriteCopy, outlineDirection);
 
                     //set active state
                     tempSpriteCopy.SetActive(Active_O);
@@ -442,15 +537,21 @@ namespace object2DOutlines
             return removeOutline(edgeGO, false);
         }
 
+        //USES... PushType_OP
         bool removeOutline(GameObject edgeGO, bool sudo)
         {
             if (PushType_OP == push.customPattern || sudo == true)
             {
-                if (outlineEdges.ContainsKey(edgeGO))
+                if (outlineEdges != null) //precautionary check
                 {
-                    outlineEdges.Remove(edgeGO);
-                    DestroyImmediate(edgeGO);
-                    return true;
+                    if (outlineEdges.ContainsKey(edgeGO))
+                    {
+                        outlineEdges.Remove(edgeGO);
+                        DestroyImmediate(edgeGO);
+                        return true;
+                    }
+                    else
+                        return false;
                 }
                 else
                     return false;
@@ -464,86 +565,30 @@ namespace object2DOutlines
             return editOutline(edgeGO, newDirection, false);
         }
 
+        //USES... PushType_OP
         bool editOutline(GameObject edgeGO, Vector2 newDirection, bool sudo)
         {
             if (PushType_OP == push.customPattern || sudo == true)
             {
-                if (outlineEdges.ContainsKey(edgeGO))
+                if (outlineEdges != null) //precautionary check
                 {
-                    outlineEdges[edgeGO] = newDirection;
+                    if (outlineEdges.ContainsKey(edgeGO))
+                    {
+                        outlineEdges[edgeGO] = newDirection;
 
-                    //update position that is affected by... size, scale par x, scale par y
-                    UpdateEdgePosition(edgeGO, newDirection);
+                        //update position that is affected by... size, scale par x, scale par y
+                        updateEdgePosition(edgeGO, newDirection);
 
-                    return true;
+                        return true;
+                    }
+                    else
+                        return false;
                 }
                 else
                     return false;
             }
             else //if we have a regular outline then we cant change the list of edges directly
                 return false;
-        }
-
-        //--- helper functions
-
-        void destroyEdgesThatCreateOutline()
-        {
-            if (outlineEdges != null)
-            {
-                foreach (KeyValuePair<GameObject, Vector2> entry in outlineEdges)
-                    DestroyImmediate(entry.Key);
-                outlineEdges.Clear();
-            }
-        }
-
-        void makeSureWeHaveCorrectNumberOfEdges()
-        {
-            if (PushType_OP == push.regularPattern)
-            {
-                if (outlineEdges.Count != ObjsMakingOutline_OPR)
-                {
-                    int iterations = Mathf.Abs(ObjsMakingOutline_OPR - outlineEdges.Count);
-
-                    if (outlineEdges.Count < ObjsMakingOutline_OPR)
-                    {
-                        for (int i = 0; i < iterations; i++)
-                            addOutline(Vector2.up, true); //NOTE: the lines will update with a simply Vector3.Up... BUT after this we update our directions and then update all of the lines directions... then all the positions...
-                    }
-                    else
-                    {
-                        List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys);
-                        for (int i = 0; i < iterations; i++)
-                            removeOutline(keyList[i], true);
-                    }
-                }
-                //ELSE... we have the correct number of edges
-            }
-            //ELSE... follow custom outline rules
-        }
-
-        void updateNormalEdgeVectors()
-        {
-            if (PushType_OP == push.regularPattern)
-            {
-                //NOTE: only required if regular Outline = True
-                float rotation = StartAngle_OPR;
-                float angleBetweenAllEdges = (ObjsMakingOutline_OPR == 0) ? 360 : 360 / ObjsMakingOutline_OPR;
-
-                List<GameObject> edgesKeys = new List<GameObject>(outlineEdges.Keys);
-                foreach (var aKey in edgesKeys)
-                {
-                    float oldMagnitude = outlineEdges[aKey].magnitude;
-                    //NOTE: your direction is calculated from a compass (your obj rotation is not taken into consideration till later)
-                    Vector3 newDirection = Quaternion.AngleAxis(rotation, Vector3.forward) * Vector3.up;
-
-                    outlineEdges[aKey] = newDirection.normalized * oldMagnitude;
-
-                    rotation += angleBetweenAllEdges;
-                }
-
-                updatePositionsOfEdges(); //we have new directions so we must recalculate our positions because they are based on our directions
-            }
-            //ELSE... follow custom outline rules
         }
     }
 }
