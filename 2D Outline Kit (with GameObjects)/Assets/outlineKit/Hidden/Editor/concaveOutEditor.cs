@@ -45,6 +45,10 @@ namespace object2DOutlines
         SerializedProperty startAngle_OPR;
         SerializedProperty pushPattern_OPR;
 
+        SerializedProperty rectSize_OPRS;
+        SerializedProperty rectWidth_OPRS;
+        SerializedProperty rectHeight_OPRS;
+
         void OnEnable()
         {
             //Optimization
@@ -82,6 +86,10 @@ namespace object2DOutlines
             edgeCount_OPR = serializedObject.FindProperty("edgeCount_OPR");
             startAngle_OPR = serializedObject.FindProperty("startAngle_OPR");
             pushPattern_OPR = serializedObject.FindProperty("pushPattern_OPR");
+
+            rectSize_OPRS = serializedObject.FindProperty("rectSize_OPRS");
+            rectWidth_OPRS = serializedObject.FindProperty("rectWidth_OPRS");
+            rectHeight_OPRS = serializedObject.FindProperty("rectHeight_OPRS");
         }
 
         public override void OnInspectorGUI()
@@ -155,7 +163,22 @@ namespace object2DOutlines
             {
                 EditorGUILayout.PropertyField(edgeCount_OPR, new GUIContent("   # Of Edges"));
                 EditorGUILayout.PropertyField(startAngle_OPR, new GUIContent("   Rotation"));
-                EditorGUILayout.PropertyField(pushPattern_OPR, new GUIContent("   Push Pattern"));
+
+                if (script.StdSize_OP)
+                {
+                    EditorGUILayout.PropertyField(pushPattern_OPR, new GUIContent("   Push Pattern"));
+
+                    if(script.PushPattern_OPR == pushPattern.squarial)
+                    {
+                        EditorGUILayout.PropertyField(rectSize_OPRS, new GUIContent("      Rect Type"));
+
+                        if (script.RectSize_OPRS == rectType.regular)
+                        {
+                            EditorGUILayout.PropertyField(rectWidth_OPRS, new GUIContent("         Width"));
+                            EditorGUILayout.PropertyField(rectHeight_OPRS, new GUIContent("         Height"));
+                        }
+                    }
+                }
             }
 
             serializedObject.ApplyModifiedProperties();

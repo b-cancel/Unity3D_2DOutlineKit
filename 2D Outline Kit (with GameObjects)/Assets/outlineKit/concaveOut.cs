@@ -6,15 +6,21 @@ namespace object2DOutlines
 {
     public enum push { regularPattern, customPattern }; //ONLY for concave outline
     public enum pushPattern { radial, squarial}; //ONLY for concave outline
+    public enum rectType { regular, custom};
 
     [System.Serializable, ExecuteInEditMode]
     public class concaveOut : outline
     {
-        //NOTE: (PushType = push.regularPattern) only the direction of the vector is used to calculate out outline
-        //ELSE... both our direction and rotation will be used (unless you specify a standard size... in which case once again only the rotation will be used)
-
         //NOTE: updateEdgeCount()... calls updateEdgeRotations()...
         //NOTE: updateEdgeRotations()... calls updateEdgePositions()...
+
+        //NOTE: (pushType == regular) -> ONLY controls rotation of edges
+        //IF(pushType == regular) && (stdSize == true) -> can select patternType (Radial or Squarial)
+        //IF(pushType == regular) && (stdSize == false) -> you can individually edit the magnitude of each edge [TODO]
+        //ELSE IF (pushType == custom) -> you can individually edit the rotation and magnitude of each edge (AND add and remove edges) [TODO]
+
+        //NOTE: IF(RectSize == regulat) -> use the height and width of our source sprite
+        //ELSE -> use our own custom height and width
 
         [SerializeField, HideInInspector]
         private bool awakeFinished_CAVE;
@@ -55,6 +61,9 @@ namespace object2DOutlines
                 EdgeCount_OPR = edgeCount_OPR;
                 StartAngle_OPR = startAngle_OPR;
                 PushPattern_OPR = pushPattern_OPR;
+                RectSize_OPRS = rectSize_OPRS;
+                RectWidth_OPRS = rectWidth_OPRS;
+                RectHeight_OPRS = rectHeight_OPRS;
             }
         }
 
@@ -264,6 +273,50 @@ namespace object2DOutlines
             set
             {
                 pushPattern_OPR = value; //update local value
+
+                updateEdgePositionsALL();
+            }
+        }
+
+        [SerializeField, HideInInspector]
+        rectType rectSize_OPRS;
+        public rectType RectSize_OPRS
+        {
+            get { return rectSize_OPRS;  }
+            set
+            {
+                rectSize_OPRS = value;
+
+                //update height and width... which will update our outline
+                if(rectSize_OPRS == rectType.regular)
+                {
+                    RectWidth_OPRS = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
+                    RectHeight_OPRS = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
+                }
+            }
+        }
+
+        [SerializeField, HideInInspector]
+        float rectWidth_OPRS;
+        public float RectWidth_OPRS
+        {
+            get { return rectWidth_OPRS; }
+            set
+            {
+                rectWidth_OPRS = value;
+
+                updateEdgePositionsALL();
+            }
+        }
+
+        [SerializeField, HideInInspector]
+        float rectHeight_OPRS;
+        public float RectHeight_OPRS
+        {
+            get { return rectHeight_OPRS; }
+            set
+            {
+                rectHeight_OPRS = value;
 
                 updateEdgePositionsALL();
             }

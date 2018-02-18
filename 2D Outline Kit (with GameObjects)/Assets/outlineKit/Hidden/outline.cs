@@ -70,7 +70,10 @@ namespace object2DOutlines
         S_OP, //size_OP
         OMO_OPR, //ObjsMakingOutline_OPR
         SA_OPR, //StartAngle_OPR
-        PP_OPR //PushPattern_OPR
+        PP_OPR, //PushPattern_OPR
+        RS_OPRS, //RectSize_OPRS 
+        RW_OPRS, //RectWidth_OPRS 
+        RH_OPRS //RectHeight_OPRS 
     };
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
@@ -492,6 +495,10 @@ namespace object2DOutlines
                 case varToUpdate.OMO_OPR: child.EdgeCount_OPR = par.EdgeCount_OPR; break;
                 case varToUpdate.SA_OPR: child.StartAngle_OPR = par.StartAngle_OPR; break;
                 case varToUpdate.PP_OPR: child.PushPattern_OPR = par.PushPattern_OPR; break;
+
+                case varToUpdate.RS_OPRS: child.RectSize_OPRS = par.RectSize_OPRS; break;
+                case varToUpdate.RW_OPRS: child.RectWidth_OPRS = par.RectWidth_OPRS; break;
+                case varToUpdate.RH_OPRS: child.RectHeight_OPRS = par.RectHeight_OPRS; break;
             };
         }
 
