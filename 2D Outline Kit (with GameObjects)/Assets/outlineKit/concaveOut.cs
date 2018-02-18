@@ -45,16 +45,16 @@ namespace object2DOutlines
                 Active_O = active_O;
                 Color_O = color_O;
                 OrderInLayer_O = orderInLayer_O;
-                Size_O = size_O;
                 ScaleWithParentX_O = scaleWithParentX_O;
                 ScaleWithParentY_O = scaleWithParentY_O;
 
                 //ONLY push
                 PushType_OP = pushType_OP;
+                StdSize_OP = stdSize_OP;
+                Size_OP = size_OP;
                 EdgeCount_OPR = edgeCount_OPR;
                 StartAngle_OPR = startAngle_OPR;
                 PushPattern_OPR = pushPattern_OPR;
-                StdSize_OPC = stdSize_OPC;
             }
         }
 
@@ -146,21 +146,6 @@ namespace object2DOutlines
         }
 
         [SerializeField, HideInInspector]
-        float size_O; //NOTE: this size refers to the world space thickness of the outline
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
-        public float Size_O
-        {
-            get { return size_O; }
-            set
-            {
-                value = (value >= 0) ? value : 0;
-                size_O = value;//update local value
-
-                updateEdgePositionsALL();
-            }
-        }
-
-        [SerializeField, HideInInspector]
         bool scaleWithParentX_O;
         //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentX_O
@@ -211,6 +196,35 @@ namespace object2DOutlines
             }
         }
 
+        [SerializeField, HideInInspector]
+        bool stdSize_OP; //NOTE: this size refers to the world space thickness of the outline
+        //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        public bool StdSize_OP
+        {
+            get { return stdSize_OP; }
+            set
+            {
+                stdSize_OP = value;//update local value
+
+                updateEdgePositionsALL();
+            }
+        }
+
+        [SerializeField, HideInInspector]
+        float size_OP; //NOTE: this size refers to the world space thickness of the outline
+        //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        public float Size_OP
+        {
+            get { return size_OP; }
+            set
+            {
+                value = (value >= 0) ? value : 0;
+                size_OP = value;//update local value
+
+                updateEdgePositionsALL();
+            }
+        }
+
         //---Regular
 
         [SerializeField, HideInInspector]
@@ -255,21 +269,6 @@ namespace object2DOutlines
             }
         }
 
-        //---Custom
-
-        [SerializeField, HideInInspector]
-        bool stdSize_OPC;
-        public bool StdSize_OPC
-        {
-            get { return stdSize_OPC; }
-            set
-            {
-                stdSize_OPC = value; //update local value
-
-                updateEdgePositionsALL();
-            }
-        }
-
         new void Awake()
         {
             awakeFinished_CAVE = false;
@@ -294,20 +293,18 @@ namespace object2DOutlines
                 Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
                 Color_O = Color.red;
                 OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-                Size_O = 2f;
                 ScaleWithParentX_O = true;
                 ScaleWithParentY_O = true;
 
                 //-----Push Type Vars
                 outlineEdges = new Dictionary<GameObject, Vector2>();
                 PushType_OP = push.regularPattern;
-
+                StdSize_OP = true;
+                Size_OP = 2f;
                 //---Regular
                 EdgeCount_OPR = 8;
                 StartAngle_OPR = 0;
                 PushPattern_OPR = pushPattern.squarial;
-                //---Custom
-                StdSize_OPC = false;
 
                 //---Var Inits from base outline class
                 base.Awake();
@@ -399,6 +396,7 @@ namespace object2DOutlines
             //ELSE... follow custom outline rules
         }
 
+        //UPDATE ---ROTATIONS--- BASED ON PATTERN
         void updateEdgeRotationsALL() //AUTOMATICALLY... calls updateEdgePositions()
         {
             if (PushType_OP == push.regularPattern)
@@ -406,19 +404,16 @@ namespace object2DOutlines
                 if(outlineEdges != null) //precautionary check
                 {
                     float edgeRotation = StartAngle_OPR;
-                    float angleBetweenAllEdges = (EdgeCount_OPR == 0) ? 0 : 360 / EdgeCount_OPR;
+                    float angleBetweenAllEdges = (EdgeCount_OPR == 0) ? 0 : 360 / (float)EdgeCount_OPR;
 
                     List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
                     foreach (var GameObject in GOs)
                     {
                         float oldMagnitude = outlineEdges[GameObject].magnitude;
                         Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                        editEdge(GameObject, newDirection.normalized * oldMagnitude, true);
-
+                        editEdge(GameObject, newDirection.normalized * oldMagnitude, true); //this will also updateEdgePosition()
                         edgeRotation += angleBetweenAllEdges;
                     }
-
-                    updateEdgePositionsALL(); //BECAUSE... the direction of every edge changed
                 }
             }
             //ELSE... follow custom outline rules
@@ -430,43 +425,56 @@ namespace object2DOutlines
         void updateEdgePositionsALL()
         {
             if (outlineEdges != null)
-                foreach (var GameObject in outlineEdges.Keys)
+            {
+                List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
+                foreach (var GameObject in GOs)
                     updateEdgePosition(GameObject, outlineEdges[GameObject]);
+            }
         }
 
         //USES...
         //(PushType_OP == regular)... use (PushPattern_OPR)
         //(PushType_OP == custom)... use (StdSize_OPC) 
         //(PushType_OP == either)... use (Size_O) (ScaleWithParentX_O) (ScaleWithParentY_O)
+
+        //UPDATE ---MAGNITUDE--- BASED ON PATTERN
         void updateEdgePosition(GameObject anEdge, Vector2 vect)
         {
+            outlineEdges[anEdge] = vect;
+
+            //NOTE: we push from origin (0,0,0)
+
+            Vector3 newVect = Vector3.zero;
             if (PushType_OP == push.regularPattern)
             {
-                anEdge.transform.position = vect.normalized; //use ONLY vector (1) direction
-
-                if (PushPattern_OPR == pushPattern.radial) //Radial Push
-                    anEdge.transform.position *= Size_O;
-                else //Square Push (note: SQUARE not RECTANGLE) [Hypotenuse = Adjecent / cos(theta)]
-                    anEdge.transform.position *= Mathf.Abs(Size_O / (Mathf.Cos((Vector2.Angle(vect, _0Rotation) % 90) * Mathf.Deg2Rad)));
+                if (StdSize_OP)
+                {
+                    if (PushPattern_OPR == pushPattern.radial) //Radial Push
+                        newVect = vect.normalized * Size_OP;
+                    else //Squarial Push
+                        newVect = vect.normalized * (Mathf.Abs(Size_OP / (Mathf.Cos((Vector2.Angle(vect, _0Rotation) % 90) * Mathf.Deg2Rad))));
+                }
+                else
+                    newVect = vect.normalized;
             }
             else
             {
-                if (StdSize_OPC) //STANDARD size for all vectors
-                    anEdge.transform.position = vect.normalized * Size_O; //use ONLY vector (1) direction
+                if (StdSize_OP) //STANDARD size for all vectors
+                    newVect = vect.normalized * Size_OP; //use ONLY vector (1) direction
                 else
-                    anEdge.transform.position = vect; //use ONLY vector (1) direction (2) magnitude
+                    newVect = vect; //use ONLY vector (1) direction (2) magnitude
             }
+            anEdge.transform.position = newVect;
 
             //NOTE: as of now our position is still on a compass in the (0,0,0) position
 
+            //take into consideration the SCALE of the sprite we are an edge for
             if (ScaleWithParentX_O)
                 anEdge.transform.position = new Vector2(anEdge.transform.position.x * this.transform.localScale.x, anEdge.transform.position.y);
-
             if (ScaleWithParentY_O)
                 anEdge.transform.position = new Vector2(anEdge.transform.position.x, anEdge.transform.position.y * this.transform.localScale.y);
 
-            //take into consideration the position and rotation of the sprite we are an edge for
-
+            //take into consideration the POSITION and ROTATION of the sprite we are an edge for
             anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
         }
 
@@ -564,9 +572,6 @@ namespace object2DOutlines
                 {
                     if (outlineEdges.ContainsKey(edgeGO))
                     {
-                        outlineEdges[edgeGO] = newDirection;
-
-                        //update position that is affected by... size, scale par x, scale par y
                         updateEdgePosition(edgeGO, newDirection);
 
                         return true;

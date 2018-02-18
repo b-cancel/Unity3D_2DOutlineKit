@@ -60,18 +60,17 @@ namespace object2DOutlines
         A_O, //Active_O
         C_O, //Color_O
         OIL_O, //OrderInLayer_O
-        S_O, //Size_O
+        S_O, //Size_O (ONLY convex)
         SWPX_O, //ScaleWithParentX_O
         SWPY_O, //ScaleWithParentY_O
 
         //----------Variables For ONLY (Concave/Push) Outline Type
         PT_OP, //PushType_OP
+        SS_OP, //stdSize_OP
+        S_OP, //size_OP
         OMO_OPR, //ObjsMakingOutline_OPR
         SA_OPR, //StartAngle_OPR
-        PP_OPR, //PushPattern_OPR
-        SS_OPC //StdSize_OPC
-
-        //NONE
+        PP_OPR //PushPattern_OPR
     };
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
@@ -483,16 +482,16 @@ namespace object2DOutlines
                 case varToUpdate.A_O: child.Active_O = par.Active_O; break;
                 case varToUpdate.C_O: child.Color_O = par.Color_O; break;
                 case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
                 case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
                 case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
 
                 //---ONLY push type
                 case varToUpdate.PT_OP: child.PushType_OP = par.PushType_OP; break;
+                case varToUpdate.SS_OP: child.StdSize_OP = par.StdSize_OP; break;
+                case varToUpdate.S_OP: child.Size_OP = par.Size_OP; break;
                 case varToUpdate.OMO_OPR: child.EdgeCount_OPR = par.EdgeCount_OPR; break;
                 case varToUpdate.SA_OPR: child.StartAngle_OPR = par.StartAngle_OPR; break;
                 case varToUpdate.PP_OPR: child.PushPattern_OPR = par.PushPattern_OPR; break;
-                case varToUpdate.SS_OPC: child.StdSize_OPC = par.StdSize_OPC; break;
             };
         }
 
@@ -518,7 +517,7 @@ namespace object2DOutlines
                 case varToUpdate.A_O: child.Active_O = par.Active_O; break;
                 case varToUpdate.C_O: child.Color_O = par.Color_O; break;
                 case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                //NOTE: sizes are too different from one type of script to the next
                 case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
                 case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
             };
@@ -546,7 +545,7 @@ namespace object2DOutlines
                 case varToUpdate.A_O: child.Active_O = par.Active_O; break;
                 case varToUpdate.C_O: child.Color_O = par.Color_O; break;
                 case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                case varToUpdate.S_O: child.Size_O = par.Size_O; break;
+                //NOTE: sizes are too different from one type of script to the next
                 case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
                 case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
             };
