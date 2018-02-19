@@ -56,7 +56,7 @@ namespace object2DOutlines
                 clipCenter_CM = value; //update local value
 
                 //enable or disable mask
-                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                newActiveCM = true;
 
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
@@ -65,6 +65,8 @@ namespace object2DOutlines
                     thisOutline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        [SerializeField, HideInInspector]
+        private bool newActiveCM;
 
         //-----Outline Variables-----
 
@@ -81,11 +83,13 @@ namespace object2DOutlines
             get { return active_O; }
             set
             {
-                active_O = value;//update local value
+                active_O = value; //update local value
 
-                thisOutline.SetActive(active_O);
+                newActiveO = true; //hack in update
             }
         }
+        [SerializeField, HideInInspector]
+        private bool newActiveO;
 
         [SerializeField, HideInInspector]
         Color color_O;
@@ -183,6 +187,10 @@ namespace object2DOutlines
                 ScaleWithParentX_O = true;
                 ScaleWithParentY_O = true;
 
+                //---Hacks Inits
+                newActiveCM = false;
+                newActiveO = false;
+
                 //---Var Inits from base outline class
                 base.Awake();
             }
@@ -199,7 +207,7 @@ namespace object2DOutlines
 
         //--------------------------------------------------SLIGHTLY DIFFERENT CODE--------------------------------------------------
 
-        void Update()
+        new void Update()
         {
             switch (UpdateSprite)
             {
@@ -209,6 +217,21 @@ namespace object2DOutlines
                         updateSpriteData();
                     break;
             }
+
+            //required hacks because of warnings
+            if (newActiveCM)
+            {
+                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                newActiveCM = false;
+            }
+
+            if (newActiveO)
+            {
+                thisOutline.SetActive(active_O);
+                newActiveO = false;
+            }
+
+            base.Update();
         }
 
         public void updateSpriteData()

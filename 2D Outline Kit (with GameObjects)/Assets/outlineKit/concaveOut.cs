@@ -16,8 +16,10 @@ namespace object2DOutlines
 
         //NOTE: (pushType == regular) -> ONLY controls rotation of edges
         //IF(pushType == regular) && (stdSize == true) -> can select patternType (Radial or Squarial)
-        //IF(pushType == regular) && (stdSize == false) -> you can individually edit the magnitude of each edge [TODO]
-        //ELSE IF (pushType == custom) -> you can individually edit the rotation and magnitude of each edge (AND add and remove edges) [TODO]
+        //IF(pushType == regular) && (stdSize == false) -> you can individually edit the magnitude of each edge [TODO in editor] 
+        //---currently doable with "editEdge(GameObject edgeGO, Vector2 newDirection)"
+        //ELSE IF (pushType == custom) -> you can individually edit the rotation and magnitude of each edge (AND add and remove edges) [TODO in editor] 
+        //---currentlty doable with "editEdgeMagnitude(GameObject edgeGO, float newMag)"
 
         //NOTE: IF(RectSize == regulat) -> use the height and width of our source sprite
         //ELSE -> use our own custom height and width
@@ -81,7 +83,7 @@ namespace object2DOutlines
                 clipCenter_CM = value; //update local value
 
                 //enable or disable mask
-                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                newActiveCM = true;
 
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
@@ -97,7 +99,9 @@ namespace object2DOutlines
                             GameObject.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
                 }
             }
-        } //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        }
+        [SerializeField, HideInInspector]
+        private bool newActiveCM;
 
         //-----Outline Variables-----
 
@@ -115,12 +119,11 @@ namespace object2DOutlines
             {
                 active_O = value;//update local value
 
-                //all edges set active
-                if (outlineEdges != null)
-                    foreach (var GameObject in outlineEdges.Keys)
-                        GameObject.SetActive(active_O);
+                newActiveO = true;
             }
         }
+        [SerializeField, HideInInspector]
+        private bool newActiveO;
 
         [SerializeField, HideInInspector]
         Color color_O;
@@ -188,7 +191,7 @@ namespace object2DOutlines
         Dictionary<GameObject, Vector2> outlineEdges;
 
         [SerializeField, HideInInspector]
-        private bool mustCallEdgeCount;
+        private bool newEdgeCount;
 
         [Space(10)]
         [Header("PUSH TYPE VARIABLES-----")]
@@ -201,7 +204,7 @@ namespace object2DOutlines
             {
                 pushType_OP = value; //update local value
 
-                mustCallEdgeCount = true;
+                newEdgeCount = true;
             }
         }
 
@@ -248,7 +251,7 @@ namespace object2DOutlines
             {
                 edgeCount_OPR = (value >= 0) ? value : 0; //update local value
 
-                mustCallEdgeCount = true;
+                newEdgeCount = true;
             }
         }
 
@@ -362,6 +365,11 @@ namespace object2DOutlines
                 RectSize_OPRS = rectType.regular;
                 //width and height set by the above
 
+                //---Hack Inits
+                newEdgeCount = false;
+                newActiveCM = false;
+                newActiveO = false;
+
                 //---Var Inits from base outline class
                 base.Awake();
             }
@@ -378,7 +386,7 @@ namespace object2DOutlines
 
         //--------------------------------------------------SLIGHTLY DIFFERENT CODE--------------------------------------------------
 
-        void Update()
+        new void Update()
         {
             switch (UpdateSprite)
             {
@@ -389,15 +397,32 @@ namespace object2DOutlines
                     break;
             }
 
-            //NOTE: this is a required "HACK"
+            //required hack because of error
             //this is because this variables change might trigger a DestroyImmediate
             //DestoryImmediate MUST be used when a script runs in edit mode... but it cant be called by OnValidate... 
             //so this is a "HACK" to make it work without it (technically) being inside OnValidate()
-            if (mustCallEdgeCount)
+            if (newEdgeCount)
             {
                 updateEdgeCount();
-                mustCallEdgeCount = false;
+                newEdgeCount = false;
             }
+
+            //required hack because of warnings
+            if (newActiveCM)
+            {
+                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                newActiveCM = false;
+            }
+
+            if (newActiveO)
+            {
+                //all edges set active
+                if (outlineEdges != null)
+                    foreach (var GameObject in outlineEdges.Keys)
+                        GameObject.SetActive(active_O);
+            }
+
+            base.Update();
         }
 
         public void updateSpriteData()
@@ -517,7 +542,7 @@ namespace object2DOutlines
                         //and that the Rect Length goes from -y to y
 
                         float cornerAngle = (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_OPRS / 2), (RectWidth_OPRS / 2))); //top right corner
-                        //TODO... repair below with conversion into degree
+                        //TODO... might have to repair below with conversion into degree
                         float cornerHypotenuse = (RectHeight_OPRS / 2) / Mathf.Sin(cornerAngle * Mathf.Deg2Rad);
 
                         float AF_Up = Vector3.Angle(Vector3.up, vect.normalized);
@@ -722,6 +747,23 @@ namespace object2DOutlines
         public bool editEdge(GameObject edgeGO, Vector2 newDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
         {
             return editEdge(edgeGO, newDirection, false);
+        }
+
+        public bool editEdgeMagnitude(GameObject edgeGO, float newMag)
+        {
+            if (outlineEdges != null) //precautionary check
+            {
+                if (outlineEdges.ContainsKey(edgeGO))
+                {
+                    updateEdgePosition(edgeGO, outlineEdges[edgeGO].normalized * newMag);
+
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else
+                return false;
         }
     }
 }

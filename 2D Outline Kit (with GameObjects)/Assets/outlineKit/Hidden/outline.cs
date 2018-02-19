@@ -132,9 +132,11 @@ namespace object2DOutlines
             {
                 active_SO = value; //update local value
 
-                spriteOverlay.GetComponent<SpriteRenderer>().enabled = active_SO;
+                newActiveSO = true;
             }
         }
+        [SerializeField, HideInInspector]
+        private bool newActiveSO;
 
         [SerializeField, HideInInspector]
         internal int orderInLayer_SO;
@@ -239,6 +241,19 @@ namespace object2DOutlines
             CustomRange_CM = false;
             FrontLayer_CM = 0; //by defaults maps to "default" layer
             BackLayer_CM = 0; //by defaults maps to "default" layer
+
+            //---Hack Inits
+            newActiveSO = false;
+        }
+
+        public void Update()
+        {
+            //required hacks because of warnings
+            if (newActiveSO)
+            {
+                spriteOverlay.GetComponent<SpriteRenderer>().enabled = active_SO;
+                newActiveSO = false;
+            }
         }
 
         [SerializeField, HideInInspector]
