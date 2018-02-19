@@ -172,7 +172,7 @@ namespace object2DOutlines
                     {
                         EditorGUILayout.PropertyField(rectSize_OPRS, new GUIContent("      Rect Type"));
 
-                        if (script.RectSize_OPRS == rectType.regular)
+                        if (script.RectSize_OPRS == rectType.custom)
                         {
                             EditorGUILayout.PropertyField(rectWidth_OPRS, new GUIContent("         Width"));
                             EditorGUILayout.PropertyField(rectHeight_OPRS, new GUIContent("         Height"));

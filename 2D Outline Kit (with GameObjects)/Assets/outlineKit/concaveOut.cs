@@ -261,7 +261,7 @@ namespace object2DOutlines
             {
                 startAngle_OPR = value; //update local value
 
-                updateEdgeRotationsALL();
+                updateEdgePositionsALL();
             }
         }
 
@@ -274,7 +274,7 @@ namespace object2DOutlines
             {
                 pushPattern_OPR = value; //update local value
 
-                updateEdgePositionsALL();
+                updateEdgeRotationsALL();
             }
         }
 
@@ -305,7 +305,7 @@ namespace object2DOutlines
             {
                 rectWidth_OPRS = value;
 
-                updateEdgePositionsALL();
+                updateEdgeRotationsALL();
             }
         }
 
@@ -318,7 +318,7 @@ namespace object2DOutlines
             {
                 rectHeight_OPRS = value;
 
-                updateEdgePositionsALL();
+                updateEdgeRotationsALL();
             }
         }
 
@@ -358,6 +358,9 @@ namespace object2DOutlines
                 EdgeCount_OPR = 8;
                 StartAngle_OPR = 0;
                 PushPattern_OPR = pushPattern.squarial;
+
+                RectSize_OPRS = rectType.regular;
+                //width and height set by the above
 
                 //---Var Inits from base outline class
                 base.Awake();
@@ -456,7 +459,10 @@ namespace object2DOutlines
             {
                 if(outlineEdges != null) //precautionary check
                 {
-                    float edgeRotation = StartAngle_OPR;
+                    //StartAngle_OPR is used to rotate the shape after this step
+                    float edgeRotation = (PushPattern_OPR == pushPattern.radial) ?
+                        0 //for RADIAL... start at _0Rotation
+                        : (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_OPRS/2), (RectWidth_OPRS/2))); //for SQUARIAL... start by placing the first edge in the first corner (1st quadrant)
                     float angleBetweenAllEdges = (EdgeCount_OPR == 0) ? 0 : 360 / (float)EdgeCount_OPR;
 
                     List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
@@ -505,10 +511,72 @@ namespace object2DOutlines
                     if (PushPattern_OPR == pushPattern.radial) //Radial Push
                         newVect = vect.normalized * Size_OP;
                     else //Squarial Push
-                        newVect = vect.normalized * (Mathf.Abs(Size_OP / (Mathf.Cos((Vector2.Angle(vect, _0Rotation) % 90) * Mathf.Deg2Rad))));
+                    {
+                        //do this pretending 
+                        //that the Rect Width length goes from -x to x
+                        //and that the Rect Length goes from -y to y
+
+                        float cornerAngle = (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_OPRS / 2), (RectWidth_OPRS / 2))); //top right corner
+                        //TODO... repair below with conversion into degree
+                        float cornerHypotenuse = (RectHeight_OPRS / 2) / Mathf.Sin(cornerAngle * Mathf.Deg2Rad);
+
+                        float AF_Up = Vector3.Angle(Vector3.up, vect.normalized);
+                        float AF_Right = Vector3.Angle(Vector3.right, vect.normalized);
+                        float AF_Down = Vector3.Angle(Vector3.down, vect.normalized);
+                        float AF_Left = Vector3.Angle(Vector3.left, vect.normalized);
+
+                        float newMagnitude = 0;
+
+                        //--find what quadrant this outline is in
+                        if (AF_Left > 90 && AF_Down > 90) //1st quad
+                        {
+                            if (AF_Right < cornerAngle) //base ourselves on width
+                                newMagnitude = (RectWidth_OPRS/2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
+                            else if (AF_Right > cornerAngle) //base ourselves on height
+                                newMagnitude = (RectHeight_OPRS/2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
+                            else
+                                newMagnitude = cornerHypotenuse;
+                        }
+                        else if(AF_Right > 90 && AF_Down > 90) //2nd quad
+                        {
+                            if (AF_Left < cornerAngle) //base ourselves on width
+                                newMagnitude = (RectWidth_OPRS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
+                            else if (AF_Left > cornerAngle) //base ourselves on height
+                                newMagnitude = (RectHeight_OPRS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
+                            else
+                                newMagnitude = cornerHypotenuse;
+                        }
+                        else if(AF_Right > 90 && AF_Up > 90) //3rd quad
+                        {
+                            if (AF_Left < cornerAngle) //base ourselves on width
+                                newMagnitude = (RectWidth_OPRS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
+                            else if (AF_Left > cornerAngle) //base ourselves on height
+                                newMagnitude = (RectHeight_OPRS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
+                            else
+                                newMagnitude = cornerHypotenuse;
+                        }
+                        else //4th quad
+                        {
+                            if (AF_Right < cornerAngle) //base ourselves on width
+                                newMagnitude = (RectWidth_OPRS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
+                            else if (AF_Right > cornerAngle) //base ourselves on height
+                                newMagnitude = (RectHeight_OPRS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
+                            else
+                                newMagnitude = cornerHypotenuse;
+                        }
+
+                        newVect = vect.normalized * newMagnitude;
+
+                        newVect = newVect.normalized * (newVect.magnitude * Size_OP);
+                    }
                 }
                 else
                     newVect = vect.normalized;
+
+                //Rotate the RADIAL or SQUARIAL pattern the number of StartAngle_OPR
+                float oldMagnitude = newVect.magnitude;
+                Vector3 newDirection = Quaternion.AngleAxis(StartAngle_OPR, Vector3.forward) * newVect.normalized;
+                newVect = newDirection.normalized * oldMagnitude;
             }
             else
             {
