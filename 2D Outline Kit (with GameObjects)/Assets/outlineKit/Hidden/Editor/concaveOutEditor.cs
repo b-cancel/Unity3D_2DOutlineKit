@@ -94,6 +94,8 @@ namespace object2DOutlines
 
         public override void OnInspectorGUI()
         {
+            EditorStyles.helpBox.wordWrap = true; //flag set
+
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
@@ -158,6 +160,10 @@ namespace object2DOutlines
             {
                 EditorGUILayout.PropertyField(size_OP, new GUIContent("      it's STD Size")); //run update outline for everything below
             }
+            else
+            {
+                EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
+            }
 
             if (script.PushType_OP == push.regularPattern)
             {
@@ -179,6 +185,10 @@ namespace object2DOutlines
                         }
                     }
                 }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, editEdge, and editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
             }
 
             serializedObject.ApplyModifiedProperties();

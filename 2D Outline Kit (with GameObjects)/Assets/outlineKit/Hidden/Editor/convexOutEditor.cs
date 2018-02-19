@@ -68,7 +68,7 @@ namespace object2DOutlines
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
-           convexOut script = (convexOut)target;
+            convexOut script = (convexOut)target;
 
             serializedObject.Update();
 
