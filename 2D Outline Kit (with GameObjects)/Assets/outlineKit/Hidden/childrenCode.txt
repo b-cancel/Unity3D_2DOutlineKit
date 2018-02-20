@@ -1,146 +1,78 @@
-//----------only in class
+//----------inside of every property that we want our children to copy [ALREADY DONE]
+
+//REGULAR outline all variables (9)
+    //--- Optimization
+    -UpdateSprite
+    //----- Debugging
+    -ShowOutline_GOs_InHierarchy_D
+    //--- Sprite Overlay
+    -Active_SO
+    -OrderInLayer_SO
+    -Color_SO
+    //--- Clipping Mask
+    -AlphaCutoff_CM
+    -CustomRange_CM
+    -FrontLayer_CM
+    -BackLayer_CM
+
+//conVEX outline all variables (7)
+    //---Clipping Mask Vars
+    -ClipCenter_CM
+    //---Outline Vars
+    -Active_O
+    -Color_O
+    -OrderInLayer_O
+    -Size_O
+    -ScaleWithParentX_O
+    -ScaleWithParentY_O
+
+//conCAVE outline all variables (15)
+    //---Clipping Mask Vars
+    -ClipCenter_CM
+    //---Outline Vars
+    -Active_O
+    -Color_O
+    -OrderInLayer_O
+    -ScaleWithParentX_O
+    -ScaleWithParentY_O
+    //-----Push Type Vars
+    -PushType_OP
+    -StdSize_OP
+    -Size_OP
+    //---Regular
+    -EdgeCount_OPR
+    -StartAngle_OPR
+    -PushPattern_OPR
+    -RectSize_OPRS
+	-RectWidth_OPRS
+	-RectHeight_OPRS
+
+//MAX VARS per outline (9) + (15) = 24
+//we need to know which ones we want to pass... to our children [use another variable... DO WE PASS THIS ONE?]
+
+//----------only in class(we can only have 1 parent... but many children...)
 
 [Header("Family Relationships")]
-public GameObject parentGOWithScript;
-GameObject prevParentGOWithScript;
+public GameObject parentGO;
+GameObject prevParentGO;
 
 public List<GameObject> children;
 
-//----------inside of every property that we want our children to copy
+//----------REQUIRE HEAVY MODIFICATION
 
-for (int i = 0; i < children.Count; i++)
-{
-    if (children[i] != null)
-    {
-        if (children[i].GetComponent<someScript>() != null)
-            children[i].GetComponent<someScript>().SomeVar = SomeVar;
-    }
-    else
-    {
-        children.RemoveAt(i);
-        i--;
-    }
-}
+BECAUSE sizes of every outline type are very different
 
-//----------heavily modified size
+we might want to pass over our size without modifications -OR- 
+or modify the size so our outline has the same distance from our source sprite regardless of outline type
 
-float size_O; //NOTE: this size refers to the world space thickness of the outline
-//NOTE: used in update function... doesnt have to do anyting special for get and set...
-public float Size_O
-{
-    get { return size_O; }
-    set
-    {
-        float oldSize = size_O;
-
-        value = (value >= .1f) ? value : .1f; //since our childrens' size depends on our porportion with them we avoid our size being 0
-        size_O = value;//update local value
-
-        if (forceRetainPorpWithChildren)
-        {
-            float smallestPossibleSize = size_O;
-
-            //go through all of our children... make sure that we can make our size as small as we want it to be
-            for (int i = 0; i < children.Count; i++)
-            {
-                if (children[i] != null)
-                {
-                    float currOurs = oldSize;
-                    float newOurs = smallestPossibleSize;
-
-                    if (children[i].GetComponent<convexOutlineV3>() != null)
-                    {
-                        float currTheirs = children[i].GetComponent<convexOutlineV3>().Size_O;
-                        float newTheirs = (currTheirs / currOurs) * newOurs;
-
-                        if (newTheirs < .1f) //we have to increase our size to keep our porportion with them
-                        {
-                            newTheirs = .1f;
-                            newOurs = currOurs * (newTheirs / currTheirs);
-
-                            if (newOurs > smallestPossibleSize)
-                                smallestPossibleSize = newOurs;
-                        }
-                    }
-
-                    if (children[i].GetComponent<concaveOutlineV3>() != null)
-                    {
-                        float currTheirs = children[i].GetComponent<concaveOutlineV3>().Size_O;
-                        float newTheirs = (currTheirs / currOurs) * newOurs;
-
-                        if (newTheirs < .1f) //we have to increase our size to keep our porportion with them
-                        {
-                            newTheirs = .1f;
-                            newOurs = currOurs * (newTheirs / currTheirs);
-
-                            if (newOurs > smallestPossibleSize)
-                                smallestPossibleSize = newOurs;
-                        }
-                    }
-                }
-                else
-                {
-                    children.RemoveAt(i);
-                    i--;
-                }
-            }
-
-            size_O = smallestPossibleSize;
-        }
-
-        //update the outline of your children
-        for (int i = 0; i < children.Count; i++)
-        {
-            if (children[i] != null)
-            {
-                float currOurs = oldSize;
-                float newOurs = size_O;
-
-                if (children[i].GetComponent<convexOutlineV3>() != null) //child has convex outline [DIFFERENT]
-                {
-                    float currTheirs = children[i].GetComponent<convexOutlineV3>().Size_O;
-                    float newTheirs = (currTheirs / currOurs) * newOurs;
-
-                    children[i].GetComponent<convexOutlineV3>().Size_O = newTheirs;
-                }
-
-                if (children[i].GetComponent<concaveOutlineV3>() != null) //child has concave outline [SAME]
-                {
-                    float currTheirs = children[i].GetComponent<concaveOutlineV3>().Size_O;
-                    float newTheirs = (currTheirs / currOurs) * newOurs;
-
-                    children[i].GetComponent<concaveOutlineV3>().Size_O = newTheirs;
-                }
-            }
-            else
-            {
-                children.RemoveAt(i);
-                i--;
-            }
-        }
-
-        UpdatepositionsOfEdges();
-    }
-}
-
-//-----
-
-bool forceRetainPorpWithChildren;
-public bool ForceRetainPorpWithChildren
-{
-    get { return forceRetainPorpWithChildren; }
-    set
-    {
-        forceRetainPorpWithChildren = value;
-        Size_O = size_O;
-    }
-}
+we also might want to retain our porportion with our parent or not
 
 //---------------in the awake function
 
-//---Children
+//DESCRIP: Make sure our parent is not our child
+
 children = new List<GameObject>();
-if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false) //if someone wants to be our parent... and they are not already our child...
+if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false)
 {
     if (parentGOWithScript.GetComponent<concaveOutlineV3>() != null)
     {
@@ -156,24 +88,15 @@ if (parentGOWithScript != null && children.Contains(parentGOWithScript) == false
 else
     parentGOWithScript = null;
 
-forceRetainPorpWithChildren = true;
-
 //---------------in the update function
 
-//---Clear Children we no longer need
-
-for (int i = 0; i < children.Count; i++)
-{
-    if (children[i] == null)
-    {
-        children.RemoveAt(i);
-        i--;
-    }
-}
+//NOTE: previously we always made sure our children where still our children... now we only do that when we update our children with out new variables... because it frankly makes no difference
 
 //---parent child relationship
 
-if (parentGOWithScript != prevParentGOWithScript) //if we change parents
+//DESCRIP: handle chaing parents
+
+if (parentGOWithScript != prevParentGOWithScript) 
 {
     //TODO... reconfigure to work with any of our 6 scripts
     if (prevParentGOWithScript != null) //If we had a parent... break all ties with them

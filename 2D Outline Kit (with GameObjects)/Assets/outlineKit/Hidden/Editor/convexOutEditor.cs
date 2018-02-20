@@ -65,6 +65,8 @@ namespace object2DOutlines
 
         public override void OnInspectorGUI()
         {
+            EditorStyles.objectField.wordWrap = true; //set flag
+
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
