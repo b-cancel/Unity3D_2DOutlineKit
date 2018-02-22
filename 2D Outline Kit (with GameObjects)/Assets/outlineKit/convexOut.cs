@@ -183,9 +183,10 @@ namespace object2DOutlines
                 Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
                 Color_O = Color.red;
                 OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-                Size_O = 2f;
                 ScaleWithParentX_O = true;
                 ScaleWithParentY_O = true;
+
+                Size_O = 2f;
 
                 //---Hacks Inits
                 newActiveCM = false;

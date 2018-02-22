@@ -4,10 +4,6 @@ using UnityEngine;
 
 namespace object2DOutlines
 {
-    public enum push { regularPattern, customPattern }; //ONLY for concave outline
-    public enum pushPattern { radial, squarial}; //ONLY for concave outline
-    public enum rectType { regular, custom};
-
     [System.Serializable, ExecuteInEditMode]
     public class concaveOut : outline
     {

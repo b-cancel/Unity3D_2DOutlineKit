@@ -314,6 +314,7 @@
   <ItemGroup>
     <Compile Include="Assets\outlineKit\Hidden\Editor\concaveOutEditor.cs" />
     <Compile Include="Assets\outlineKit\Hidden\Editor\convexOutEditor.cs" />
+    <Compile Include="Assets\outlineKit\Hidden\Editor\spriteOutEditor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\outlineKit\Hidden\childrenCode.txt" />

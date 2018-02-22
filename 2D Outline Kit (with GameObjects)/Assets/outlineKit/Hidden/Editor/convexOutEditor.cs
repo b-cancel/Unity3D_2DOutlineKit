@@ -65,8 +65,6 @@ namespace object2DOutlines
 
         public override void OnInspectorGUI()
         {
-            EditorStyles.objectField.wordWrap = true; //set flag
-
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
@@ -86,6 +84,7 @@ namespace object2DOutlines
 
             //Sprite Overlay
             EditorGUILayout.PropertyField(active_SO, new GUIContent("Activate Sprite Overlay"));
+
             if(script.Active_SO)
             {
                 EditorGUILayout.PropertyField(orderInLayer_SO, new GUIContent("   it's Order In Layer"));
@@ -108,14 +107,6 @@ namespace object2DOutlines
 
             //Sprite Outline
             EditorGUILayout.PropertyField(active_O, new GUIContent("Active Sprite Outline"));
-            if (script.Active_O)
-            {
-                EditorGUILayout.PropertyField(color_O, new GUIContent("   it's Color"));
-                EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("   it's Order In Layer"));
-                EditorGUILayout.PropertyField(size_O, new GUIContent("   it's Size")); //run update outline for everything below
-                EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("   Follow Parent X Scale"));
-                EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("   Follow Parent Y Scale"));
-            }
 
             serializedObject.ApplyModifiedProperties();
         }

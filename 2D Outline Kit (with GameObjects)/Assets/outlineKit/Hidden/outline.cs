@@ -13,75 +13,71 @@ using UnityEngine;
 //BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
 //NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
-/*
- * ---Other Resources
- * https://answers.unity.com/questions/235595/custom-editor-losing-settings-on-play.html
- * 
- * ---Other Docs
- * https://docs.unity3d.com/Manual/script-Serialization.html
- * https://docs.unity3d.com/ScriptReference/EditorUtility.SetDirty.html
- * 
- * ---Unity Documentation
- * UnityEditor.Build
- * UnityEditor.Callbacks
- * UnityEditor.EventSystems
- * 
- * UnityEditor.IOS
- * 
- * CHECK ALL CLASSES INBETWEEN FOR ANTHING USEFUL
- * 
- * Classes
- * Enumerations
- * Attributes
- */
-
 namespace object2DOutlines
 {
+    //--------------------------------------------------ENUMERABLES--------------------------------------------------
+
     //---This Enum makes it easier for us to pass our variables to our children (helps keep code clean)
     public enum varToUpdate
     {
-        //----------Variables For All Outline Types
+        //optimization
+        US, //updateSprite
 
-        //-----Optimization
-        USEF, //UpdateSpriteEveryFrame
-        //-----Debugging
-        SOGIH, //ShowOutline_GOs_InHierarchy_D
-        //-----Sprite Overlay
-        A_SO, //Active_SO
-        OIL_SO, //OrderInLayer_SO
-        C_SO, //Color_SO
-        //-----Clipping Mask
-        CC_CM, //ClipCenter_CM
-        AC_CM, //AlphaCutoff_CM
-        CR_CM, //CustomRange_CM
-        FL_CM, //FrontLayer_CM
-        BL_CM, //BackLayer_CM
-        //-----Sprite Outline
-        A_O, //Active_O
-        C_O, //Color_O
-        OIL_O, //OrderInLayer_O
-        S_O, //Size_O (ONLY convex)
-        SWPX_O, //ScaleWithParentX_O
-        SWPY_O, //ScaleWithParentY_O
+        //debugging
+        SOGIH, //showOutline_GOs_InHierarchy
 
-        //----------Variables For ONLY (Concave/Push) Outline Type
-        PT_OP, //PushType_OP
-        SS_OP, //stdSize_OP
-        S_OP, //size_OP
-        OMO_OPR, //ObjsMakingOutline_OPR
-        SA_OPR, //StartAngle_OPR
-        PP_OPR, //PushPattern_OPR
-        RS_OPRS, //RectSize_OPRS 
-        RW_OPRS, //RectWidth_OPRS 
-        RH_OPRS //RectHeight_OPRS 
+        //overlay
+        A_SO, //active_SO
+        OIL_SO, //orderInLayer_SO
+        C_SO, //color_SO
+
+        //clipping Mask
+        CC_CM, //clipCenter_CM
+        AC_CM, //alphaCutoff_CM
+        CR_CM, //customRange_CM
+        FL_CM, //frontLayer_CM
+        BL_CM, //backLayer_CM
+
+        //outline
+        A_O, //active_O
+        C_O, //color_O
+        OIL_O, //orderInLayer_O
+        SWPX_O, //scaleWithParentX_O
+        SWPY_O, //scaleWithParentY_O
+        ST_O, //spriteType_O
+        S_O, //size_O
+
+        //-----conCAVE
+
+        PT_O_CAVE, //pushType_O_CAVE
+        SS_O_CAVE, //stdSize_O_CAVE
+
+        //ONLY regular
+        EC_O_CAVE_R, //edgeCount_O_CAVE_R
+        SA_O_CAVE_R, //startAngle_O_CAVE_R
+        PP_O_CAVE_R, //pushPattern_O_CAVE_R
+
+        //ONLY regular && squarial
+        RS_O_CAVE_RS, //rectSize_O_CAVE_RS 
+        RW_O_CAVE_RS, //rectWidth_O_CAVE_RS 
+        RH_O_CAVE_RS //rectHeight_O_CAVE_RS 
     };
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
 
+    public enum spriteType { conVEX, conCAVE };
+
+    //ONLY for conCAVE outline
+    public enum push { regularPattern, customPattern };
+    public enum pushPattern { radial, squarial };
+    public enum rectType { regular, custom };
+
+    //--------------------------------------------------PARENT CLASS--------------------------------------------------
+
     [System.Serializable, ExecuteInEditMode]
     public class outline : MonoBehaviour
     {
-        //--- Optimization
+        //-----Optimization Variable-----
 
         [Header("OPTIMIZATION VARIABLES-----")]
         [SerializeField, HideInInspector]
@@ -94,9 +90,8 @@ namespace object2DOutlines
 
         //-----Debugging Variables-----
 
-        //IMPORTANT NOTE: currently only one outline is supported
         [SerializeField, HideInInspector]
-        internal GameObject outlineGameObjectsFolder; //contains all the outlines
+        internal GameObject outlineGameObjectsFolder; //contains all the gameobjects used by the script
 
         [Space(10)]
         [Header("DEBUGGING VARIABLES-----")]
@@ -107,7 +102,7 @@ namespace object2DOutlines
             get { return showOutline_GOs_InHierarchy_D; }
             set
             {
-                showOutline_GOs_InHierarchy_D = value; //update local value
+                showOutline_GOs_InHierarchy_D = value; 
 
                 if (showOutline_GOs_InHierarchy_D)
                     outlineGameObjectsFolder.hideFlags = HideFlags.None;
@@ -119,7 +114,7 @@ namespace object2DOutlines
         //-----Overlay Variables-----
 
         [SerializeField, HideInInspector]
-        internal GameObject spriteOverlay;
+        internal GameObject spriteOverlay; //the sprite overlay gameobject
 
         [Space(10)]
         [Header("SPRITE OVERLAY VARIABLES-----")]
@@ -130,7 +125,7 @@ namespace object2DOutlines
             get { return active_SO; }
             set
             {
-                active_SO = value; //update local value
+                active_SO = value; 
 
                 newActiveSO = true;
             }
@@ -145,7 +140,7 @@ namespace object2DOutlines
             get { return orderInLayer_SO; }
             set
             {
-                orderInLayer_SO = value; //update local value
+                orderInLayer_SO = value; 
 
                 spriteOverlay.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_SO;
             }
@@ -158,16 +153,16 @@ namespace object2DOutlines
             get { return color_SO; }
             set
             {
-                color_SO = value; //update local value
+                color_SO = value; 
 
                 spriteOverlay.GetComponent<SpriteRenderer>().color = color_SO;
             }
         }
 
-        //-----Clipping Mask Variables
+        //-----Clipping Mask Variables-----
 
         [SerializeField, HideInInspector]
-        internal GameObject clippingMask; //gameobject with sprite mask
+        internal GameObject clippingMask; //the gameobject with sprite mask
 
         [SerializeField, HideInInspector]
         internal float alphaCutoff_CM;
@@ -176,7 +171,7 @@ namespace object2DOutlines
             get { return alphaCutoff_CM; }
             set
             {
-                alphaCutoff_CM = Mathf.Clamp01(value); //update local value
+                alphaCutoff_CM = Mathf.Clamp01(value); 
 
                 clippingMask.GetComponent<SpriteMask>().alphaCutoff = alphaCutoff_CM;
             }
@@ -189,7 +184,7 @@ namespace object2DOutlines
             get { return customRange_CM; }
             set
             {
-                customRange_CM = value; //update local value
+                customRange_CM = value; 
 
                 clippingMask.GetComponent<SpriteMask>().isCustomRangeActive = customRange_CM;
             }
@@ -202,7 +197,7 @@ namespace object2DOutlines
             get { return frontLayer_CM; }
             set
             {
-                frontLayer_CM = value; //update local value
+                frontLayer_CM = value; 
 
                 clippingMask.GetComponent<SpriteMask>().frontSortingLayerID = frontLayer_CM;
             }
@@ -215,7 +210,7 @@ namespace object2DOutlines
             get { return backLayer_CM; }
             set
             {
-                backLayer_CM = value; //update local value
+                backLayer_CM = value; 
 
                 clippingMask.GetComponent<SpriteMask>().backSortingLayerID = backLayer_CM;
             }
@@ -225,24 +220,24 @@ namespace object2DOutlines
         {
             //----------Variable Inits
 
-            //--- Optimization
+            //-----Optimization
             UpdateSprite = spriteUpdateSetting.AfterEveryChange;
 
-            //----- Debugging
+            //-----Debugging
             ShowOutline_GOs_InHierarchy_D = false;
 
-            //--- Sprite Overlay
+            //-----Sprite Overlay
             Active_SO = false;
             OrderInLayer_SO = this.GetComponent<SpriteRenderer>().sortingOrder + 1; //by default in front
             Color_SO = new Color(0, 0, 1, .5f);
 
-            //--- Clipping Mask
+            //-----Clipping Mask
             AlphaCutoff_CM = .25f;
             CustomRange_CM = false;
             FrontLayer_CM = 0; //by defaults maps to "default" layer
             BackLayer_CM = 0; //by defaults maps to "default" layer
 
-            //---Hack Inits
+            //-----Hack Inits
             newActiveSO = false;
         }
 
@@ -394,182 +389,57 @@ namespace object2DOutlines
         //TODO... I.O.W. make sure the switch case isnt become a dictionary from Enums -> Delegates when compiled... cuz that would be really slow
         public static void passToChildren(varToUpdate varEnum, GameObject parent, List<GameObject> children)
         {
-            if(parent.GetComponent<convexOut>() != null)
-            {
-                for (int childID = 0; childID < children.Count; childID++)
-                {
-                    if (children[childID] != null)
-                    {
-                        convexOut[] convexOutlines = children[childID].GetComponents<convexOut>();
-                        concaveOut[] concaveOutlines = children[childID].GetComponents<concaveOut>();
-
-                        if (convexOutlines.Length != 0)
-                            for(int i=0; i<convexOutlines.Length; i++)
-                                convexSwitch(varEnum, parent.GetComponent<convexOut>(), convexOutlines[i]); //convex, convex
-                            
-                        if (concaveOutlines.Length != 0)
-                            for(int i=0; i<concaveOutlines.Length; i++)
-                                convexParent_concaveChild_Switch(varEnum, parent.GetComponent<convexOut>(), concaveOutlines[i]); //convex, concave
-                            
-                    }
-                    else
-                    {
-                        children.RemoveAt(childID);
-                        childID--;
-                    }
-                }
-
-            }
-            else if(parent.GetComponent<concaveOut>() != null)
-            {
-
-                for (int childID = 0; childID < children.Count; childID++)
-                {
-                    if (children[childID] != null)
-                    {
-                        convexOut[] convexOutlines = children[childID].GetComponents<convexOut>();
-                        concaveOut[] concaveOutlines = children[childID].GetComponents<concaveOut>();
-
-                        if (convexOutlines.Length != 0)
-                            for (int i = 0; i < convexOutlines.Length; i++)
-                                concaveParent_convexChild_Switch(varEnum, parent.GetComponent<concaveOut>(), convexOutlines[i]); //concave, convex
-
-                        if (concaveOutlines.Length != 0)
-                            for (int i = 0; i < concaveOutlines.Length; i++)
-                                concaveSwitch(varEnum, parent.GetComponent<concaveOut>(), concaveOutlines[i]); //concave, concave
-                    }
-                    else
-                    {
-                        children.RemoveAt(childID);
-                        childID--;
-                    } 
-                }
-            }
-            //ELSE... parent has no data to pass
+            for (int childID = 0; childID < children.Count; childID++)
+                theSwitch(varEnum, parent.GetComponent<spriteOutline>(), children[childID].GetComponent<spriteOutline>());
         }
 
-        //-------------------------Switch Cases For Every Combination Of Parent And Children
+        //-------------------------Switch Case
 
-        public static void convexSwitch(varToUpdate varEnum, convexOut par, convexOut child)
+        public static void theSwitch(varToUpdate varEnum, spriteOutline par, spriteOutline child)
         {
             switch (varEnum)
             {
                 //Optimization
-                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
+                case varToUpdate.US: child.UpdateSprite = par.UpdateSprite; break;
+
                 //Debugging
                 case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
-                //Sprite Overlay
+
+                //Overlay
                 case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
                 case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
                 case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
+
                 //Clipping Mask
                 case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
                 case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
                 case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
                 case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
                 case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
+
                 //Sprite Outline
                 case varToUpdate.A_O: child.Active_O = par.Active_O; break;
                 case varToUpdate.C_O: child.Color_O = par.Color_O; break;
                 case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
+                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
+                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+                case varToUpdate.ST_O: child.SpriteType_O = par.SpriteType_O; break;
                 case varToUpdate.S_O: child.Size_O = par.Size_O; break;
-                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
-                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
-            };
-        }
 
-        public static void concaveSwitch(varToUpdate varEnum, concaveOut par, concaveOut child)
-        {
-            switch (varEnum)
-            {
-                //Optimization
-                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
-                //Debugging
-                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
-                //Sprite Overlay
-                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
-                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
-                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
-                //Clipping Mask
-                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
-                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
-                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
-                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
-                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
-                //Sprite Outline
-                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
-                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
-                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
-                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+                //-----conCAVE
 
-                //---ONLY push type
-                case varToUpdate.PT_OP: child.PushType_OP = par.PushType_OP; break;
-                case varToUpdate.SS_OP: child.StdSize_OP = par.StdSize_OP; break;
-                case varToUpdate.S_OP: child.Size_OP = par.Size_OP; break;
-                case varToUpdate.OMO_OPR: child.EdgeCount_OPR = par.EdgeCount_OPR; break;
-                case varToUpdate.SA_OPR: child.StartAngle_OPR = par.StartAngle_OPR; break;
-                case varToUpdate.PP_OPR: child.PushPattern_OPR = par.PushPattern_OPR; break;
+                case varToUpdate.PT_O_CAVE: child.PushType_O_CAVE = par.PushType_O_CAVE; break;
+                case varToUpdate.SS_O_CAVE: child.StdSize_O_CAVE = par.StdSize_O_CAVE; break;
 
-                case varToUpdate.RS_OPRS: child.RectSize_OPRS = par.RectSize_OPRS; break;
-                case varToUpdate.RW_OPRS: child.RectWidth_OPRS = par.RectWidth_OPRS; break;
-                case varToUpdate.RH_OPRS: child.RectHeight_OPRS = par.RectHeight_OPRS; break;
-            };
-        }
+                //ONLY regular
+                case varToUpdate.EC_O_CAVE_R: child.EdgeCount_O_CAVE_R = par.EdgeCount_O_CAVE_R; break;
+                case varToUpdate.SA_O_CAVE_R: child.StartAngle_O_CAVE_R = par.StartAngle_O_CAVE_R; break;
+                case varToUpdate.PP_O_CAVE_R: child.PushPattern_O_CAVE_R = par.PushPattern_O_CAVE_R; break;
 
-        public static void concaveParent_convexChild_Switch(varToUpdate varEnum, concaveOut par, convexOut child)
-        {
-            switch (varEnum)
-            {
-                //Optimization
-                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
-                //Debugging
-                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
-                //Sprite Overlay
-                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
-                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
-                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
-                //Clipping Mask
-                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
-                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
-                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
-                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
-                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
-                //Sprite Outline
-                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
-                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
-                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                //NOTE: sizes are too different from one type of script to the next
-                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
-                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
-            };
-        }
-
-        public static void convexParent_concaveChild_Switch(varToUpdate varEnum, convexOut par, concaveOut child)
-        {
-            switch (varEnum)
-            {
-                //Optimization
-                case varToUpdate.USEF: child.UpdateSprite = par.UpdateSprite; break;
-                //Debugging
-                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
-                //Sprite Overlay
-                case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;
-                case varToUpdate.OIL_SO: child.OrderInLayer_SO = par.OrderInLayer_SO; break;
-                case varToUpdate.C_SO: child.Color_SO = par.Color_SO; break;
-                //Clipping Mask
-                case varToUpdate.CC_CM: child.ClipCenter_CM = par.ClipCenter_CM; break;
-                case varToUpdate.AC_CM: child.AlphaCutoff_CM = par.AlphaCutoff_CM; break;
-                case varToUpdate.CR_CM: child.CustomRange_CM = par.CustomRange_CM; break;
-                case varToUpdate.FL_CM: child.FrontLayer_CM = par.FrontLayer_CM; break;
-                case varToUpdate.BL_CM: child.BackLayer_CM = par.BackLayer_CM; break;
-                //Sprite Outline
-                case varToUpdate.A_O: child.Active_O = par.Active_O; break;
-                case varToUpdate.C_O: child.Color_O = par.Color_O; break;
-                case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
-                //NOTE: sizes are too different from one type of script to the next
-                case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
-                case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+                //ONLY regular && squarial
+                case varToUpdate.RS_O_CAVE_RS: child.RectSize_O_CAVE_RS = par.RectSize_O_CAVE_RS; break;
+                case varToUpdate.RW_O_CAVE_RS: child.RectWidth_O_CAVE_RS = par.RectWidth_O_CAVE_RS; break;
+                case varToUpdate.RH_O_CAVE_RS: child.RectHeight_O_CAVE_RS = par.RectHeight_O_CAVE_RS; break;
             };
         }
     }
