@@ -22,6 +22,11 @@ namespace object2DOutlines
 
         //NOTE: any function that ends in VEX... will not run if unless your "SpriteType_O" == conVEX
         //ditto for any function that ends in CAVE
+        
+        //NOTE: initially set SpriteType_O runs once from Awake -> sets our type to conVEX
+        //then runs again from OnValidate() -> new set is ignored
+        //but for reasons unkonw the first time it changes our type... it doesnt run convex in udpdate hack
+
 
         [SerializeField, HideInInspector]
         private bool _awakeFinished;
@@ -229,17 +234,9 @@ namespace object2DOutlines
                 value = (value >= 0) ? value : 0;
                 size_O = value;
 
-                print("new size: " + size_O);
-
-                print("value changing START");
-
                 //the one that is currently active will run
                 updateOutlineVEX();
                 updateOutlineCAVE();
-
-                print("NEW size: " + size_O);
-
-                print("value changing END");
             }
         }
 
@@ -381,11 +378,7 @@ namespace object2DOutlines
                 DestroyImmediate(thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
-                outlineEdges = new Dictionary<GameObject, Vector2>();
-
-                //----------Main Init
-                SpriteType_O = spriteType.conVEX; 
-                //NOTE: many variables are also initialized when this is set
+                outlineEdges = new Dictionary<GameObject, Vector2>(); //(MUST be before any inits)
 
                 //----------Hack Inits
 
@@ -394,6 +387,10 @@ namespace object2DOutlines
                 newActiveO = false;
                 newCAVEinit = false;
                 newVEXinit = false;
+
+                //----------Main Init (MUST be after hack inits)
+                SpriteType_O = spriteType.conVEX; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
+                //NOTE: many variables are also initialized when this is set
 
                 //----------Variable Inits
 
@@ -453,8 +450,6 @@ namespace object2DOutlines
             {
                 print("**********");
 
-                print("new run");
-
                 //--------------wipe out conCAVE outline
                 spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
                 pushType_O_CAVE = push.regularPattern; //DIRECT SETTING... be careful [nothing]
@@ -471,7 +466,7 @@ namespace object2DOutlines
                 spriteType_O = spriteType.conVEX; //DIRECT SETTING... be careful [nothing]
 
                 //---------------initialize variables
-                Size_O = 10f;
+                Size_O = 2f;
 
                 newVEXinit = false;
 
@@ -482,6 +477,8 @@ namespace object2DOutlines
 
             if(newCAVEinit)
             {
+                print("**********");
+
                 //---------------set the new value
                 spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
 
@@ -492,7 +489,7 @@ namespace object2DOutlines
 
                 //---------------initialize variables
 
-                Size_O = .75f;
+                Size_O = .25f;
 
                 PushType_O_CAVE = push.regularPattern; //NOTE: newEdgeCount next frame
                 StdSize_O_CAVE = true;
@@ -509,6 +506,8 @@ namespace object2DOutlines
                 newCAVEinit = false;
 
                 print("we should now be CAVE " + SpriteType_O.ToString());
+
+                print("**********");
             }
 
             //required hack because of warnings

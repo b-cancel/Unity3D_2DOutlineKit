@@ -165,6 +165,8 @@ namespace object2DOutlines
 
                 EditorGUILayout.PropertyField(spriteType_O, new GUIContent("-Sprite Type"));
 
+                EditorGUILayout.Space(); ///-------------------------
+
                 if (script.SpriteType_O == spriteType.conVEX)
                     EditorGUILayout.PropertyField(size_O, new GUIContent("--it's Size"));
                 else

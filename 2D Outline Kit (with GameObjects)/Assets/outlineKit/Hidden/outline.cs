@@ -68,7 +68,7 @@ namespace object2DOutlines
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
 
-    public enum spriteType { conCAVE, conVEX };
+    public enum spriteType { conCAVE, conVEX }; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
 
     //ONLY for conCAVE outline
     public enum push { regularPattern, customPattern };
