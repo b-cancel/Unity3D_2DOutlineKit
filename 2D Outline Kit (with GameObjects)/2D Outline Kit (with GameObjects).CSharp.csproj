@@ -310,8 +310,8 @@
     <Compile Include="Assets\outlineKit\concaveOut.cs" />
     <Compile Include="Assets\outlineKit\convexOut.cs" />
     <Compile Include="Assets\outlineKit\Hidden\outline.cs" />
-    <Compile Include="Assets\outlineKit\spriteOutline.cs" />
     <Compile Include="Assets\ruler.cs" />
+    <Compile Include="Assets\spriteOutline.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\outlineKit\Hidden\childrenCode.txt" />

@@ -56,7 +56,7 @@ namespace object2DOutlines
             updateSprite = serializedObject.FindProperty("updateSprite");
 
             //Debugging
-            showOutline_GOs_InHierarchy = serializedObject.FindProperty("showOutline_GOs_InHierarchy_D");
+            showOutline_GOs_InHierarchy = serializedObject.FindProperty("showOutline_GOs_InHierarchy");
 
             //Overlay
             active_SO = serializedObject.FindProperty("active_SO");

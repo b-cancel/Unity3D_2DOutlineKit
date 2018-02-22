@@ -13,6 +13,9 @@ using UnityEngine;
 //BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
 //NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
+
+//NOTE: here we are not allowing users to change "backSortingLayerID" -OR- "frontSortingLayerID"
+
 namespace object2DOutlines
 {
     //--------------------------------------------------ENUMERABLES--------------------------------------------------
@@ -65,7 +68,7 @@ namespace object2DOutlines
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
 
-    public enum spriteType { conVEX, conCAVE };
+    public enum spriteType { conCAVE, conVEX };
 
     //ONLY for conCAVE outline
     public enum push { regularPattern, customPattern };
@@ -93,7 +96,6 @@ namespace object2DOutlines
         [SerializeField, HideInInspector]
         internal GameObject outlineGameObjectsFolder; //contains all the gameobjects used by the script
 
-        [Space(10)]
         [Header("DEBUGGING VARIABLES-----")]
         [SerializeField, HideInInspector]
         internal bool showOutline_GOs_InHierarchy;
@@ -116,7 +118,6 @@ namespace object2DOutlines
         [SerializeField, HideInInspector]
         internal GameObject spriteOverlay; //the sprite overlay gameobject
 
-        [Space(10)]
         [Header("SPRITE OVERLAY VARIABLES-----")]
         [SerializeField, HideInInspector]
         internal bool active_SO;
@@ -199,7 +200,7 @@ namespace object2DOutlines
             {
                 frontLayer_CM = value; 
 
-                clippingMask.GetComponent<SpriteMask>().frontSortingLayerID = frontLayer_CM;
+                clippingMask.GetComponent<SpriteMask>().frontSortingOrder = frontLayer_CM;
             }
         }
 
@@ -212,7 +213,7 @@ namespace object2DOutlines
             {
                 backLayer_CM = value; 
 
-                clippingMask.GetComponent<SpriteMask>().backSortingLayerID = backLayer_CM;
+                clippingMask.GetComponent<SpriteMask>().backSortingOrder = backLayer_CM;
             }
         }
 
