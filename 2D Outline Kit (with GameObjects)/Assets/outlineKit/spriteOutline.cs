@@ -209,7 +209,9 @@ namespace object2DOutlines
                     removeAllEdges();
 
                     //--------------spawn in conVEX outline
-                    EdgeCount_O_CAVE_R = 1;
+                    spriteType_O = spriteType.conCAVE;
+                    EdgeCount_O_CAVE_R = 1; //spriteType_O MUST be concave for this to run
+                    spriteType_O = spriteType.conVEX;
 
                     //---------------initialize variables
 
