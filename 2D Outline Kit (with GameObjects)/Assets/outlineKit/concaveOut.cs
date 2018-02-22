@@ -52,10 +52,11 @@ namespace object2DOutlines
                 ScaleWithParentX_O = scaleWithParentX_O;
                 ScaleWithParentY_O = scaleWithParentY_O;
 
+                Size_OP = size_OP;
+
                 //ONLY push
                 PushType_OP = pushType_OP;
                 StdSize_OP = stdSize_OP;
-                Size_OP = size_OP;
                 EdgeCount_OPR = edgeCount_OPR;
                 StartAngle_OPR = startAngle_OPR;
                 PushPattern_OPR = pushPattern_OPR;

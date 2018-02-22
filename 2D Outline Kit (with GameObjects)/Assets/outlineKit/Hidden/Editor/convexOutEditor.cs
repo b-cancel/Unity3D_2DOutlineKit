@@ -12,7 +12,7 @@ namespace object2DOutlines
         SerializedProperty updateSprite;
 
         //Debugging
-        SerializedProperty showOutline_GOs_InHierarchy_D;
+        SerializedProperty showOutline_GOs_InHierarchy;
 
         //Sprite Outline
         SerializedProperty active_SO;
@@ -40,7 +40,7 @@ namespace object2DOutlines
             updateSprite = serializedObject.FindProperty("updateSprite");
 
             //Debugging
-            showOutline_GOs_InHierarchy_D = serializedObject.FindProperty("showOutline_GOs_InHierarchy_D");
+            showOutline_GOs_InHierarchy = serializedObject.FindProperty("showOutline_GOs_InHierarchy");
 
             //Sprite Outline
             active_SO = serializedObject.FindProperty("active_SO");
@@ -80,7 +80,7 @@ namespace object2DOutlines
                     script.updateSpriteData();
 
             //Debugging
-            EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy_D, new GUIContent("Show Outline In Hierarchy"));
+            EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy, new GUIContent("Show Outline In Hierarchy"));
 
             //Sprite Overlay
             EditorGUILayout.PropertyField(active_SO, new GUIContent("Activate Sprite Overlay"));
