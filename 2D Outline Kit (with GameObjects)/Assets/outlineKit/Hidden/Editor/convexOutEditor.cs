@@ -108,7 +108,16 @@ namespace object2DOutlines
             //Sprite Outline
             EditorGUILayout.PropertyField(active_O, new GUIContent("Active Sprite Outline"));
 
-            serializedObject.ApplyModifiedProperties();
+            if (script.Active_O)
+            {
+                EditorGUILayout.PropertyField(size_O, new GUIContent("-it's Size"));
+                EditorGUILayout.PropertyField(color_O, new GUIContent("-it's Color"));
+                EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("-it's Order In Layer"));
+                EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("-Follow Parent X Scale"));
+                EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("-Follow Parent Y Scale"));
+            }
+
+                serializedObject.ApplyModifiedProperties();
         }
     }
 }

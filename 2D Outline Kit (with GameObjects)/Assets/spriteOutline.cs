@@ -30,6 +30,8 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         private bool _awakeFinished;
+        [SerializeField, HideInInspector]
+        private bool _firstUpdateFinished;
 
         void OnValidate()
         {
@@ -59,7 +61,8 @@ namespace object2DOutlines
                 OrderInLayer_O = orderInLayer_O;
                 ScaleWithParentX_O = scaleWithParentX_O;
                 ScaleWithParentY_O = scaleWithParentY_O;
-                SpriteType_O = spriteType_O;
+                //if(_firstUpdateFinished) //repairs an error caused by unity's custom editor scripts and the hack i have to do to be able to use DestroyImmediate()
+                    SpriteType_O = spriteType_O;
                 Size_O = size_O;
 
                 //-----conCAVE
@@ -203,17 +206,25 @@ namespace object2DOutlines
             get { return spriteType_O; }
             set
             {
+                print("---Set to: " + value);
+                if (value == spriteType.conVEX)
+                    newVEXinit = true;
+                else
+                    newCAVEinit = true;
+                /*
                 print("+++++SET SPRITE TYPE+++++");
+                print("currently: " + spriteType_O.ToString());
                 if (value != spriteType_O)
                 {
-                    print("Set to: " + value);
+                    print("---Set to: " + value);
                     if (value == spriteType.conVEX)
                         newVEXinit = true;
                     else
                         newCAVEinit = true;
                 }
                 else
-                    print("it was equal");
+                    print("---it was equal");
+                    */
             }
         }
         [SerializeField, HideInInspector]
@@ -243,7 +254,7 @@ namespace object2DOutlines
         //-------------------------Push Type Variables-------------------------
 
         [SerializeField, HideInInspector]
-        Dictionary<GameObject, Vector2> outlineEdges;
+        private Dictionary<GameObject, Vector2> outlineEdges;
 
         [SerializeField, HideInInspector]
         private bool newEdgeCount;
@@ -366,6 +377,7 @@ namespace object2DOutlines
         new void Awake()
         {
             _awakeFinished = false;
+            _firstUpdateFinished = false;
 
             if (gameObject.transform.Find("Outline Folder") == null)
             {
@@ -411,11 +423,12 @@ namespace object2DOutlines
             {
                 outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
                 thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
+                print("awake count: " + outlineEdges.Count);
                 spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
                 clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
             }
 
-            print("---------");
+            print("---------AWAKE FINISHED");
 
             _awakeFinished = true;
         }
@@ -446,69 +459,81 @@ namespace object2DOutlines
             }
 
             //required hack
-            if (newVEXinit)
+            if(newVEXinit || newCAVEinit)
             {
-                print("**********");
+                if (newVEXinit && newCAVEinit)
+                    print("ERROR... i cant set the outline to both");
+                else
+                {
+                    if (newVEXinit)
+                    {
+                        print("**********VEX");
 
-                //--------------wipe out conCAVE outline
-                spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
-                pushType_O_CAVE = push.regularPattern; //DIRECT SETTING... be careful [nothing]
-                edgeCount_O_CAVE_R = 0; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
-                updateEdgeCountCAVE();
+                        //--------------wipe out conCAVE outline
+                        spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
+                        pushType_O_CAVE = push.regularPattern; //DIRECT SETTING... be careful [nothing]
+                        edgeCount_O_CAVE_R = 0; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
+                        updateEdgeCountCAVE();
 
-                //--------------spawn in conVEX outline
-                _0Rotation = Vector3.zero;
-                edgeCount_O_CAVE_R = 1; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
-                updateEdgeCountCAVE();
-                _0Rotation = Vector3.right;
+                        //--------------spawn in conVEX outline
+                        _0Rotation = Vector3.zero;
+                        edgeCount_O_CAVE_R = 1; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
+                        updateEdgeCountCAVE();
+                        _0Rotation = Vector3.right;
 
-                //---------------set the new value
-                spriteType_O = spriteType.conVEX; //DIRECT SETTING... be careful [nothing]
+                        //---------------set the new value
+                        spriteType_O = spriteType.conVEX; //DIRECT SETTING... be careful [nothing]
 
-                //---------------initialize variables
-                Size_O = 2f;
+                        //---------------initialize variables
+                        Size_O = 2f;
 
+                        print("we should now be VEX " + SpriteType_O.ToString());
+
+                        print("**********VEX");
+                    }
+                    else
+                    {
+                        print("**********CAVE");
+
+                        //--------------wipe out conVEX outline
+                        spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
+                        pushType_O_CAVE = push.regularPattern; //DIRECT SETTING... be careful [nothing]
+                        edgeCount_O_CAVE_R = 0; //spriteType_O MUST be conCAVE for this to run
+                        updateEdgeCountCAVE();
+                        print("edgecount " + outlineEdges.Count);
+
+                        //--------------spawn in conCAVE outline
+                        edgeCount_O_CAVE_R = 8; //spriteType_O MUST be conCAVE for this to run
+                        updateEdgeCountCAVE();
+                        print("edgecount " + outlineEdges.Count);
+
+                        //---------------initialize variables
+                        Size_O = .25f;
+
+                        PushType_O_CAVE = push.regularPattern; //NOTE: newEdgeCount next frame
+                        StdSize_O_CAVE = true;
+
+                        //ONLY regular
+                        EdgeCount_O_CAVE_R = 8;
+                        StartAngle_O_CAVE_R = 0;
+                        PushPattern_O_CAVE_R = pushPattern.squarial;
+
+                        //ONLY regular && squarial
+                        RectSize_O_CAVE_RS = rectType.regular;
+                        //width and height set by the above
+
+                        print("we should now be CAVE " + SpriteType_O.ToString());
+
+                        print("**********CAVE");
+                    }
+                }
+
+                //reset vars
                 newVEXinit = false;
-
-                print("we should now be VEX " + SpriteType_O.ToString());
-
-                print("**********");
-            }
-
-            if(newCAVEinit)
-            {
-                print("**********");
-
-                //---------------set the new value
-                spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
-
-                //--------------wipe out conVEX outline
-                EdgeCount_O_CAVE_R = 0; //spriteType_O MUST be conCAVE for this to run
-
-                //--------------spawn in conCAVE outline
-
-                //---------------initialize variables
-
-                Size_O = .25f;
-
-                PushType_O_CAVE = push.regularPattern; //NOTE: newEdgeCount next frame
-                StdSize_O_CAVE = true;
-
-                //ONLY regular
-                EdgeCount_O_CAVE_R = 8;
-                StartAngle_O_CAVE_R = 0;
-                PushPattern_O_CAVE_R = pushPattern.squarial;
-
-                //ONLY regular && squarial
-                RectSize_O_CAVE_RS = rectType.regular;
-                //width and height set by the above
-
                 newCAVEinit = false;
-
-                print("we should now be CAVE " + SpriteType_O.ToString());
-
-                print("**********");
             }
+            else //both FALSE
+                print("sprite type " + SpriteType_O.ToString());
 
             //required hack because of warnings
             if (newActiveCM)
@@ -526,6 +551,8 @@ namespace object2DOutlines
             }
 
             base.Update();
+
+            _firstUpdateFinished = true;
         }
 
         public void updateSpriteData()
