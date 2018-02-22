@@ -96,15 +96,15 @@ namespace object2DOutlines
         [Space(10)]
         [Header("DEBUGGING VARIABLES-----")]
         [SerializeField, HideInInspector]
-        internal bool showOutline_GOs_InHierarchy_D;
-        public bool ShowOutline_GOs_InHierarchy_D
+        internal bool showOutline_GOs_InHierarchy;
+        public bool ShowOutline_GOs_InHierarchy
         {
-            get { return showOutline_GOs_InHierarchy_D; }
+            get { return showOutline_GOs_InHierarchy; }
             set
             {
-                showOutline_GOs_InHierarchy_D = value; 
+                showOutline_GOs_InHierarchy = value; 
 
-                if (showOutline_GOs_InHierarchy_D)
+                if (showOutline_GOs_InHierarchy)
                     outlineGameObjectsFolder.hideFlags = HideFlags.None;
                 else
                     outlineGameObjectsFolder.hideFlags = HideFlags.HideInHierarchy;
@@ -224,7 +224,7 @@ namespace object2DOutlines
             UpdateSprite = spriteUpdateSetting.AfterEveryChange;
 
             //-----Debugging
-            ShowOutline_GOs_InHierarchy_D = false;
+            ShowOutline_GOs_InHierarchy = false;
 
             //-----Sprite Overlay
             Active_SO = false;
@@ -403,7 +403,7 @@ namespace object2DOutlines
                 case varToUpdate.US: child.UpdateSprite = par.UpdateSprite; break;
 
                 //Debugging
-                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy_D = par.ShowOutline_GOs_InHierarchy_D; break;
+                case varToUpdate.SOGIH: child.ShowOutline_GOs_InHierarchy = par.ShowOutline_GOs_InHierarchy; break;
 
                 //Overlay
                 case varToUpdate.A_SO: child.Active_SO = par.Active_SO; break;

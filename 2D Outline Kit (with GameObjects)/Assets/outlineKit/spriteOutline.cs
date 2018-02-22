@@ -20,6 +20,9 @@ namespace object2DOutlines
         //NOTE: IF(RectSize == regulat) -> use the height and width of our source sprite
         //ELSE -> use our own custom height and width
 
+        //NOTE: any function that ends in VEX... will not run if unless your "SpriteType_O" == conVEX
+        //ditto for any function that ends in CAVE
+
         [SerializeField, HideInInspector]
         private bool _awakeFinished;
 
@@ -31,7 +34,7 @@ namespace object2DOutlines
                 UpdateSprite = updateSprite;
 
                 //Debugging
-                ShowOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
+                ShowOutline_GOs_InHierarchy = showOutline_GOs_InHierarchy;
 
                 //Sprite Overlay
                 Active_SO = active_SO;
@@ -56,18 +59,18 @@ namespace object2DOutlines
 
                 //-----conCAVE
 
-                PushType_O_CAVE = pushType_OP;
-                StdSize_O_CAVE = stdSize_OP;
+                PushType_O_CAVE = pushType_O_CAVE;
+                StdSize_O_CAVE = stdSize_O_CAVE;
 
                 //ONLY regular
-                EdgeCount_O_CAVE_R = edgeCount_OPR;
-                StartAngle_O_CAVE_R = startAngle_OPR;
-                PushPattern_O_CAVE_R = pushPattern_OPR;
+                EdgeCount_O_CAVE_R = edgeCount_O_CAVE_R;
+                StartAngle_O_CAVE_R = startAngle_O_CAVE_R;
+                PushPattern_O_CAVE_R = pushPattern_O_CAVE_R;
 
                 //ONLY regular && squarial
-                RectSize_O_CAVE_RS = rectSize_OPRS;
-                RectWidth_O_CAVE_RS = rectWidth_OPRS;
-                RectHeight_O_CAVE_RS = rectHeight_OPRS;
+                RectSize_O_CAVE_RS = rectSize_O_CAVE_RS;
+                RectWidth_O_CAVE_RS = rectWidth_O_CAVE_RS;
+                RectHeight_O_CAVE_RS = rectHeight_O_CAVE_RS;
             }
         }
 
@@ -82,7 +85,7 @@ namespace object2DOutlines
             get { return clipCenter_CM; }
             set
             {
-                clipCenter_CM = value; //update local value
+                clipCenter_CM = value; 
 
                 //enable or disable mask
                 newActiveCM = true;
@@ -119,7 +122,7 @@ namespace object2DOutlines
             get { return active_O; }
             set
             {
-                active_O = value;//update local value
+                active_O = value;
 
                 newActiveO = true;
             }
@@ -134,7 +137,7 @@ namespace object2DOutlines
             get { return color_O; }
             set
             {
-                color_O = value;//update local value
+                color_O = value;
 
                 //update our edges with the new color
                 if (outlineEdges != null)
@@ -150,7 +153,7 @@ namespace object2DOutlines
             get { return orderInLayer_O; }
             set
             {
-                orderInLayer_O = value;//update local value
+                orderInLayer_O = value;
 
                 //update our edges with the new color
                 if (outlineEdges != null)
@@ -159,37 +162,35 @@ namespace object2DOutlines
             }
         }
 
+        //TODO... might require reconfiguration
         [SerializeField, HideInInspector]
         bool scaleWithParentX_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentX_O
         {
             get { return scaleWithParentX_O; }
             set
             {
-                scaleWithParentX_O = value;//update local value
+                scaleWithParentX_O = value;
 
-                if (SpriteType_O == spriteType.conVEX)
-                    updateOutline();
-                else
-                    updateEdgePositionsALL();
+                //the one that is currently active will run
+                updateOutlineVEX();
+                updateOutlineCAVE();
             }
         }
 
+        //TODO... might require reconfiguration
         [SerializeField, HideInInspector]
         bool scaleWithParentY_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentY_O
         {
             get { return scaleWithParentY_O; }
             set
             {
-                scaleWithParentY_O = value;//update local value
+                scaleWithParentY_O = value;
 
-                if (SpriteType_O == spriteType.conVEX)
-                    updateOutline();
-                else
-                    updateEdgePositionsALL();
+                //the one that is currently active will run
+                updateOutlineVEX();
+                updateOutlineCAVE();
             }
         }
 
@@ -202,25 +203,47 @@ namespace object2DOutlines
             set
             {
                 spriteType_O = value;
-
-                if(SpriteType_O == spriteType.conVEX)
+                if (spriteType_O == spriteType.conVEX)
                 {
-                    //wipe out all data we MUST from conCAVE version
+                    //--------------wipe out conCAVE outline
+                    removeAllEdges();
 
-                    //make sure we only have 1 outline in array or list
+                    //--------------spawn in conVEX outline
+                    EdgeCount_O_CAVE_R = 1;
+
+                    //---------------initialize variables
+
+                    Size_O = 2f;
                 }
                 else
                 {
-                    //wipe out all data we MUST from conVEX version
+                    //--------------wipe out conVEX outline
+                    removeAllEdges();
 
-                    //spawn in conCAVE outline with default settings
+                    //--------------spawn in conCAVE outline
 
+                    //---------------initialize variables
+
+                    Size_O = .75f;
+
+                    PushType_O_CAVE = push.regularPattern;
+                    StdSize_O_CAVE = true;
+
+                    //ONLY regular
+                    EdgeCount_O_CAVE_R = 8;
+                    StartAngle_O_CAVE_R = 0;
+                    PushPattern_O_CAVE_R = pushPattern.squarial;
+
+                    //ONLY regular && squarial
+                    RectSize_O_CAVE_RS = rectType.regular;
+                    //width and height set by the above
                 }
             }
         }
 
         //---CONCAVE and CONVEX use this differently
-            
+
+        //TODO... might require reconfiguration
         [SerializeField, HideInInspector]
         float size_O; //NOTE: this size refers to the world space thickness of the outline
         //NOTE: used in update function... doesnt have to do anyting special for get and set...
@@ -230,12 +253,11 @@ namespace object2DOutlines
             set
             {
                 value = (value >= 0) ? value : 0;
-                size_O = value;//update local value
+                size_O = value;
 
-                if (SpriteType_O == spriteType.conVEX)
-                    updateOutline();
-                else
-                    updateEdgePositionsALL();
+                //the one that is currently active will run
+                updateOutlineVEX();
+                updateOutlineCAVE();
             }
         }
 
@@ -247,31 +269,32 @@ namespace object2DOutlines
         [SerializeField, HideInInspector]
         private bool newEdgeCount;
 
+        //TODO... might require reconfiguration
         [Space(10)]
         [Header("PUSH TYPE VARIABLES-----")]
         [SerializeField, HideInInspector]
-        push pushType_OP;
+        push pushType_O_CAVE;
         public push PushType_O_CAVE
         {
-            get { return pushType_OP; }
+            get { return pushType_O_CAVE; }
             set
             {
-                pushType_OP = value; //update local value
+                pushType_O_CAVE = value;
 
                 newEdgeCount = true;
             }
         }
 
         [SerializeField, HideInInspector]
-        bool stdSize_OP; //NOTE: this size refers to the world space thickness of the outline
+        bool stdSize_O_CAVE; //NOTE: this size refers to the world space thickness of the outline
         public bool StdSize_O_CAVE
         {
-            get { return stdSize_OP; }
+            get { return stdSize_O_CAVE; }
             set
             {
-                stdSize_OP = value;//update local value
+                stdSize_O_CAVE = value;
 
-                updateEdgePositionsALL();
+                updateOutlineCAVE();
             }
         }
 
@@ -280,56 +303,57 @@ namespace object2DOutlines
         [SerializeField, HideInInspector]
         private static Vector2 _0Rotation; //what we consider 0 rotation (current Vector3.right)
 
+        //TODO... might require reconfiguration
         [SerializeField, HideInInspector]
-        int edgeCount_OPR; //also the count of gameobjects that make up the outline
+        int edgeCount_O_CAVE_R; //also the count of gameobjects that make up the outline
         public int EdgeCount_O_CAVE_R
         {
-            get { return edgeCount_OPR; }
+            get { return edgeCount_O_CAVE_R; }
             set
             {
-                edgeCount_OPR = (value >= 0) ? value : 0; //update local value
+                edgeCount_O_CAVE_R = (value >= 0) ? value : 0; //update local value
 
                 newEdgeCount = true;
             }
         }
 
         [SerializeField, HideInInspector]
-        float startAngle_OPR;
+        float startAngle_O_CAVE_R;
         public float StartAngle_O_CAVE_R
         {
-            get { return startAngle_OPR; }
+            get { return startAngle_O_CAVE_R; }
             set
             {
-                startAngle_OPR = value; //update local value
+                startAngle_O_CAVE_R = value; //update local value
 
-                updateEdgePositionsALL();
+                updateOutlineCAVE();
             }
         }
 
         [SerializeField, HideInInspector]
-        pushPattern pushPattern_OPR; //push objs to edge of circle or to edge of box
+        pushPattern pushPattern_O_CAVE_R; //push objs to edge of circle or to edge of box
         public pushPattern PushPattern_O_CAVE_R
         {
-            get { return pushPattern_OPR; }
+            get { return pushPattern_O_CAVE_R; }
             set
             {
-                pushPattern_OPR = value; //update local value
+                pushPattern_O_CAVE_R = value; //update local value
 
-                updateEdgeRotationsALL();
+                updateEdgeRotationsCAVE();
             }
         }
 
         [SerializeField, HideInInspector]
-        rectType rectSize_OPRS;
+        rectType rectSize_O_CAVE_RS;
         public rectType RectSize_O_CAVE_RS
         {
-            get { return rectSize_OPRS; }
+            get { return rectSize_O_CAVE_RS; }
             set
             {
-                rectSize_OPRS = value;
+                rectSize_O_CAVE_RS = value;
 
                 //update height and width... which will update our outline
-                if (rectSize_OPRS == rectType.regular)
+                if (rectSize_O_CAVE_RS == rectType.regular)
                 {
                     RectWidth_O_CAVE_RS = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
                     RectHeight_O_CAVE_RS = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
@@ -338,28 +362,28 @@ namespace object2DOutlines
         }
 
         [SerializeField, HideInInspector]
-        float rectWidth_OPRS;
+        float rectWidth_O_CAVE_RS;
         public float RectWidth_O_CAVE_RS
         {
-            get { return rectWidth_OPRS; }
+            get { return rectWidth_O_CAVE_RS; }
             set
             {
-                rectWidth_OPRS = value;
+                rectWidth_O_CAVE_RS = value;
 
-                updateEdgeRotationsALL();
+                updateEdgeRotationsCAVE();
             }
         }
 
         [SerializeField, HideInInspector]
-        float rectHeight_OPRS;
+        float rectHeight_O_CAVE_RS;
         public float RectHeight_O_CAVE_RS
         {
-            get { return rectHeight_OPRS; }
+            get { return rectHeight_O_CAVE_RS; }
             set
             {
-                rectHeight_OPRS = value;
+                rectHeight_O_CAVE_RS = value;
 
-                updateEdgeRotationsALL();
+                updateEdgeRotationsCAVE();
             }
         }
 
@@ -392,22 +416,9 @@ namespace object2DOutlines
 
                 //---DECIDES BETWEEN OUTLINE TYPE
                 SpriteType_O = spriteType.conVEX;
+                //NOTE: many variables are also initialized when this is set
 
-                //---CONCAVE and CONVEX use this differently
-                Size_O = 2f;
-
-                //-----Push Type Vars
                 outlineEdges = new Dictionary<GameObject, Vector2>();
-                PushType_O_CAVE = push.regularPattern;
-                StdSize_O_CAVE = true;
-                
-                //---Regular
-                EdgeCount_O_CAVE_R = 8;
-                StartAngle_O_CAVE_R = 0;
-                PushPattern_O_CAVE_R = pushPattern.squarial;
-
-                RectSize_O_CAVE_RS = rectType.regular;
-                //width and height set by the above
 
                 //---Hack Inits
                 newEdgeCount = false;
@@ -447,7 +458,7 @@ namespace object2DOutlines
             //so this is a "HACK" to make it work without it (technically) being inside OnValidate()
             if (newEdgeCount)
             {
-                updateEdgeCount();
+                updateEdgeCountCAVE();
                 newEdgeCount = false;
             }
 
@@ -487,102 +498,121 @@ namespace object2DOutlines
 
         //-------------------------ONLY conVEX-------------------------
 
-        void updateOutline()
+        void updateOutlineVEX()
         {
-            float localSizeX;
-            float localSizeY;
+            if(SpriteType_O == spriteType.conVEX)
+            {
+                float localSizeX;
+                float localSizeY;
 
-            //REQUIRED because: when we want our size to be able to be == to 0
-            //when size is 0 there should essentially be a "solidly colored sprite behind our current sprite"
-            //without this adjustment to get a "solidly colored sprite behind our current sprite" our size needs to be 1
-            float adjustedSize = Size_O + 1;
+                //REQUIRED because: when we want our size to be able to be == to 0
+                //when size is 0 there should essentially be a "solidly colored sprite behind our current sprite"
+                //without this adjustment to get a "solidly colored sprite behind our current sprite" our size needs to be 1
+                float adjustedSize = Size_O + 1;
 
-            if (ScaleWithParentX_O)
-                localSizeX = adjustedSize;
-            else
-                localSizeX = adjustedSize / this.transform.localScale.x;
+                if (ScaleWithParentX_O)
+                    localSizeX = adjustedSize;
+                else
+                    localSizeX = adjustedSize / this.transform.localScale.x;
 
-            if (ScaleWithParentY_O)
-                localSizeY = adjustedSize;
-            else
-                localSizeY = adjustedSize / this.transform.localScale.y;
+                if (ScaleWithParentY_O)
+                    localSizeY = adjustedSize;
+                else
+                    localSizeY = adjustedSize / this.transform.localScale.y;
 
-            thisOutline.transform.localScale = new Vector3(localSizeX, localSizeY, 1);
+                thisOutline.transform.localScale = new Vector3(localSizeX, localSizeY, 1);
+            }
+            //ELSE... this function should not be running
         }
 
         //-------------------------ONLY conCAVE-------------------------
 
         //-------------------------ONLY PushType == push.regularPattern
 
-        void updateEdgeCount() //AUTOMATICALLY... calls updateEdgeRotations()
+        void updateEdgeCountCAVE() //AUTOMATICALLY... calls updateEdgeRotations()
         {
-            if (PushType_O_CAVE == push.regularPattern)
+            if(SpriteType_O == spriteType.conCAVE)
             {
-                if (outlineEdges != null) //precautionary check
+                if (PushType_O_CAVE == push.regularPattern)
                 {
-                    if (outlineEdges.Count != EdgeCount_O_CAVE_R)
+                    if (outlineEdges != null) //precautionary check
                     {
-                        int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
+                        if (outlineEdges.Count != EdgeCount_O_CAVE_R)
+                        {
+                            int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
 
-                        if (outlineEdges.Count < EdgeCount_O_CAVE_R)
-                        {
-                            for (int i = 0; i < totalDifferences; i++)
-                                addEdge(_0Rotation, true);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < totalDifferences; i++)
+                            if (outlineEdges.Count < EdgeCount_O_CAVE_R)
                             {
-                                List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys);
-                                removeEdge(keyList[keyList.Count - 1], true); //remove from the back
+                                for (int i = 0; i < totalDifferences; i++)
+                                    addEdge(_0Rotation, true);
                             }
-                        }
+                            else
+                            {
+                                for (int i = 0; i < totalDifferences; i++)
+                                {
+                                    List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys);
+                                    removeEdge(keyList[keyList.Count - 1], true); //remove from the back
+                                }
+                            }
 
-                        updateEdgeRotationsALL(); //BECAUSE... the count of edges changed
+                            updateEdgeRotationsCAVE(); //BECAUSE... the count of edges changed
+                        }
+                        //ELSE... we have the correct number of edges
                     }
-                    //ELSE... we have the correct number of edges
+                    //ELSE... the outline doesnt yet exist
                 }
+                //ELSE... follow custom outline rules
             }
-            //ELSE... follow custom outline rules
+            //ELSE... this function should not be running
         }
 
         //UPDATE ---ROTATIONS--- BASED ON PATTERN
-        void updateEdgeRotationsALL() //AUTOMATICALLY... calls updateEdgePositions()
+        void updateEdgeRotationsCAVE() //AUTOMATICALLY... calls updateEdgePositions()
         {
-            if (PushType_O_CAVE == push.regularPattern)
+            if(SpriteType_O == spriteType.conCAVE)
             {
-                if (outlineEdges != null) //precautionary check
+                if (PushType_O_CAVE == push.regularPattern)
                 {
-                    //StartAngle_OPR is used to rotate the shape after this step
-                    float edgeRotation = (PushPattern_O_CAVE_R == pushPattern.radial) ?
-                        0 //for RADIAL... start at _0Rotation
-                        : (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //for SQUARIAL... start by placing the first edge in the first corner (1st quadrant)
-                    float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
-
-                    List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                    foreach (var GameObject in GOs)
+                    if (outlineEdges != null) //precautionary check
                     {
-                        float oldMagnitude = outlineEdges[GameObject].magnitude;
-                        Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                        editEdge(GameObject, newDirection.normalized * oldMagnitude, true); //this will also updateEdgePosition()
-                        edgeRotation += angleBetweenAllEdges;
+                        //StartAngle_OPR is used to rotate the shape after this step
+                        float edgeRotation = (PushPattern_O_CAVE_R == pushPattern.radial) ?
+                            0 //for RADIAL... start at _0Rotation
+                            : (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //for SQUARIAL... start by placing the first edge in the first corner (1st quadrant)
+                        float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
+
+                        List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
+                        foreach (var GameObject in GOs)
+                        {
+                            float oldMagnitude = outlineEdges[GameObject].magnitude;
+                            Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
+                            editEdge(GameObject, newDirection.normalized * oldMagnitude, true); //this will also updateEdgePosition()
+                            edgeRotation += angleBetweenAllEdges;
+                        }
                     }
+                    //ELSE... the outline doesnt yet exist
                 }
+                //ELSE... follow custom outline rules
             }
-            //ELSE... follow custom outline rules
+            //ELSE... this function should not be running
         }
 
         //-------------------------FOR BOTH PushTypes
 
         //USES... same as "updateEdgePosition()"
-        void updateEdgePositionsALL()
+        void updateOutlineCAVE()
         {
-            if (outlineEdges != null)
+            if (SpriteType_O == spriteType.conCAVE)
             {
-                List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                foreach (var GameObject in GOs)
-                    updateEdgePosition(GameObject, outlineEdges[GameObject]);
+                if (outlineEdges != null)
+                {
+                    List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
+                    foreach (var GameObject in GOs)
+                        updateEdgePositionCAVE(GameObject, outlineEdges[GameObject]);
+                }
+                //ELSE... the outline doesnt yet exist
             }
+            //ELSE... this function should not be running
         }
 
         //USES...
@@ -591,106 +621,110 @@ namespace object2DOutlines
         //(PushType_OP == either)... use (Size_O) (ScaleWithParentX_O) (ScaleWithParentY_O)
 
         //UPDATE ---MAGNITUDE--- BASED ON PATTERN
-        void updateEdgePosition(GameObject anEdge, Vector2 vect)
+        void updateEdgePositionCAVE(GameObject anEdge, Vector2 vect)
         {
-            outlineEdges[anEdge] = vect;
-
-            //NOTE: we push from origin (0,0,0)
-
-            Vector3 newVect = Vector3.zero;
-            if (PushType_O_CAVE == push.regularPattern)
+            if(SpriteType_O == spriteType.conCAVE)
             {
-                if (StdSize_O_CAVE)
+                outlineEdges[anEdge] = vect;
+
+                //NOTE: we push from origin (0,0,0)
+
+                Vector3 newVect = Vector3.zero;
+                if (PushType_O_CAVE == push.regularPattern)
                 {
-                    if (PushPattern_O_CAVE_R == pushPattern.radial) //Radial Push
-                        newVect = vect.normalized * Size_O;
-                    else //Squarial Push
+                    if (StdSize_O_CAVE)
                     {
-                        //do this pretending 
-                        //that the Rect Width length goes from -x to x
-                        //and that the Rect Length goes from -y to y
-
-                        float cornerAngle = (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //top right corner
-                        //TODO... might have to repair below with conversion into degree
-                        float cornerHypotenuse = (RectHeight_O_CAVE_RS / 2) / Mathf.Sin(cornerAngle * Mathf.Deg2Rad);
-
-                        float AF_Up = Vector3.Angle(Vector3.up, vect.normalized);
-                        float AF_Right = Vector3.Angle(Vector3.right, vect.normalized);
-                        float AF_Down = Vector3.Angle(Vector3.down, vect.normalized);
-                        float AF_Left = Vector3.Angle(Vector3.left, vect.normalized);
-
-                        float newMagnitude = 0;
-
-                        //--find what quadrant this outline is in
-                        if (AF_Left > 90 && AF_Down > 90) //1st quad
+                        if (PushPattern_O_CAVE_R == pushPattern.radial) //Radial Push
+                            newVect = vect.normalized * Size_O;
+                        else //Squarial Push
                         {
-                            if (AF_Right < cornerAngle) //base ourselves on width
-                                newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
-                            else if (AF_Right > cornerAngle) //base ourselves on height
-                                newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
-                            else
-                                newMagnitude = cornerHypotenuse;
-                        }
-                        else if (AF_Right > 90 && AF_Down > 90) //2nd quad
-                        {
-                            if (AF_Left < cornerAngle) //base ourselves on width
-                                newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
-                            else if (AF_Left > cornerAngle) //base ourselves on height
-                                newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
-                            else
-                                newMagnitude = cornerHypotenuse;
-                        }
-                        else if (AF_Right > 90 && AF_Up > 90) //3rd quad
-                        {
-                            if (AF_Left < cornerAngle) //base ourselves on width
-                                newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
-                            else if (AF_Left > cornerAngle) //base ourselves on height
-                                newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
-                            else
-                                newMagnitude = cornerHypotenuse;
-                        }
-                        else //4th quad
-                        {
-                            if (AF_Right < cornerAngle) //base ourselves on width
-                                newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
-                            else if (AF_Right > cornerAngle) //base ourselves on height
-                                newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
-                            else
-                                newMagnitude = cornerHypotenuse;
-                        }
+                            //do this pretending 
+                            //that the Rect Width length goes from -x to x
+                            //and that the Rect Length goes from -y to y
 
-                        newVect = vect.normalized * newMagnitude;
+                            float cornerAngle = (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //top right corner
+                                                                                                                                      //TODO... might have to repair below with conversion into degree
+                            float cornerHypotenuse = (RectHeight_O_CAVE_RS / 2) / Mathf.Sin(cornerAngle * Mathf.Deg2Rad);
 
-                        newVect = newVect.normalized * (newVect.magnitude * Size_O);
+                            float AF_Up = Vector3.Angle(Vector3.up, vect.normalized);
+                            float AF_Right = Vector3.Angle(Vector3.right, vect.normalized);
+                            float AF_Down = Vector3.Angle(Vector3.down, vect.normalized);
+                            float AF_Left = Vector3.Angle(Vector3.left, vect.normalized);
+
+                            float newMagnitude = 0;
+
+                            //--find what quadrant this outline is in
+                            if (AF_Left > 90 && AF_Down > 90) //1st quad
+                            {
+                                if (AF_Right < cornerAngle) //base ourselves on width
+                                    newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
+                                else if (AF_Right > cornerAngle) //base ourselves on height
+                                    newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
+                                else
+                                    newMagnitude = cornerHypotenuse;
+                            }
+                            else if (AF_Right > 90 && AF_Down > 90) //2nd quad
+                            {
+                                if (AF_Left < cornerAngle) //base ourselves on width
+                                    newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
+                                else if (AF_Left > cornerAngle) //base ourselves on height
+                                    newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
+                                else
+                                    newMagnitude = cornerHypotenuse;
+                            }
+                            else if (AF_Right > 90 && AF_Up > 90) //3rd quad
+                            {
+                                if (AF_Left < cornerAngle) //base ourselves on width
+                                    newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
+                                else if (AF_Left > cornerAngle) //base ourselves on height
+                                    newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
+                                else
+                                    newMagnitude = cornerHypotenuse;
+                            }
+                            else //4th quad
+                            {
+                                if (AF_Right < cornerAngle) //base ourselves on width
+                                    newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
+                                else if (AF_Right > cornerAngle) //base ourselves on height
+                                    newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
+                                else
+                                    newMagnitude = cornerHypotenuse;
+                            }
+
+                            newVect = vect.normalized * newMagnitude;
+
+                            newVect = newVect.normalized * (newVect.magnitude * Size_O);
+                        }
                     }
+                    else
+                        newVect = vect.normalized;
+
+                    //Rotate the RADIAL or SQUARIAL pattern the number of StartAngle_OPR
+                    float oldMagnitude = newVect.magnitude;
+                    Vector3 newDirection = Quaternion.AngleAxis(StartAngle_O_CAVE_R, Vector3.forward) * newVect.normalized;
+                    newVect = newDirection.normalized * oldMagnitude;
                 }
                 else
-                    newVect = vect.normalized;
+                {
+                    if (StdSize_O_CAVE) //STANDARD size for all vectors
+                        newVect = vect.normalized * Size_O; //use ONLY vector (1) direction
+                    else
+                        newVect = vect; //use ONLY vector (1) direction (2) magnitude
+                }
+                anEdge.transform.position = newVect;
 
-                //Rotate the RADIAL or SQUARIAL pattern the number of StartAngle_OPR
-                float oldMagnitude = newVect.magnitude;
-                Vector3 newDirection = Quaternion.AngleAxis(StartAngle_O_CAVE_R, Vector3.forward) * newVect.normalized;
-                newVect = newDirection.normalized * oldMagnitude;
+                //NOTE: as of now our position is still on a compass in the (0,0,0) position
+
+                //take into consideration the SCALE of the sprite we are an edge for
+                if (ScaleWithParentX_O)
+                    anEdge.transform.position = new Vector2(anEdge.transform.position.x * this.transform.localScale.x, anEdge.transform.position.y);
+                if (ScaleWithParentY_O)
+                    anEdge.transform.position = new Vector2(anEdge.transform.position.x, anEdge.transform.position.y * this.transform.localScale.y);
+
+                //take into consideration the POSITION and ROTATION of the sprite we are an edge for
+                anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
             }
-            else
-            {
-                if (StdSize_O_CAVE) //STANDARD size for all vectors
-                    newVect = vect.normalized * Size_O; //use ONLY vector (1) direction
-                else
-                    newVect = vect; //use ONLY vector (1) direction (2) magnitude
-            }
-            anEdge.transform.position = newVect;
-
-            //NOTE: as of now our position is still on a compass in the (0,0,0) position
-
-            //take into consideration the SCALE of the sprite we are an edge for
-            if (ScaleWithParentX_O)
-                anEdge.transform.position = new Vector2(anEdge.transform.position.x * this.transform.localScale.x, anEdge.transform.position.y);
-            if (ScaleWithParentY_O)
-                anEdge.transform.position = new Vector2(anEdge.transform.position.x, anEdge.transform.position.y * this.transform.localScale.y);
-
-            //take into consideration the POSITION and ROTATION of the sprite we are an edge for
-            anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
+            //ELSE... this function should not be running
         }
 
         //-------------------------Outline Edge List Edits-------------------------
@@ -741,7 +775,7 @@ namespace object2DOutlines
                     outlineEdges.Add(tempSpriteCopy, outlineDirection);
 
                     //update position that is affected by... size, scale par x, scale par y
-                    updateEdgePosition(tempSpriteCopy, outlineDirection);
+                    updateEdgePositionCAVE(tempSpriteCopy, outlineDirection);
 
                     //set active state
                     tempSpriteCopy.SetActive(Active_O);
@@ -778,6 +812,13 @@ namespace object2DOutlines
                 return false;
         }
 
+        void removeAllEdges()
+        {
+            List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
+            foreach (var GameObject in GOs)
+                removeEdge(GameObject);
+        }
+
         //USES... PushType_OP
         bool editEdge(GameObject edgeGO, Vector2 newDirection, bool sudo)
         {
@@ -787,7 +828,7 @@ namespace object2DOutlines
                 {
                     if (outlineEdges.ContainsKey(edgeGO))
                     {
-                        updateEdgePosition(edgeGO, newDirection);
+                        updateEdgePositionCAVE(edgeGO, newDirection);
 
                         return true;
                     }
@@ -824,7 +865,7 @@ namespace object2DOutlines
             {
                 if (outlineEdges.ContainsKey(edgeGO))
                 {
-                    updateEdgePosition(edgeGO, outlineEdges[edgeGO].normalized * newMag);
+                    updateEdgePositionCAVE(edgeGO, outlineEdges[edgeGO].normalized * newMag);
 
                     return true;
                 }

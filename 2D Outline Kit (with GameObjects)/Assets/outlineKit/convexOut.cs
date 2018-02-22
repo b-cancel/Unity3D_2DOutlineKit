@@ -18,7 +18,7 @@ namespace object2DOutlines
                 UpdateSprite = updateSprite;
 
                 //Debugging
-                ShowOutline_GOs_InHierarchy_D = showOutline_GOs_InHierarchy_D;
+                ShowOutline_GOs_InHierarchy = showOutline_GOs_InHierarchy;
 
                 //Sprite Outline
                 Active_SO = active_SO;
