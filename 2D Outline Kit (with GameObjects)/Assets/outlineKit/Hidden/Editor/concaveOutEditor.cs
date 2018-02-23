@@ -34,20 +34,21 @@ namespace object2DOutlines
         SerializedProperty scaleWithParentX_O;
         SerializedProperty scaleWithParentY_O;
 
-        //-------------------------Push Type Variables-------------------------(only rotation)
+        SerializedProperty size_O;
 
-        SerializedProperty pushType_OP;
-        SerializedProperty stdSize_OP;
-        SerializedProperty size_OP;
+        //-----conCAVE
+
+        SerializedProperty pushType_O_CAVE;
+        SerializedProperty stdSize_O_CAVE;
 
         //ONLY regular
-        SerializedProperty edgeCount_OPR;
-        SerializedProperty startAngle_OPR;
-        SerializedProperty pushPattern_OPR;
+        SerializedProperty edgeCount_O_CAVE_R;
+        SerializedProperty startAngle_O_CAVE_R;
+        SerializedProperty pushPattern_O_CAVE_R;
 
-        SerializedProperty rectSize_OPRS;
-        SerializedProperty rectWidth_OPRS;
-        SerializedProperty rectHeight_OPRS;
+        SerializedProperty rectSize_O_CAVE_RS;
+        SerializedProperty rectWidth_O_CAVE_RS;
+        SerializedProperty rectHeight_O_CAVE_RS;
 
         void OnEnable()
         {
@@ -76,45 +77,53 @@ namespace object2DOutlines
             scaleWithParentX_O = serializedObject.FindProperty("scaleWithParentX_O");
             scaleWithParentY_O = serializedObject.FindProperty("scaleWithParentY_O");
 
-            size_OP = serializedObject.FindProperty("size_OP");
+            size_O = serializedObject.FindProperty("size_O");
 
             //-------------------------Push Type Variables-------------------------
 
-            pushType_OP = serializedObject.FindProperty("pushType_OP");
-            stdSize_OP = serializedObject.FindProperty("stdSize_OP");
+            pushType_O_CAVE = serializedObject.FindProperty("pushType_O_CAVE");
+            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
 
             //ONLY regular
-            edgeCount_OPR = serializedObject.FindProperty("edgeCount_OPR");
-            startAngle_OPR = serializedObject.FindProperty("startAngle_OPR");
-            pushPattern_OPR = serializedObject.FindProperty("pushPattern_OPR");
+            edgeCount_O_CAVE_R = serializedObject.FindProperty("edgeCount_O_CAVE_R");
+            startAngle_O_CAVE_R = serializedObject.FindProperty("startAngle_O_CAVE_R");
+            pushPattern_O_CAVE_R = serializedObject.FindProperty("pushPattern_O_CAVE_R");
 
-            rectSize_OPRS = serializedObject.FindProperty("rectSize_OPRS");
-            rectWidth_OPRS = serializedObject.FindProperty("rectWidth_OPRS");
-            rectHeight_OPRS = serializedObject.FindProperty("rectHeight_OPRS");
+            rectSize_O_CAVE_RS = serializedObject.FindProperty("rectSize_O_CAVE_RS");
+            rectWidth_O_CAVE_RS = serializedObject.FindProperty("rectWidth_O_CAVE_RS");
+            rectHeight_O_CAVE_RS = serializedObject.FindProperty("rectHeight_O_CAVE_RS");
         }
 
         public override void OnInspectorGUI()
         {
-            EditorStyles.helpBox.wordWrap = true; //flag set
+            //set flags
+            EditorStyles.helpBox.wordWrap = true;
 
+            //IDK
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
+            //link up to our script
             concaveOut script = (concaveOut)target;
 
+            //grab properties from scripts
             serializedObject.Update();
 
-            //Optimization
+            //---Optimization
             EditorGUILayout.PropertyField(updateSprite, new GUIContent("We Update The Sprite"));
 
             if (script.UpdateSprite == spriteUpdateSetting.Manually)
                 if (GUILayout.Button("Update Sprite"))
                     script.updateSpriteData();
 
-            //Debugging
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Debugging
             EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy, new GUIContent("Show Outline In Hierarchy"));
 
-            //Sprite Overlay
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Sprite Overlay
             EditorGUILayout.PropertyField(active_SO, new GUIContent("Activate Sprite Overlay"));
 
             if (script.Active_SO)
@@ -123,7 +132,9 @@ namespace object2DOutlines
                 EditorGUILayout.PropertyField(color_SO, new GUIContent("   it's Color"));
             }
 
-            //Clipping Mask
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Clipping Mask
             EditorGUILayout.PropertyField(clipCenter_CM, new GUIContent("Support Semi-Transparency"));
 
             if (script.ClipCenter_CM)
@@ -137,7 +148,9 @@ namespace object2DOutlines
                 }
             }
 
-            //Sprite Outline
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Sprite Outline
             EditorGUILayout.PropertyField(active_O, new GUIContent("Active Sprite Outline"));
 
             if (script.Active_O)
@@ -146,52 +159,55 @@ namespace object2DOutlines
                 EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("   it's Order In Layer"));
                 EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("   Follow Parent X Scale"));
                 EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("   Follow Parent Y Scale"));
-            }
 
-            //-------------------------Push Type Variables-------------------------
+                EditorGUILayout.Space(); ///-------------------------
 
-            EditorGUILayout.PropertyField(pushType_OP, new GUIContent("Push With A"));
+                EditorGUILayout.PropertyField(pushType_O_CAVE, new GUIContent("--Push With A"));
 
-            if (script.PushType_OP == push.regularPattern)
-                EditorGUILayout.PropertyField(stdSize_OP, new GUIContent("   Use Pattern Size")); //run update outline for everything below
-            else
-                EditorGUILayout.PropertyField(stdSize_OP, new GUIContent("   Use Standard Size")); //run update outline for everything below
-
-            if (script.StdSize_OP)
-            {
-                EditorGUILayout.PropertyField(size_OP, new GUIContent("      it's STD Size")); //run update outline for everything below
-            }
-            else
-            {
-                EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
-            }
-
-            if (script.PushType_OP == push.regularPattern)
-            {
-                EditorGUILayout.PropertyField(edgeCount_OPR, new GUIContent("   # Of Edges"));
-                EditorGUILayout.PropertyField(startAngle_OPR, new GUIContent("   Rotation"));
-
-                if (script.StdSize_OP)
+                if (script.PushType_O_CAVE == push.regularPattern)
                 {
-                    EditorGUILayout.PropertyField(pushPattern_OPR, new GUIContent("   Push Pattern"));
+                    EditorGUILayout.PropertyField(startAngle_O_CAVE_R, new GUIContent("---Rotation"));
 
-                    if(script.PushPattern_OPR == pushPattern.squarial)
+                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
+
+                    if (script.StdSize_O_CAVE)
                     {
-                        EditorGUILayout.PropertyField(rectSize_OPRS, new GUIContent("      Rect Type"));
+                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
 
-                        if (script.RectSize_OPRS == rectType.custom)
+                        EditorGUILayout.PropertyField(pushPattern_O_CAVE_R, new GUIContent("----Push Pattern"));
+
+                        if (script.PushPattern_O_CAVE_R == pushPattern.squarial)
                         {
-                            EditorGUILayout.PropertyField(rectWidth_OPRS, new GUIContent("         Width"));
-                            EditorGUILayout.PropertyField(rectHeight_OPRS, new GUIContent("         Height"));
+                            EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Multiplier Of Edges"));
+
+                            EditorGUILayout.PropertyField(rectSize_O_CAVE_RS, new GUIContent("-----Rect Type"));
+
+                            if (script.RectSize_O_CAVE_RS == rectType.custom)
+                            {
+                                EditorGUILayout.PropertyField(rectWidth_O_CAVE_RS, new GUIContent("------Width"));
+                                EditorGUILayout.PropertyField(rectHeight_O_CAVE_RS, new GUIContent("------Height"));
+                            }
                         }
+                        else
+                            EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Number Of Edges"));
                     }
+                    else
+                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("--Use Standard Size"));
+
+                    if (script.StdSize_O_CAVE)
+                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
+                    else
+                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
+
+                    EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, and editEdge) \n*An Editor Based Solution is in the works", MessageType.Info);
                 }
             }
-            else
-            {
-                EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, editEdge, and editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
-            }
 
+            //apply modified properties
             serializedObject.ApplyModifiedProperties();
         }
     }

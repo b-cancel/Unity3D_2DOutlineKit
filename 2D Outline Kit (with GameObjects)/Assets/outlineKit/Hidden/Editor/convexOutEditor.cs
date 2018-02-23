@@ -29,10 +29,11 @@ namespace object2DOutlines
         //Sprite Overlay
         SerializedProperty active_O;
         SerializedProperty color_O;
-        SerializedProperty orderInLayer_O;
-        SerializedProperty size_O;
+        SerializedProperty orderInLayer_O;        
         SerializedProperty scaleWithParentX_O;
         SerializedProperty scaleWithParentY_O;
+
+        SerializedProperty size_O;
 
         void OnEnable()
         {
@@ -58,31 +59,39 @@ namespace object2DOutlines
             active_O = serializedObject.FindProperty("active_O");
             color_O = serializedObject.FindProperty("color_O");
             orderInLayer_O = serializedObject.FindProperty("orderInLayer_O");
-            size_O = serializedObject.FindProperty("size_O");
             scaleWithParentX_O = serializedObject.FindProperty("scaleWithParentX_O");
             scaleWithParentY_O = serializedObject.FindProperty("scaleWithParentY_O");
+
+            size_O = serializedObject.FindProperty("size_O");
         }
 
         public override void OnInspectorGUI()
         {
+            //IDK
             if (GUI.changed)
                 EditorUtility.SetDirty(target);
 
+            //link up to our script
             convexOut script = (convexOut)target;
 
+            //grab properties from scripts
             serializedObject.Update();
 
-            //Optimization
+            //---Optimization
             EditorGUILayout.PropertyField(updateSprite, new GUIContent("We Update The Sprite"));
 
             if (script.UpdateSprite == spriteUpdateSetting.Manually)
                 if (GUILayout.Button("Update Sprite"))
                     script.updateSpriteData();
 
-            //Debugging
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Debugging
             EditorGUILayout.PropertyField(showOutline_GOs_InHierarchy, new GUIContent("Show Outline In Hierarchy"));
 
-            //Sprite Overlay
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Sprite Overlay
             EditorGUILayout.PropertyField(active_SO, new GUIContent("Activate Sprite Overlay"));
 
             if(script.Active_SO)
@@ -91,8 +100,9 @@ namespace object2DOutlines
                 EditorGUILayout.PropertyField(color_SO, new GUIContent("   it's Color"));
             }
 
-            //Clipping Mask
+            EditorGUILayout.Space(); ///-------------------------
 
+            //---Clipping Mask
             EditorGUILayout.PropertyField(clipCenter_CM, new GUIContent("Support Semi-Transparency"));
             if (script.ClipCenter_CM)
             {
@@ -105,16 +115,19 @@ namespace object2DOutlines
                 }
             }
 
-            //Sprite Outline
+            EditorGUILayout.Space(); ///-------------------------
+
+            //---Sprite Outline
             EditorGUILayout.PropertyField(active_O, new GUIContent("Active Sprite Outline"));
 
             if (script.Active_O)
             {
-                EditorGUILayout.PropertyField(size_O, new GUIContent("-it's Size"));
                 EditorGUILayout.PropertyField(color_O, new GUIContent("-it's Color"));
                 EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("-it's Order In Layer"));
                 EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("-Follow Parent X Scale"));
                 EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("-Follow Parent Y Scale"));
+
+                EditorGUILayout.PropertyField(size_O, new GUIContent("-it's Size"));
             }
 
                 serializedObject.ApplyModifiedProperties();

@@ -32,7 +32,9 @@ namespace object2DOutlines
         SerializedProperty orderInLayer_O;
         SerializedProperty scaleWithParentX_O;
         SerializedProperty scaleWithParentY_O;
+
         SerializedProperty spriteType_O;
+
         SerializedProperty size_O;
 
         //-----conCAVE
@@ -76,7 +78,9 @@ namespace object2DOutlines
             orderInLayer_O = serializedObject.FindProperty("orderInLayer_O");
             scaleWithParentX_O = serializedObject.FindProperty("scaleWithParentX_O");
             scaleWithParentY_O = serializedObject.FindProperty("scaleWithParentY_O");
+
             spriteType_O = serializedObject.FindProperty("spriteType_O");
+
             size_O = serializedObject.FindProperty("size_O");
 
             //-----conCAVE
@@ -175,7 +179,6 @@ namespace object2DOutlines
 
                     if (script.PushType_O_CAVE == push.regularPattern)
                     {
-                        EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---# Of Edges"));
                         EditorGUILayout.PropertyField(startAngle_O_CAVE_R, new GUIContent("---Rotation"));
 
                         EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
@@ -188,6 +191,8 @@ namespace object2DOutlines
 
                             if (script.PushPattern_O_CAVE_R == pushPattern.squarial)
                             {
+                                EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Multiplier Of Edges"));
+
                                 EditorGUILayout.PropertyField(rectSize_O_CAVE_RS, new GUIContent("-----Rect Type"));
 
                                 if (script.RectSize_O_CAVE_RS == rectType.custom)
@@ -196,6 +201,8 @@ namespace object2DOutlines
                                     EditorGUILayout.PropertyField(rectHeight_O_CAVE_RS, new GUIContent("------Height"));
                                 }
                             }
+                            else
+                                EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Number Of Edges"));
                         }
                         else
                             EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);

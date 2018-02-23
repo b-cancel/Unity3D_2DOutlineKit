@@ -10,6 +10,9 @@ namespace object2DOutlines
         [System.NonSerialized]
         private bool awakeFinished_VEX; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
 
+        [SerializeField]
+        private bool notFirstRun; //NOTE: this releis on the fact that DEFAULT bool value is FALSE
+
         void OnValidate()
         {
             if (awakeFinished_VEX)
@@ -164,7 +167,7 @@ namespace object2DOutlines
         {
             awakeFinished_VEX = false;
 
-            if (gameObject.transform.Find("Outline Folder") == null) //NOTE: will directly search children
+            if (notFirstRun == false) //NOTE: will directly search children
             {
                 //----------Objects Inits
 
@@ -190,6 +193,8 @@ namespace object2DOutlines
 
                 //---Var Inits from base outline class
                 base.Awake();
+
+                notFirstRun = true;
             }
 
             //---Hacks Inits (dont need serialization and you will never be fast enough to hit play unless they are false)
