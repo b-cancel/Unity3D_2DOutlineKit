@@ -612,7 +612,7 @@ namespace object2DOutlines
                             {
                                 for (int i = 0; i < totalDifferences; i++)
                                 {
-                                    List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys);
+                                    List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys); //MIGHT CAUSE ISSUES
                                     removeEdge(keyList[keyList.Count - 1], true); //remove from the back
                                 }
                             }

@@ -7,8 +7,8 @@ namespace object2DOutlines
     [System.Serializable, ExecuteInEditMode]
     public class convexOut : outline
     {
-        [SerializeField, HideInInspector]
-        private bool awakeFinished_VEX;
+        [System.NonSerialized]
+        private bool awakeFinished_VEX; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
 
         void OnValidate()
         {
@@ -65,7 +65,7 @@ namespace object2DOutlines
                     thisOutline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
-        [SerializeField, HideInInspector]
+        [System.NonSerialized]
         private bool newActiveCM;
 
         //-----Outline Variables-----
@@ -88,7 +88,7 @@ namespace object2DOutlines
                 newActiveO = true; //hack in update
             }
         }
-        [SerializeField, HideInInspector]
+        [System.NonSerialized]
         private bool newActiveO;
 
         [SerializeField, HideInInspector]
@@ -188,20 +188,13 @@ namespace object2DOutlines
 
                 Size_O = 2f;
 
-                //---Hacks Inits
-                newActiveCM = false;
-                newActiveO = false;
-
                 //---Var Inits from base outline class
                 base.Awake();
             }
-            else
-            {
-                outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
-                thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
-                spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
-                clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
-            }
+
+            //---Hacks Inits (dont need serialization and you will never be fast enough to hit play unless they are false)
+            newActiveCM = false;
+            newActiveO = false;
 
             awakeFinished_VEX = true;
         }
@@ -210,29 +203,32 @@ namespace object2DOutlines
 
         new void Update()
         {
-            switch (UpdateSprite)
+            if (awakeFinished_VEX)
             {
-                case spriteUpdateSetting.EveryFrame: updateSpriteData(); break;
-                case spriteUpdateSetting.AfterEveryChange:
-                    if (spriteChanged(this.GetComponent<SpriteRenderer>()))
-                        updateSpriteData();
-                    break;
-            }
+                switch (UpdateSprite)
+                {
+                    case spriteUpdateSetting.EveryFrame: updateSpriteData(); break;
+                    case spriteUpdateSetting.AfterEveryChange:
+                        if (spriteChanged(this.GetComponent<SpriteRenderer>()))
+                            updateSpriteData();
+                        break;
+                }
 
-            //required hacks because of warnings
-            if (newActiveCM)
-            {
-                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
-                newActiveCM = false;
-            }
+                //required hacks because of warnings
+                if (newActiveCM)
+                {
+                    clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                    newActiveCM = false;
+                }
 
-            if (newActiveO)
-            {
-                thisOutline.SetActive(active_O);
-                newActiveO = false;
-            }
+                if (newActiveO)
+                {
+                    thisOutline.SetActive(active_O);
+                    newActiveO = false;
+                }
 
-            base.Update();
+                base.Update();
+            }
         }
 
         public void updateSpriteData()
