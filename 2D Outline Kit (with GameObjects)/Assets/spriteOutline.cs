@@ -310,6 +310,8 @@ namespace object2DOutlines
                 outlineEdges = new List<GO_to_Vector2>();
 
                 notFirstRun = true;
+
+                ManualReset();
             }
             else
             {
@@ -322,7 +324,7 @@ namespace object2DOutlines
             _awakeFinished = true;
         }
 
-        new void Reset()
+        new void ManualReset()
         {
             //----------Object Linkages (I dont know why this is required since the linkages should be serialized but for some reason they break)
 

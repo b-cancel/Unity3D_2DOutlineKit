@@ -289,6 +289,17 @@ namespace object2DOutlines
                 outEdgesHelper = new Dictionary<GameObject, int>(); //this is required again since dictionaries are not serializable
                 for (int i = 0; i < outlineEdges.Count; i++)
                     outEdgesHelper.Add(outlineEdges[i].go, i);
+
+                //----------Some Strange Bug Fix
+
+                //NOTE: for reasons unknown our gameobjects would lose their materials after spawning a prefab where the original used to create it had the material
+                var tempMaterial = new Material(gameObject.GetComponent<SpriteRenderer>().sharedMaterial);
+                tempMaterial.shader = Shader.Find("GUI/Text Shader");
+
+                spriteOverlay.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+
+                foreach(var pair in outlineEdges)
+                    pair.go.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
             }
 
             _awakeFinished_CAVE = true;

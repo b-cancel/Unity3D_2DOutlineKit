@@ -178,12 +178,23 @@ namespace object2DOutlines
                 thisOutline = new GameObject("The Outline");
                 Material tempMaterial = initPart1(gameObject, ref thisOutline, ref outlineGameObjectsFolder);
                 thisOutline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial; //DIFFERENT
-                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
+                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>());//DIFFERENT
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
                 ManualReset();
 
                 notFirstRun = true;
+            }
+            else
+            {
+                //----------Some Strange Bug Fix
+
+                //NOTE: for reasons unknown our gameobjects would lose their materials after spawning a prefab where the original used to create it had the material
+                var tempMaterial = new Material(gameObject.GetComponent<SpriteRenderer>().sharedMaterial);
+                tempMaterial.shader = Shader.Find("GUI/Text Shader");
+
+                spriteOverlay.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+                thisOutline.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
             }
 
             _awakeFinished_VEX = true;
