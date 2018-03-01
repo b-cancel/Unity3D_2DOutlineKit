@@ -68,7 +68,7 @@ namespace object2DOutlines
             get { return clipCenter_CM; }
             set
             {
-                clipCenter_CM = value; //update local value
+                clipCenter_CM = value;
 
                 //enable or disable mask
                 _newActiveCM = true;
@@ -105,7 +105,7 @@ namespace object2DOutlines
             get { return active_O; }
             set
             {
-                active_O = value;//update local value
+                active_O = value;
 
                 _newActiveO = true;
             }
@@ -120,7 +120,7 @@ namespace object2DOutlines
             get { return color_O; }
             set
             {
-                color_O = value;//update local value
+                color_O = value;
 
                 //update our edges with the new color
                 if (outlineEdges != null)
@@ -136,7 +136,7 @@ namespace object2DOutlines
             get { return orderInLayer_O; }
             set
             {
-                orderInLayer_O = value;//update local value
+                orderInLayer_O = value;
 
                 //update our edges with the new color
                 if (outlineEdges != null)
@@ -147,13 +147,12 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         bool scaleWithParentX_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentX_O
         {
             get { return scaleWithParentX_O; }
             set
             {
-                scaleWithParentX_O = value;//update local value
+                scaleWithParentX_O = value;
 
                 _newEdgeCount = true;
             }
@@ -161,13 +160,12 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         bool scaleWithParentY_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentY_O
         {
             get { return scaleWithParentY_O; }
             set
             {
-                scaleWithParentY_O = value;//update local value
+                scaleWithParentY_O = value;
 
                 _newEdgeCount = true;
             }
@@ -175,14 +173,13 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         float size_O; //NOTE: this size refers to the world space thickness of the outline
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public float Size_O
         {
             get { return size_O; }
             set
             {
                 value = (value >= 0) ? value : 0;
-                size_O = value;//update local value
+                size_O = value;
 
                 _newEdgeCount = true;
             }
@@ -208,7 +205,7 @@ namespace object2DOutlines
             get { return patternType_O_CAVE; }
             set
             {
-                patternType_O_CAVE = value; //update local value
+                patternType_O_CAVE = value;
 
                 _newEdgeCount = true;
             }
@@ -224,7 +221,7 @@ namespace object2DOutlines
             get { return edgeCount_O_CAVE_R; }
             set
             {
-                edgeCount_O_CAVE_R = (value >= 0) ? value : 0; //update local value
+                edgeCount_O_CAVE_R = (value >= 0) ? value : 0;
 
                 _newEdgeCount = true;
             }
@@ -232,13 +229,12 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         bool stdSize_O_CAVE; //NOTE: this size refers to the world space thickness of the outline
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool StdSize_O_CAVE
         {
             get { return stdSize_O_CAVE; }
             set
             {
-                stdSize_O_CAVE = value;//update local value
+                stdSize_O_CAVE = value;
 
                 _newEdgeCount = true;
             }
@@ -251,7 +247,7 @@ namespace object2DOutlines
             get { return rotation_O_CAVE; }
             set
             {
-                rotation_O_CAVE = value; //update local value
+                rotation_O_CAVE = value; 
 
                 _newEdgeCount = true;
             }
@@ -375,6 +371,20 @@ namespace object2DOutlines
 
                 base.Update();
             }          
+        }
+
+        void OnDisable()
+        {
+            print("disabled");
+        }
+
+        void OnDestroy()
+        {
+            print("destroy");
+
+            DestroyImmediate(outlineGameObjectsFolder);
+
+            //TODO... here we also break our relationship with our parent
         }
 
         public void updateSpriteData()

@@ -56,7 +56,7 @@ namespace object2DOutlines
             get { return clipCenter_CM; }
             set
             {
-                clipCenter_CM = value; //update local value
+                clipCenter_CM = value; 
 
                 //enable or disable mask
                 _newActiveCM = true;
@@ -67,7 +67,7 @@ namespace object2DOutlines
                 else
                     thisOutline.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
             }
-        } //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        }
         [System.NonSerialized]
         private bool _newActiveCM;
 
@@ -80,13 +80,12 @@ namespace object2DOutlines
         [Header("OUTLINE VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool active_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool Active_O
         {
             get { return active_O; }
             set
             {
-                active_O = value; //update local value
+                active_O = value; 
 
                 _newActiveO = true; //hack in update
             }
@@ -101,7 +100,7 @@ namespace object2DOutlines
             get { return color_O; }
             set
             {
-                color_O = value;//update local value
+                color_O = value;
 
                 thisOutline.GetComponent<SpriteRenderer>().color = color_O;
             }
@@ -114,7 +113,7 @@ namespace object2DOutlines
             get { return orderInLayer_O; }
             set
             {
-                orderInLayer_O = value;//update local value
+                orderInLayer_O = value;
 
                 thisOutline.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
@@ -122,14 +121,13 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         float size_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public float Size_O
         {
             get { return size_O; }
             set
             {
                 value = (value >= 0) ? value : 0;
-                size_O = value; //update local value 
+                size_O = value; 
 
                 updateOutline();
             }
@@ -137,13 +135,12 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         bool scaleWithParentX_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentX_O
         {
             get { return scaleWithParentX_O; }
             set
             {
-                scaleWithParentX_O = value;//update local value
+                scaleWithParentX_O = value;
 
                 updateOutline();
             }
@@ -151,13 +148,12 @@ namespace object2DOutlines
 
         [SerializeField, HideInInspector]
         bool scaleWithParentY_O;
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentY_O
         {
             get { return scaleWithParentY_O; }
             set
             {
-                scaleWithParentY_O = value;//update local value
+                scaleWithParentY_O = value;
 
                 updateOutline();
             }
@@ -251,6 +247,20 @@ namespace object2DOutlines
 
                 base.Update();
             }
+        }
+
+        void OnDisable()
+        {
+            print("disabled");
+        }
+
+        void OnDestroy()
+        {
+            print("destroy");
+
+            DestroyImmediate(outlineGameObjectsFolder);
+
+            //TODO... here we also break our relationship with our parent
         }
 
         public void updateSpriteData()

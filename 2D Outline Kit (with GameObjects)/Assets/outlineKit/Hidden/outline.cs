@@ -3,18 +3,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//-----Draw Mode Issues
+
 //NOTE: "DRAW_MODE_SLICED" WON'T WORK (IF you require a sprite mask)
 //this is because the current unity sprite mask does not support the 9 slice system
 
 //NOTE: "DRAW_MODE_TILED" WONT'T WORK 
 //this is because the current unity sprite mask does not support tiled draw mode
-//and
 
 //BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
 //NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
+//-----Sprite Mask Details
 
 //NOTE: here we are not allowing users to change "backSortingLayerID" -OR- "frontSortingLayerID"
+
+//-----Inspector Tool Details (editor only)
+
+//NOTE: Unity Reset will break things and SHOULD NOT be used
+
+//-----Disabling Details
+
+//use GameObject.activeInHierarchy
+//OR GameObject.activeSelf
+
+//NOTE: disabling the script and disabling the whole gameobject calls the same function[OnDisable] (Awake, and Update wont run)
+//CHECK IF INDEED THESE WONT RUN
+//IF I disable the parent of a gameobject it will also be disabled (disable is recursive through gameobjects [disabling a script will not disable all scripts in its children])
+//OnDestroy will still run if the object is disabled
+
+//NOTE: when disabling a gameobject that data is still accessible but monobehavior scripts wont run
+//since some of our variables require the update function to update properly... its best if we shut off the modification of those variables when we are not enabled
+//since we are shutting off modification its also best to shut off the inspector
 
 namespace object2DOutlines
 {
