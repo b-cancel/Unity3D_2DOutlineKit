@@ -76,15 +76,15 @@ namespace object2DOutlines
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
                 {
-                    if (outlineGameObjects != null)
-                        foreach (var go in outlineGameObjects)
-                            go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                    if (outlineEdges != null)
+                        foreach (var pair in outlineEdges)
+                            pair.go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
                 }
                 else
                 {
-                    if (outlineGameObjects != null)
-                        foreach (var go in outlineGameObjects)
-                            go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                    if (outlineEdges != null)
+                        foreach (var pair in outlineEdges)
+                            pair.go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
                 }
             }
         }
@@ -123,9 +123,9 @@ namespace object2DOutlines
                 color_O = value;//update local value
 
                 //update our edges with the new color
-                if (outlineGameObjects != null)
-                    foreach (var go in outlineGameObjects)
-                        go.GetComponent<SpriteRenderer>().color = color_O;
+                if (outlineEdges != null)
+                    foreach (var pair in outlineEdges)
+                        pair.go.GetComponent<SpriteRenderer>().color = color_O;
             }
         }
 
@@ -139,9 +139,9 @@ namespace object2DOutlines
                 orderInLayer_O = value;//update local value
 
                 //update our edges with the new color
-                if (outlineGameObjects != null)
-                    foreach (var go in outlineGameObjects)
-                        go.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
+                if (outlineEdges != null)
+                    foreach (var pair in outlineEdges)
+                        pair.go.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
         }
 
@@ -190,13 +190,11 @@ namespace object2DOutlines
 
         //-------------------------Push Type Variables-------------------------
 
+        [SerializeField, HideInInspector]
+        List<GO_to_Vector2> outlineEdges;
+
         //non serializable dictionary simply makes lookups quick
         Dictionary<GameObject, int> outEdgesHelper;
-
-        [SerializeField, HideInInspector]
-        List<GameObject> outlineGameObjects;
-        [SerializeField, HideInInspector]
-        List<Vector2> outlineVector2s;
 
         [System.NonSerialized]
         private bool _newEdgeCount;
@@ -280,63 +278,29 @@ namespace object2DOutlines
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
                 outEdgesHelper = new Dictionary<GameObject, int>();
+                outlineEdges = new List<GO_to_Vector2>();
 
-                outlineGameObjects = new List<GameObject>();
-                outlineVector2s = new List<Vector2>();
+                ManualReset();
 
                 notFirstRun = true;
             }
             else
             {
                 outEdgesHelper = new Dictionary<GameObject, int>(); //this is required again since dictionaries are not serializable
-                for (int i = 0; i < outlineGameObjects.Count; i++)
-                    outEdgesHelper.Add(outlineGameObjects[i], i);
+                for (int i = 0; i < outlineEdges.Count; i++)
+                    outEdgesHelper.Add(outlineEdges[i].go, i);
             }
 
             _awakeFinished_CAVE = true;
         }
 
         //assign good values to inspector
-        new void Reset()
+        public new void ManualReset()
         {
-            //----------Object Linkages (I dont know why this is required since the linkages should be serialized but for some reason they break)
-
-            outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
-            thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
-            spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
-            clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
-
-            //current thee are both not null when reset but they end up having nothing...
-            if (outlineGameObjects != null)
-                print("go not null " + outlineGameObjects.Count);
-            if (outlineVector2s != null)
-                print("vects not null " + outlineVector2s.Count);
-
-            /*
-            //----------Outline Edges Repair 
-            //for reasons unknown the list of objects that contains a gameobject and a vector... 
-            //when we reset we lose the connection to our spawned game objects (eventhough the list is serialized)
-            //as in the list of objects is now empty... [so it doesn't make sense to use "removeAllEdges()"] [but it is NOT null]
-            //so the best solution is when reset to simply delete all the gameobjects that are contained in "The Outline"
-            //and let additions be made in update with the hack
-
-            //---delete outline edge gameobjects manually
-            int childCount = thisOutline.transform.childCount;
-            while(childCount > 0)
-            {
-                DestroyImmediate(thisOutline.transform.GetChild(0).gameObject);
-                childCount--;
-            }
-
-            //---create a new list for our outline edge gameobjects
-            outEdgesHelper = new Dictionary<GameObject, int>();
-            outlineEdges = new List<GO_to_Vector2>();
-            */
-
             //----------Variable Inits
 
             //---Var Inits from base outline class
-            base.Reset();
+            base.ManualReset();
 
             //---Clipping Mask Vars
             ClipCenter_CM = true;
@@ -393,9 +357,9 @@ namespace object2DOutlines
                 if (_newActiveO)
                 {
                     //all edges set active
-                    if (outlineGameObjects != null)
-                        foreach (var go in outlineGameObjects)
-                            go.SetActive(active_O);
+                    if (outlineEdges != null)
+                        foreach (var pair in outlineEdges)
+                            pair.go.SetActive(active_O);
                 }
 
                 base.Update();
@@ -411,9 +375,9 @@ namespace object2DOutlines
             copySpriteRendererDataToClipMask(this.gameObject, clippingMask);
 
             //update outline
-            if (outlineGameObjects != null)
-                foreach (var go in outlineGameObjects)
-                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), go.GetComponent<SpriteRenderer>());
+            if (outlineEdges != null)
+                foreach (var pair in outlineEdges)
+                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), pair.go.GetComponent<SpriteRenderer>());
         }
 
         //--------------------------------------------------SUPER DIFFERENT CODE--------------------------------------------------
@@ -424,15 +388,15 @@ namespace object2DOutlines
 
         void updateEdgeCount()
         {
-            if (outlineGameObjects != null) 
+            if (outlineEdges != null) 
             {
                 if(PatternType_O_CAVE == pushPattern.radial)
                 {
-                    if (outlineGameObjects.Count != EdgeCount_O_CAVE_R)
+                    if (outlineEdges.Count != EdgeCount_O_CAVE_R)
                     {
-                        int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineGameObjects.Count);
+                        int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
 
-                        if (outlineGameObjects.Count < EdgeCount_O_CAVE_R)
+                        if (outlineEdges.Count < EdgeCount_O_CAVE_R)
                         {
                             for (int i = 0; i < totalDifferences; i++)
                                 addEdge(_0Rotation, true);
@@ -440,7 +404,7 @@ namespace object2DOutlines
                         else
                         {
                             for (int i = 0; i < totalDifferences; i++)
-                                removeEdge(outlineGameObjects[outlineGameObjects.Count-1], true); //remove from the back
+                                removeEdge(outlineEdges[outlineEdges.Count-1].go, true); //remove from the back
                         }
                     }
                     //ELSE... we have the correct number of edges
@@ -453,18 +417,18 @@ namespace object2DOutlines
         //UPDATE ---ROTATIONS--- BASED ON PATTERN
         void updateEdgeRotationsALL() //AUTOMATICALLY... calls updateEdgePositions()
         {
-            if (outlineGameObjects != null)
+            if (outlineEdges != null)
             {
                 if (PatternType_O_CAVE == pushPattern.radial)
                 {
                     float edgeRotation = 0;
 
                     float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
-                    for(int i = 0; i < outlineGameObjects.Count; i++)
+                    foreach (var pair in outlineEdges)
                     {
-                        float oldMag = outlineVector2s[i].magnitude;
+                        float oldMag = pair.v2.magnitude;
                         Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                        editEdge(outlineGameObjects[i], newDirection.normalized * oldMag, true); //this will also updateEdgePosition()
+                        editEdge(pair.go, newDirection.normalized * oldMag, true); //this will also updateEdgePosition()
                         edgeRotation += angleBetweenAllEdges;
                     }
 
@@ -477,10 +441,10 @@ namespace object2DOutlines
         //USES... same as "updateEdgePosition()"
         void updateEdgePositionsALL()
         {
-            if (outlineGameObjects != null)
+            if (outlineEdges != null)
             {
-                for (int i = 0; i < outlineGameObjects.Count; i++)
-                    updateEdgePosition(outlineGameObjects[i], outlineVector2s[i]);
+                foreach (var pair in outlineEdges)
+                    updateEdgePosition(pair.go, pair.v2);
             }
         }
 
@@ -492,9 +456,9 @@ namespace object2DOutlines
         //UPDATE ---MAGNITUDE--- BASED ON PATTERN
         void updateEdgePosition(GameObject anEdge, Vector2 vect)
         {
-            if (outlineGameObjects != null && outEdgesHelper != null && anEdge != null) 
+            if (outlineEdges != null && outEdgesHelper != null && anEdge != null) 
             {
-                outlineVector2s[outEdgesHelper[anEdge]] = vect;
+                outlineEdges[outEdgesHelper[anEdge]].v2 = vect;
 
                 //NOTE: we push from origin (0,0,0)
 
@@ -545,7 +509,7 @@ namespace object2DOutlines
         //USES... PushType_OP | Color_O | orderInLayer_O | ClipCenter_CM | Active_O
         bool addEdge(Vector2 outlineDirection, bool sudo)
         {
-            if (outlineGameObjects != null && outEdgesHelper != null && thisOutline != null)
+            if (outlineEdges != null && outEdgesHelper != null && thisOutline != null)
             {
                 if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
                 {
@@ -580,9 +544,8 @@ namespace object2DOutlines
                         tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
 
                     //save our data
-                    outEdgesHelper.Add(tempSpriteCopy, outlineGameObjects.Count); //add at the end
-                    outlineGameObjects.Add(tempSpriteCopy);
-                    outlineVector2s.Add(outlineDirection);
+                    outEdgesHelper.Add(tempSpriteCopy, outlineEdges.Count);
+                    outlineEdges.Add(new GO_to_Vector2(tempSpriteCopy, outlineDirection));
 
                     //update position that is affected by... size, scale par x, scale par y
                     updateEdgePosition(tempSpriteCopy, outlineDirection);
@@ -601,15 +564,13 @@ namespace object2DOutlines
 
         bool removeEdge(GameObject edgeGO, bool sudo)
         {
-            if (outlineGameObjects != null && outEdgesHelper != null && edgeGO != null)
+            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
             {
                 if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
                 {
                     if (outEdgesHelper.ContainsKey(edgeGO))
                     {
-                        int edgeIndex = outEdgesHelper[edgeGO];
-                        outlineGameObjects.RemoveAt(edgeIndex);
-                        outlineVector2s.RemoveAt(edgeIndex);
+                        outlineEdges.RemoveAt(outEdgesHelper[edgeGO]);
                         outEdgesHelper.Remove(edgeGO);
 
                         DestroyImmediate(edgeGO);
@@ -660,10 +621,10 @@ namespace object2DOutlines
 
         public bool removeAllEdges()
         {
-            if (outlineGameObjects != null)
+            if (outlineEdges != null)
             {
-                for (int i = 0; i < outlineGameObjects.Count; i++)
-                    removeEdge(outlineGameObjects[i]);
+                for (int i = 0; i < outlineEdges.Count; i++)
+                    removeEdge(outlineEdges[i].go);
                 return true;
             }
             return
@@ -672,9 +633,9 @@ namespace object2DOutlines
 
         public bool editEdgeMagnitude(GameObject edgeGO, float newMag)
         {
-            if (outlineGameObjects != null && outEdgesHelper != null && edgeGO != null)
+            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
             {
-                editEdge(edgeGO, outlineVector2s[outEdgesHelper[edgeGO]].normalized * newMag);
+                editEdge(edgeGO, outlineEdges[outEdgesHelper[edgeGO]].v2.normalized * newMag);
                 return true;
             }
             else

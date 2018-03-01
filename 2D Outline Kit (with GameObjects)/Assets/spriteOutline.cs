@@ -334,7 +334,7 @@ namespace object2DOutlines
             //----------Variable Inits
 
             //---Var Inits from base outline class
-            base.Reset();
+            base.ManualReset();
 
             //---Main VEX vs CAVE Init (MUST be after hack inits)
             SpriteType_O = spriteType.conVEX; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly

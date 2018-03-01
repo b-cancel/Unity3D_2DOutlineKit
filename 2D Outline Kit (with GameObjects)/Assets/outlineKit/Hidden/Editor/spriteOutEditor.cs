@@ -102,6 +102,16 @@ namespace object2DOutlines
             //grab properties from scripts
             serializedObject.Update();
 
+            //---Manual Reset
+            if (GUILayout.Button("Reset Variables"))
+                script.ManualReset();
+            //NOTE: I beleive It either (1) breaks the references of serialized varaibles -OR-  (2) unserializes serialized variables
+            EditorGUILayout.HelpBox("DO NOT USE the *RESET* option in the INSPECTOR", MessageType.Warning);
+            EditorGUILayout.HelpBox("I require multiple references to GameObjects and Vector2s \nThese references are lost when you use the Unity RESET option", MessageType.None);
+            EditorGUILayout.HelpBox("DO NOT USE the *COPY COMPONENT* option in the INSPECTOR", MessageType.Warning);
+
+            EditorGUILayout.Space(); ///-------------------------
+
             //---Optimization
             EditorGUILayout.PropertyField(updateSprite, new GUIContent("We Update The Sprite"));
 

@@ -181,6 +181,8 @@ namespace object2DOutlines
                 copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
+                ManualReset();
+
                 notFirstRun = true;
             }
 
@@ -188,19 +190,12 @@ namespace object2DOutlines
         }
 
         //assign good values to inspector
-        new void Reset()
+        public new void ManualReset()
         {
-            //----------Object Linkages (I dont know why this is required since the linkages should be serialized but for some reason they break)
-
-            outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
-            thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
-            spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
-            clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
-
             //----------Variable Inits
 
             //---Var Inits from base outline class
-            base.Reset();
+            base.ManualReset();
 
             //---Clipping Mask Vars
             ClipCenter_CM = true;

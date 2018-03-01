@@ -21,7 +21,7 @@ namespace object2DOutlines
     //--------------------------------------------------EXTRA "DICTIONARY" CLASS--------------------------------------------------
 
     [System.Serializable, ExecuteInEditMode]
-    public class GO_to_Vector2 //TODO... try changing this into a struct
+    public class GO_to_Vector2
     {
         [SerializeField, HideInInspector]
         public GameObject go;
@@ -234,7 +234,7 @@ namespace object2DOutlines
         }
 
         //assign good values to inspector
-        public void Reset()
+        public void ManualReset()
         {
             //----------Hack Inits (simplifies code bit by serializing eventhough not needed)
             _newActiveSO = false;
