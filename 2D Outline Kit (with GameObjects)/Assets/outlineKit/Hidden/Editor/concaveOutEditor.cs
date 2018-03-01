@@ -8,7 +8,6 @@ namespace object2DOutlines
     [CustomEditor(typeof(concaveOut))]
     public class concaveOutEditor : Editor
     {
-
         //Optimization
         SerializedProperty updateSprite;
 
@@ -38,17 +37,14 @@ namespace object2DOutlines
 
         //-----conCAVE
 
-        SerializedProperty pushType_O_CAVE;
-        SerializedProperty stdSize_O_CAVE;
-
-        //ONLY regular
+        SerializedProperty patternType_O_CAVE;
+        
+        //ONLY radial
         SerializedProperty edgeCount_O_CAVE_R;
-        SerializedProperty startAngle_O_CAVE_R;
-        SerializedProperty pushPattern_O_CAVE_R;
 
-        SerializedProperty rectSize_O_CAVE_RS;
-        SerializedProperty rectWidth_O_CAVE_RS;
-        SerializedProperty rectHeight_O_CAVE_RS;
+        //BOTH
+        SerializedProperty stdSize_O_CAVE;
+        SerializedProperty rotation_O_CAVE;
 
         void OnEnable()
         {
@@ -79,19 +75,16 @@ namespace object2DOutlines
 
             size_O = serializedObject.FindProperty("size_O");
 
-            //-------------------------Push Type Variables-------------------------
+            //-----conCAVE
 
-            pushType_O_CAVE = serializedObject.FindProperty("pushType_O_CAVE");
-            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
-
-            //ONLY regular
+            patternType_O_CAVE = serializedObject.FindProperty("patternType_O_CAVE");
+            
+            //ONLY radial
             edgeCount_O_CAVE_R = serializedObject.FindProperty("edgeCount_O_CAVE_R");
-            startAngle_O_CAVE_R = serializedObject.FindProperty("startAngle_O_CAVE_R");
-            pushPattern_O_CAVE_R = serializedObject.FindProperty("pushPattern_O_CAVE_R");
 
-            rectSize_O_CAVE_RS = serializedObject.FindProperty("rectSize_O_CAVE_RS");
-            rectWidth_O_CAVE_RS = serializedObject.FindProperty("rectWidth_O_CAVE_RS");
-            rectHeight_O_CAVE_RS = serializedObject.FindProperty("rectHeight_O_CAVE_RS");
+            //BOTH
+            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
+            rotation_O_CAVE = serializedObject.FindProperty("rotation_O_CAVE");
         }
 
         public override void OnInspectorGUI()
@@ -162,34 +155,17 @@ namespace object2DOutlines
 
                 EditorGUILayout.Space(); ///-------------------------
 
-                EditorGUILayout.PropertyField(pushType_O_CAVE, new GUIContent("--Push With A"));
+                EditorGUILayout.PropertyField(patternType_O_CAVE, new GUIContent("--Push With A"));
 
-                if (script.PushType_O_CAVE == push.regularPattern)
+                if (script.PatternType_O_CAVE == pushPattern.radial)
                 {
-                    EditorGUILayout.PropertyField(startAngle_O_CAVE_R, new GUIContent("---Rotation"));
-
                     EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
 
                     if (script.StdSize_O_CAVE)
                     {
                         EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
 
-                        EditorGUILayout.PropertyField(pushPattern_O_CAVE_R, new GUIContent("----Push Pattern"));
-
-                        if (script.PushPattern_O_CAVE_R == pushPattern.squarial)
-                        {
-                            EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Multiplier Of Edges"));
-
-                            EditorGUILayout.PropertyField(rectSize_O_CAVE_RS, new GUIContent("-----Rect Type"));
-
-                            if (script.RectSize_O_CAVE_RS == rectType.custom)
-                            {
-                                EditorGUILayout.PropertyField(rectWidth_O_CAVE_RS, new GUIContent("------Width"));
-                                EditorGUILayout.PropertyField(rectHeight_O_CAVE_RS, new GUIContent("------Height"));
-                            }
-                        }
-                        else
-                            EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Number Of Edges"));
+                        EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---# Of Edges"));
                     }
                     else
                         EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
@@ -205,6 +181,8 @@ namespace object2DOutlines
 
                     EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, and editEdge) \n*An Editor Based Solution is in the works", MessageType.Info);
                 }
+
+                EditorGUILayout.PropertyField(rotation_O_CAVE, new GUIContent("Rotation"));
             }
 
             //apply modified properties

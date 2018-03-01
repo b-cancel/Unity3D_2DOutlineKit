@@ -18,6 +18,24 @@ using UnityEngine;
 
 namespace object2DOutlines
 {
+    //--------------------------------------------------EXTRA "DICTIONARY" CLASS--------------------------------------------------
+
+    [System.Serializable, ExecuteInEditMode]
+    public class GO_to_Vector2 //TODO... try changing this into a struct
+    {
+        [SerializeField, HideInInspector]
+        public GameObject go;
+
+        [SerializeField, HideInInspector]
+        public Vector2 v2;
+
+        public GO_to_Vector2(GameObject G, Vector2 V)
+        {
+            go = G;
+            v2 = V;
+        }
+    }
+
     //--------------------------------------------------ENUMERABLES--------------------------------------------------
 
     //---This Enum makes it easier for us to pass our variables to our children (helps keep code clean)
@@ -47,23 +65,21 @@ namespace object2DOutlines
         OIL_O, //orderInLayer_O
         SWPX_O, //scaleWithParentX_O
         SWPY_O, //scaleWithParentY_O
+
         ST_O, //spriteType_O
+
         S_O, //size_O
 
         //-----conCAVE
 
         PT_O_CAVE, //pushType_O_CAVE
-        SS_O_CAVE, //stdSize_O_CAVE
 
         //ONLY regular
         EC_O_CAVE_R, //edgeCount_O_CAVE_R
-        SA_O_CAVE_R, //startAngle_O_CAVE_R
-        PP_O_CAVE_R, //pushPattern_O_CAVE_R
 
-        //ONLY regular && squarial
-        RS_O_CAVE_RS, //rectSize_O_CAVE_RS 
-        RW_O_CAVE_RS, //rectWidth_O_CAVE_RS 
-        RH_O_CAVE_RS //rectHeight_O_CAVE_RS 
+        //BOTH
+        SS_O_CAVE, //stdSize_O_CAVE
+        R_O_CAVE //rotation_O_CAVE
     };
 
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
@@ -71,11 +87,11 @@ namespace object2DOutlines
     public enum spriteType { conCAVE, conVEX }; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
 
     //ONLY for conCAVE outline
-    public enum push { regularPattern, customPattern };
-    public enum pushPattern { radial, squarial };
-    public enum rectType { regular, custom };
+    public enum pushPattern { radial, custom };
 
     //--------------------------------------------------PARENT CLASS--------------------------------------------------
+
+    //NOTE: hack inits dont really need to be serialized by we do so to simplify code
 
     [System.Serializable, ExecuteInEditMode]
     public class outline : MonoBehaviour
@@ -128,11 +144,11 @@ namespace object2DOutlines
             {
                 active_SO = value; 
 
-                newActiveSO = true;
+                _newActiveSO = true;
             }
         }
         [SerializeField, HideInInspector]
-        private bool newActiveSO;
+        private bool _newActiveSO;
 
         [SerializeField, HideInInspector]
         internal int orderInLayer_SO;
@@ -217,8 +233,12 @@ namespace object2DOutlines
             }
         }
 
-        public void Awake()
+        //assign good values to inspector
+        public void Reset()
         {
+            //----------Hack Inits (simplifies code bit by serializing eventhough not needed)
+            _newActiveSO = false;
+
             //----------Variable Inits
 
             //-----Optimization
@@ -237,18 +257,15 @@ namespace object2DOutlines
             CustomRange_CM = false;
             FrontLayer_CM = 0; //by defaults maps to "default" layer
             BackLayer_CM = 0; //by defaults maps to "default" layer
-
-            //-----Hack Inits
-            newActiveSO = false;
         }
 
         public void Update()
         {
             //required hacks because of warnings
-            if (newActiveSO)
+            if (_newActiveSO)
             {
                 spriteOverlay.GetComponent<SpriteRenderer>().enabled = active_SO;
-                newActiveSO = false;
+                _newActiveSO = false;
             }
         }
 
@@ -424,24 +441,22 @@ namespace object2DOutlines
                 case varToUpdate.OIL_O: child.OrderInLayer_O = par.OrderInLayer_O; break;
                 case varToUpdate.SWPX_O: child.ScaleWithParentX_O = par.ScaleWithParentX_O; break;
                 case varToUpdate.SWPY_O: child.ScaleWithParentY_O = par.ScaleWithParentY_O; break;
+
                 case varToUpdate.ST_O: child.SpriteType_O = par.SpriteType_O; break;
+
                 case varToUpdate.S_O: child.Size_O = par.Size_O; break;
 
                 //-----conCAVE
 
-                case varToUpdate.PT_O_CAVE: child.PushType_O_CAVE = par.PushType_O_CAVE; break;
-                case varToUpdate.SS_O_CAVE: child.StdSize_O_CAVE = par.StdSize_O_CAVE; break;
+                case varToUpdate.PT_O_CAVE: child.PatternType_O_CAVE = par.PatternType_O_CAVE; break;
 
-                //ONLY regular
+                //ONLY radial
                 case varToUpdate.EC_O_CAVE_R: child.EdgeCount_O_CAVE_R = par.EdgeCount_O_CAVE_R; break;
-                case varToUpdate.SA_O_CAVE_R: child.StartAngle_O_CAVE_R = par.StartAngle_O_CAVE_R; break;
-                case varToUpdate.PP_O_CAVE_R: child.PushPattern_O_CAVE_R = par.PushPattern_O_CAVE_R; break;
 
-                //ONLY regular && squarial
-                case varToUpdate.RS_O_CAVE_RS: child.RectSize_O_CAVE_RS = par.RectSize_O_CAVE_RS; break;
-                case varToUpdate.RW_O_CAVE_RS: child.RectWidth_O_CAVE_RS = par.RectWidth_O_CAVE_RS; break;
-                case varToUpdate.RH_O_CAVE_RS: child.RectHeight_O_CAVE_RS = par.RectHeight_O_CAVE_RS; break;
-            };
+                //BOTH
+                case varToUpdate.SS_O_CAVE: child.StdSize_O_CAVE = par.StdSize_O_CAVE; break;
+                case varToUpdate.R_O_CAVE: child.Rotation_O_CAVE = par.Rotation_O_CAVE; break;
+            }
         }
     }
 }

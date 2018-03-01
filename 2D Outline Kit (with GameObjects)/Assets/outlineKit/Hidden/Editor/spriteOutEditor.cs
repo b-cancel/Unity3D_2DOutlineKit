@@ -33,24 +33,18 @@ namespace object2DOutlines
         SerializedProperty scaleWithParentX_O;
         SerializedProperty scaleWithParentY_O;
 
-        SerializedProperty spriteType_O;
-
         SerializedProperty size_O;
 
         //-----conCAVE
 
         SerializedProperty pushType_O_CAVE;
-        SerializedProperty stdSize_O_CAVE;
 
-        //ONLY regular
+        //ONLY radial
         SerializedProperty edgeCount_O_CAVE_R;
-        SerializedProperty startAngle_O_CAVE_R;
-        SerializedProperty pushPattern_O_CAVE_R;
 
-        //ONLY regular && squarial
-        SerializedProperty rectSize_O_CAVE_RS;
-        SerializedProperty rectWidth_O_CAVE_RS;
-        SerializedProperty rectHeight_O_CAVE_RS;
+        //BOTH
+        SerializedProperty stdSize_O_CAVE;
+        SerializedProperty rotation_O_CAVE;
 
         void OnEnable()
         {
@@ -60,7 +54,7 @@ namespace object2DOutlines
             //Debugging
             showOutline_GOs_InHierarchy = serializedObject.FindProperty("showOutline_GOs_InHierarchy");
 
-            //Overlay
+            //Sprite Outline
             active_SO = serializedObject.FindProperty("active_SO");
             orderInLayer_SO = serializedObject.FindProperty("orderInLayer_SO");
             color_SO = serializedObject.FindProperty("color_SO");
@@ -72,31 +66,25 @@ namespace object2DOutlines
             frontLayer_CM = serializedObject.FindProperty("frontLayer_CM");
             backLayer_CM = serializedObject.FindProperty("backLayer_CM");
 
-            //Outline
+            //Sprite Overlay
             active_O = serializedObject.FindProperty("active_O");
             color_O = serializedObject.FindProperty("color_O");
             orderInLayer_O = serializedObject.FindProperty("orderInLayer_O");
             scaleWithParentX_O = serializedObject.FindProperty("scaleWithParentX_O");
             scaleWithParentY_O = serializedObject.FindProperty("scaleWithParentY_O");
 
-            spriteType_O = serializedObject.FindProperty("spriteType_O");
-
             size_O = serializedObject.FindProperty("size_O");
 
             //-----conCAVE
 
             pushType_O_CAVE = serializedObject.FindProperty("pushType_O_CAVE");
-            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
 
-            //ONLY regular
+            //ONLY radial
             edgeCount_O_CAVE_R = serializedObject.FindProperty("edgeCount_O_CAVE_R");
-            startAngle_O_CAVE_R = serializedObject.FindProperty("startAngle_O_CAVE_R");
-            pushPattern_O_CAVE_R = serializedObject.FindProperty("pushPattern_O_CAVE_R");
 
-            //ONLY regular && squarial
-            rectSize_O_CAVE_RS = serializedObject.FindProperty("rectSize_O_CAVE_RS");
-            rectWidth_O_CAVE_RS = serializedObject.FindProperty("rectWidth_O_CAVE_RS");
-            rectHeight_O_CAVE_RS = serializedObject.FindProperty("rectHeight_O_CAVE_RS");
+            //BOTH
+            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
+            rotation_O_CAVE = serializedObject.FindProperty("rotation_O_CAVE");
         }
 
         public override void OnInspectorGUI()
@@ -109,7 +97,7 @@ namespace object2DOutlines
                 EditorUtility.SetDirty(target);
 
             //link up to our script
-            spriteOutline script = (spriteOutline)target;
+            concaveOut script = (concaveOut)target;
 
             //grab properties from scripts
             serializedObject.Update();
@@ -133,8 +121,8 @@ namespace object2DOutlines
 
             if (script.Active_SO)
             {
-                EditorGUILayout.PropertyField(orderInLayer_SO, new GUIContent("-it's Order In Layer"));
-                EditorGUILayout.PropertyField(color_SO, new GUIContent("-it's Color"));
+                EditorGUILayout.PropertyField(orderInLayer_SO, new GUIContent("   it's Order In Layer"));
+                EditorGUILayout.PropertyField(color_SO, new GUIContent("   it's Color"));
             }
 
             EditorGUILayout.Space(); ///-------------------------
@@ -144,12 +132,12 @@ namespace object2DOutlines
 
             if (script.ClipCenter_CM)
             {
-                EditorGUILayout.PropertyField(alphaCutoff_CM, new GUIContent("-it's Alpha Cut-Off"));
-                EditorGUILayout.PropertyField(customRange_CM, new GUIContent("-Use A Custom Range"));
+                EditorGUILayout.PropertyField(alphaCutoff_CM, new GUIContent("   it's Alpha Cut-Off"));
+                EditorGUILayout.PropertyField(customRange_CM, new GUIContent("   Use A Custom Range"));
                 if (script.CustomRange_CM)
                 {
-                    EditorGUILayout.PropertyField(frontLayer_CM, new GUIContent("--it's Front Layer"));
-                    EditorGUILayout.PropertyField(backLayer_CM, new GUIContent("--it's Back Layer"));
+                    EditorGUILayout.PropertyField(frontLayer_CM, new GUIContent("      it's Front Layer"));
+                    EditorGUILayout.PropertyField(backLayer_CM, new GUIContent("      it's Back Layer"));
                 }
             }
 
@@ -160,65 +148,41 @@ namespace object2DOutlines
 
             if (script.Active_O)
             {
-                EditorGUILayout.PropertyField(color_O, new GUIContent("-it's Color"));
-                EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("-it's Order In Layer"));
-                EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("-Follow Parent X Scale"));
-                EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("-Follow Parent Y Scale"));
+                EditorGUILayout.PropertyField(color_O, new GUIContent("   it's Color"));
+                EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("   it's Order In Layer"));
+                EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("   Follow Parent X Scale"));
+                EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("   Follow Parent Y Scale"));
 
                 EditorGUILayout.Space(); ///-------------------------
 
-                EditorGUILayout.PropertyField(spriteType_O, new GUIContent("-Sprite Type"));
+                EditorGUILayout.PropertyField(pushType_O_CAVE, new GUIContent("--Push With A"));
 
-                EditorGUILayout.Space(); ///-------------------------
-
-                if (script.SpriteType_O == spriteType.conVEX)
-                    EditorGUILayout.PropertyField(size_O, new GUIContent("--it's Size"));
-                else
+                if (script.PatternType_O_CAVE == pushPattern.radial)
                 {
-                    EditorGUILayout.PropertyField(pushType_O_CAVE, new GUIContent("--Push With A"));  
+                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
 
-                    if (script.PushType_O_CAVE == push.regularPattern)
+                    if (script.StdSize_O_CAVE)
                     {
-                        EditorGUILayout.PropertyField(startAngle_O_CAVE_R, new GUIContent("---Rotation"));
+                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
 
-                        EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
-
-                        if (script.StdSize_O_CAVE)
-                        {
-                            EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
-
-                            EditorGUILayout.PropertyField(pushPattern_O_CAVE_R, new GUIContent("----Push Pattern"));
-
-                            if (script.PushPattern_O_CAVE_R == pushPattern.squarial)
-                            {
-                                EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Multiplier Of Edges"));
-
-                                EditorGUILayout.PropertyField(rectSize_O_CAVE_RS, new GUIContent("-----Rect Type"));
-
-                                if (script.RectSize_O_CAVE_RS == rectType.custom)
-                                {
-                                    EditorGUILayout.PropertyField(rectWidth_O_CAVE_RS, new GUIContent("------Width"));
-                                    EditorGUILayout.PropertyField(rectHeight_O_CAVE_RS, new GUIContent("------Height"));
-                                }
-                            }
-                            else
-                                EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---Number Of Edges"));
-                        }
-                        else
-                            EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
+                        EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---# Of Edges"));
                     }
                     else
-                    {
-                        EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("--Use Standard Size"));
-
-                        if (script.StdSize_O_CAVE)
-                            EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
-                        else
-                            EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
-
-                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, and editEdge) \n*An Editor Based Solution is in the works", MessageType.Info);
-                    }
+                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
                 }
+                else
+                {
+                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("--Use Standard Size"));
+
+                    if (script.StdSize_O_CAVE)
+                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
+                    else
+                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
+
+                    EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, and editEdge) \n*An Editor Based Solution is in the works", MessageType.Info);
+                }
+
+                EditorGUILayout.PropertyField(rotation_O_CAVE, new GUIContent("Rotation"));
             }
 
             //apply modified properties

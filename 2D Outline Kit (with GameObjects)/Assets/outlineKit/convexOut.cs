@@ -8,14 +8,14 @@ namespace object2DOutlines
     public class convexOut : outline
     {
         [System.NonSerialized]
-        private bool awakeFinished_VEX; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
+        private bool _awakeFinished_VEX; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
 
         [SerializeField]
         private bool notFirstRun; //NOTE: this releis on the fact that DEFAULT bool value is FALSE
 
         void OnValidate()
         {
-            if (awakeFinished_VEX)
+            if (_awakeFinished_VEX)
             {
                 //Optimization
                 UpdateSprite = updateSprite;
@@ -59,7 +59,7 @@ namespace object2DOutlines
                 clipCenter_CM = value; //update local value
 
                 //enable or disable mask
-                newActiveCM = true;
+                _newActiveCM = true;
 
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
@@ -69,7 +69,7 @@ namespace object2DOutlines
             }
         } //NOTE: used in update function... doesnt have to do anyting special for get and set...
         [System.NonSerialized]
-        private bool newActiveCM;
+        private bool _newActiveCM;
 
         //-----Outline Variables-----
 
@@ -88,11 +88,11 @@ namespace object2DOutlines
             {
                 active_O = value; //update local value
 
-                newActiveO = true; //hack in update
+                _newActiveO = true; //hack in update
             }
         }
         [System.NonSerialized]
-        private bool newActiveO;
+        private bool _newActiveO;
 
         [SerializeField, HideInInspector]
         Color color_O;
@@ -163,9 +163,13 @@ namespace object2DOutlines
             }
         }
 
-        new void Awake()
+        void Awake()
         {
-            awakeFinished_VEX = false;
+            _awakeFinished_VEX = false;
+
+            //---Hacks Inits
+            _newActiveCM = false;
+            _newActiveO = false;
 
             if (notFirstRun == false) //NOTE: will directly search children
             {
@@ -177,38 +181,45 @@ namespace object2DOutlines
                 copySpriteRendererData(this.GetComponent<SpriteRenderer>(), thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
-                //----------Variable Inits
-
-                //---Clipping Mask Vars
-                ClipCenter_CM = true;
-
-                //---Outline Vars
-                Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
-                Color_O = Color.red;
-                OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-                ScaleWithParentX_O = true;
-                ScaleWithParentY_O = true;
-
-                Size_O = 2f;
-
-                //---Var Inits from base outline class
-                base.Awake();
-
                 notFirstRun = true;
             }
 
-            //---Hacks Inits (dont need serialization and you will never be fast enough to hit play unless they are false)
-            newActiveCM = false;
-            newActiveO = false;
+            _awakeFinished_VEX = true;
+        }
 
-            awakeFinished_VEX = true;
+        //assign good values to inspector
+        new void Reset()
+        {
+            //----------Object Linkages (I dont know why this is required since the linkages should be serialized but for some reason they break)
+
+            outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
+            thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
+            spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
+            clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
+
+            //----------Variable Inits
+
+            //---Var Inits from base outline class
+            base.Reset();
+
+            //---Clipping Mask Vars
+            ClipCenter_CM = true;
+
+            //---Outline Vars
+            Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+            Color_O = Color.red;
+            OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
+            ScaleWithParentX_O = true;
+            ScaleWithParentY_O = true;
+
+            Size_O = 2f;
         }
 
         //--------------------------------------------------SLIGHTLY DIFFERENT CODE--------------------------------------------------
 
         new void Update()
         {
-            if (awakeFinished_VEX)
+            if (_awakeFinished_VEX)
             {
                 switch (UpdateSprite)
                 {
@@ -220,16 +231,16 @@ namespace object2DOutlines
                 }
 
                 //required hacks because of warnings
-                if (newActiveCM)
+                if (_newActiveCM)
                 {
                     clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
-                    newActiveCM = false;
+                    _newActiveCM = false;
                 }
 
-                if (newActiveO)
+                if (_newActiveO)
                 {
                     thisOutline.SetActive(active_O);
-                    newActiveO = false;
+                    _newActiveO = false;
                 }
 
                 base.Update();

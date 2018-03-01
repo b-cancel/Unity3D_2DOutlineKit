@@ -7,29 +7,11 @@ namespace object2DOutlines
     [System.Serializable, ExecuteInEditMode]
     public class spriteOutline : outline
     {
-        //NOTE: updateEdgeCount()... calls updateEdgeRotations()...
-        //NOTE: updateEdgeRotations()... calls updateEdgePositions()...
+        [System.NonSerialized]
+        private bool _awakeFinished; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
 
-        //NOTE: (pushType == regular) -> ONLY controls rotation of edges
-        //IF(pushType == regular) && (stdSize == true) -> can select patternType (Radial or Squarial)
-        //IF(pushType == regular) && (stdSize == false) -> you can individually edit the magnitude of each edge [TODO in editor] 
-        //---currently doable with "editEdge(GameObject edgeGO, Vector2 newDirection)"
-        //ELSE IF (pushType == custom) -> you can individually edit the rotation and magnitude of each edge (AND add and remove edges) [TODO in editor] 
-        //---currentlty doable with "editEdgeMagnitude(GameObject edgeGO, float newMag)"
-
-        //NOTE: IF(RectSize == regulat) -> use the height and width of our source sprite
-        //ELSE -> use our own custom height and width
-
-        //NOTE: any function that ends in VEX... will not run if unless your "SpriteType_O" == conVEX
-        //ditto for any function that ends in CAVE
-
-        //NOTE: initially set SpriteType_O runs once from Awake -> sets our type to conVEX
-        //then runs again from OnValidate() -> new set is ignored
-        //but for reasons unkonw the first time it changes our type... it doesnt run convex in udpdate hack
-
-
-        [SerializeField, HideInInspector]
-        private bool _awakeFinished;
+        [SerializeField]
+        private bool notFirstRun; //NOTE: this relies on the fact that DEFAULT bool value is FALSE
 
         void OnValidate()
         {
@@ -41,7 +23,7 @@ namespace object2DOutlines
                 //Debugging
                 ShowOutline_GOs_InHierarchy = showOutline_GOs_InHierarchy;
 
-                //Sprite Overlay
+                //Sprite Outline
                 Active_SO = active_SO;
                 OrderInLayer_SO = orderInLayer_SO;
                 Color_SO = color_SO;
@@ -53,34 +35,33 @@ namespace object2DOutlines
                 FrontLayer_CM = frontLayer_CM;
                 BackLayer_CM = backLayer_CM;
 
-                //Sprite Outline
+                //Sprite Overlay
                 Active_O = active_O;
                 Color_O = color_O;
                 OrderInLayer_O = orderInLayer_O;
                 ScaleWithParentX_O = scaleWithParentX_O;
                 ScaleWithParentY_O = scaleWithParentY_O;
+
                 SpriteType_O = spriteType_O;
+
                 Size_O = size_O;
 
                 //-----conCAVE
+                PatternType_O_CAVE = patternType_O_CAVE;
 
-                PushType_O_CAVE = pushType_O_CAVE;
-                StdSize_O_CAVE = stdSize_O_CAVE;
-
-                //ONLY regular
+                //pattern type == radial
                 EdgeCount_O_CAVE_R = edgeCount_O_CAVE_R;
-                StartAngle_O_CAVE_R = startAngle_O_CAVE_R;
-                PushPattern_O_CAVE_R = pushPattern_O_CAVE_R;
 
-                //ONLY regular && squarial
-                RectSize_O_CAVE_RS = rectSize_O_CAVE_RS;
-                RectWidth_O_CAVE_RS = rectWidth_O_CAVE_RS;
-                RectHeight_O_CAVE_RS = rectHeight_O_CAVE_RS;
+                //pattern type == BOTH
+                StdSize_O_CAVE = stdSize_O_CAVE;
+                //---SIZE goes here in inspector
+                Rotation_O_CAVE = rotation_O_CAVE;
             }
         }
 
         //-----Clipping Mask Variables
 
+        [Space(10)]
         [Header("CLIPPING MASK VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool clipCenter_CM;
@@ -89,34 +70,35 @@ namespace object2DOutlines
             get { return clipCenter_CM; }
             set
             {
-                clipCenter_CM = value;
+                clipCenter_CM = value; //update local value
 
                 //enable or disable mask
-                newActiveCM = true;
+                _newActiveCM = true;
 
                 //update how our edge gameobjects interact with the mask
                 if (clipCenter_CM == true)
                 {
                     if (outlineEdges != null)
-                        foreach (var GameObject in outlineEdges.Keys)
-                            GameObject.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                        foreach (var pair in outlineEdges)
+                            pair.go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
                 }
                 else
                 {
                     if (outlineEdges != null)
-                        foreach (var GameObject in outlineEdges.Keys)
-                            GameObject.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+                        foreach (var pair in outlineEdges)
+                            pair.go.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
                 }
             }
         }
-        [SerializeField, HideInInspector]
-        private bool newActiveCM;
+        [System.NonSerialized]
+        private bool _newActiveCM;
 
         //-----Outline Variables-----
 
         [SerializeField, HideInInspector]
         GameObject thisOutline;
 
+        [Space(10)]
         [Header("OUTLINE VARIABLES-----")]
         [SerializeField, HideInInspector]
         bool active_O;
@@ -125,13 +107,13 @@ namespace object2DOutlines
             get { return active_O; }
             set
             {
-                active_O = value;
+                active_O = value;//update local value
 
-                newActiveO = true;
+                _newActiveO = true;
             }
         }
-        [SerializeField, HideInInspector]
-        private bool newActiveO;
+        [System.NonSerialized]
+        private bool _newActiveO;
 
         [SerializeField, HideInInspector]
         Color color_O;
@@ -140,12 +122,12 @@ namespace object2DOutlines
             get { return color_O; }
             set
             {
-                color_O = value;
+                color_O = value;//update local value
 
                 //update our edges with the new color
                 if (outlineEdges != null)
-                    foreach (var GameObject in outlineEdges.Keys)
-                        GameObject.GetComponent<SpriteRenderer>().color = color_O;
+                    foreach (var pair in outlineEdges)
+                        pair.go.GetComponent<SpriteRenderer>().color = color_O;
             }
         }
 
@@ -156,42 +138,40 @@ namespace object2DOutlines
             get { return orderInLayer_O; }
             set
             {
-                orderInLayer_O = value;
+                orderInLayer_O = value;//update local value
 
                 //update our edges with the new color
                 if (outlineEdges != null)
-                    foreach (var GameObject in outlineEdges.Keys)
-                        GameObject.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
+                    foreach (var pair in outlineEdges)
+                        pair.go.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
             }
         }
 
         [SerializeField, HideInInspector]
         bool scaleWithParentX_O;
+        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentX_O
         {
             get { return scaleWithParentX_O; }
             set
             {
-                scaleWithParentX_O = value;
+                scaleWithParentX_O = value;//update local value
 
-                //the one that is currently active will run
-                updateOutlineVEX();
-                updateOutlineCAVE();
+                _newEdgeCount = true; //TODO... we shouldn't need this here
             }
         }
 
         [SerializeField, HideInInspector]
         bool scaleWithParentY_O;
+        //NOTE: used in update function... doesnt have to do anyting special for get and set...
         public bool ScaleWithParentY_O
         {
             get { return scaleWithParentY_O; }
             set
             {
-                scaleWithParentY_O = value;
+                scaleWithParentY_O = value;//update local value
 
-                //the one that is currently active will run
-                updateOutlineVEX();
-                updateOutlineCAVE();
+                _newEdgeCount = true; //TODO... we shouldn't need this here
             }
         }
 
@@ -208,77 +188,61 @@ namespace object2DOutlines
                 {
                     print("Set to: " + value);
                     if (value == spriteType.conVEX)
-                        newVEXinit = true;
+                        _newVEXinit = true;
                     else
-                        newCAVEinit = true;
+                        _newCAVEinit = true;
                 }
                 else
                     print("it was equal");
             }
         }
-        [SerializeField, HideInInspector]
-        private bool newVEXinit;
-        [SerializeField, HideInInspector]
-        private bool newCAVEinit;
-
-        //---CONCAVE and CONVEX use this differently
+        [System.NonSerialized]
+        private bool _newVEXinit;
+        [System.NonSerialized]
+        private bool _newCAVEinit;
 
         [SerializeField, HideInInspector]
-        float size_O; //NOTE: this size refers to the world space thickness of the outline
-        //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        float size_O;
         public float Size_O
         {
             get { return size_O; }
             set
             {
                 value = (value >= 0) ? value : 0;
-                size_O = value;
+                size_O = value;//update local value
 
-                //the one that is currently active will run
-                updateOutlineVEX();
-                updateOutlineCAVE();
+                _newEdgeCount = true; //TODO... we shouldn't need this here
             }
         }
 
         //-------------------------Push Type Variables-------------------------
 
         [SerializeField, HideInInspector]
-        Dictionary<GameObject, Vector2> outlineEdges;
+        List<GO_to_Vector2> outlineEdges;
 
-        [SerializeField, HideInInspector]
-        private bool newEdgeCount;
+        //non serializable dictionary simply makes lookups quick
+        Dictionary<GameObject, int> outEdgesHelper;
 
-        [Header("PUSH TYPE VARIABLES-----")]
+        [System.NonSerialized]
+        private bool _newEdgeCount;
+
+        [Space(10)]
+        [Header("conCAVE TYPE VARIABLES-----")]
         [SerializeField, HideInInspector]
-        push pushType_O_CAVE;
-        public push PushType_O_CAVE
+        pushPattern patternType_O_CAVE;
+        public pushPattern PatternType_O_CAVE
         {
-            get { return pushType_O_CAVE; }
+            get { return patternType_O_CAVE; }
             set
             {
-                pushType_O_CAVE = value;
+                patternType_O_CAVE = value; //update local value
 
-                newEdgeCount = true;
+                _newEdgeCount = true;
             }
         }
 
         [SerializeField, HideInInspector]
-        bool stdSize_O_CAVE; //NOTE: this size refers to the world space thickness of the outline
-        public bool StdSize_O_CAVE
-        {
-            get { return stdSize_O_CAVE; }
-            set
-            {
-                stdSize_O_CAVE = value;
-
-                updateOutlineCAVE();
-            }
-        }
-
-        //---Regular
-
-        [SerializeField, HideInInspector]
-        private static Vector2 _0Rotation; //what we consider 0 rotation (current Vector3.right)
+        private Vector2 _0Rotation; //what we consider 0 rotation (current Vector3.right)
 
         [SerializeField, HideInInspector]
         int edgeCount_O_CAVE_R; //also the count of gameobjects that make up the outline
@@ -289,85 +253,49 @@ namespace object2DOutlines
             {
                 edgeCount_O_CAVE_R = (value >= 0) ? value : 0; //update local value
 
-                newEdgeCount = true;
+                _newEdgeCount = true;
             }
         }
 
         [SerializeField, HideInInspector]
-        float startAngle_O_CAVE_R;
-        public float StartAngle_O_CAVE_R
+        bool stdSize_O_CAVE; //NOTE: this size refers to the world space thickness of the outline
+        //NOTE: used in update function... doesnt have to do anyting special for get and set...
+        public bool StdSize_O_CAVE
         {
-            get { return startAngle_O_CAVE_R; }
+            get { return stdSize_O_CAVE; }
             set
             {
-                startAngle_O_CAVE_R = value; //update local value
+                stdSize_O_CAVE = value;//update local value
 
-                updateOutlineCAVE();
+                _newEdgeCount = true; //TODO... we shouldn't need this here
             }
         }
 
         [SerializeField, HideInInspector]
-        pushPattern pushPattern_O_CAVE_R; //push objs to edge of circle or to edge of box
-        public pushPattern PushPattern_O_CAVE_R
+        float rotation_O_CAVE;
+        public float Rotation_O_CAVE
         {
-            get { return pushPattern_O_CAVE_R; }
+            get { return rotation_O_CAVE; }
             set
             {
-                pushPattern_O_CAVE_R = value; //update local value
+                rotation_O_CAVE = value; //update local value
 
-                updateEdgeRotationsCAVE();
+                _newEdgeCount = true; //TODO... we shouldn't need this here
             }
         }
 
-        [SerializeField, HideInInspector]
-        rectType rectSize_O_CAVE_RS;
-        public rectType RectSize_O_CAVE_RS
-        {
-            get { return rectSize_O_CAVE_RS; }
-            set
-            {
-                rectSize_O_CAVE_RS = value;
-
-                //update height and width... which will update our outline
-                if (rectSize_O_CAVE_RS == rectType.regular)
-                {
-                    RectWidth_O_CAVE_RS = gameObject.GetComponent<SpriteRenderer>().bounds.size.x;
-                    RectHeight_O_CAVE_RS = gameObject.GetComponent<SpriteRenderer>().bounds.size.y;
-                }
-            }
-        }
-
-        [SerializeField, HideInInspector]
-        float rectWidth_O_CAVE_RS;
-        public float RectWidth_O_CAVE_RS
-        {
-            get { return rectWidth_O_CAVE_RS; }
-            set
-            {
-                rectWidth_O_CAVE_RS = value;
-
-                updateEdgeRotationsCAVE();
-            }
-        }
-
-        [SerializeField, HideInInspector]
-        float rectHeight_O_CAVE_RS;
-        public float RectHeight_O_CAVE_RS
-        {
-            get { return rectHeight_O_CAVE_RS; }
-            set
-            {
-                rectHeight_O_CAVE_RS = value;
-
-                updateEdgeRotationsCAVE();
-            }
-        }
-
-        new void Awake()
+        void Awake()
         {
             _awakeFinished = false;
 
-            if (gameObject.transform.Find("Outline Folder") == null)
+            //---Hacks Inits (dont need serialization and you will never be fast enough to hit play unless they are false)
+            _newEdgeCount = false;
+            _newActiveCM = false;
+            _newActiveO = false;
+            _newCAVEinit = false;
+            _newVEXinit = false;
+
+            if (notFirstRun == false)
             {
                 _0Rotation = Vector3.right; //what we consider 0 rotation (current Vector3.right)
 
@@ -378,154 +306,179 @@ namespace object2DOutlines
                 DestroyImmediate(thisOutline.GetComponent<SpriteRenderer>()); //DIFFERENT
                 initPart2(gameObject, ref outlineGameObjectsFolder, ref spriteOverlay, ref clippingMask, ref tempMaterial);
 
-                outlineEdges = new Dictionary<GameObject, Vector2>(); //(MUST be before any inits)
+                outEdgesHelper = new Dictionary<GameObject, int>();
+                outlineEdges = new List<GO_to_Vector2>();
 
-                //----------Hack Inits
-
-                newEdgeCount = false;
-                newActiveCM = false;
-                newActiveO = false;
-                newCAVEinit = false;
-                newVEXinit = false;
-
-                //----------Main Init (MUST be after hack inits)
-                SpriteType_O = spriteType.conVEX; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
-                //NOTE: many variables are also initialized when this is set
-
-                //----------Variable Inits
-
-                //---Clipping Mask Vars
-                ClipCenter_CM = true;
-
-                //---Outline Vars
-                Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
-                Color_O = Color.red;
-                OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
-                ScaleWithParentX_O = true;
-                ScaleWithParentY_O = true;
-
-                //---Var Inits from base outline class
-                base.Awake();
+                notFirstRun = true;
             }
             else
             {
-                outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
-                thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
-                spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
-                clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
+                //fill our dictionary again from our serializable data (then we use them together)
+                outEdgesHelper = new Dictionary<GameObject, int>();
+                for (int i = 0; i < outlineEdges.Count; i++)
+                    outEdgesHelper.Add(outlineEdges[i].go, i);
             }
 
-            print("---------");
-
             _awakeFinished = true;
+        }
+
+        new void Reset()
+        {
+            //----------Object Linkages (I dont know why this is required since the linkages should be serialized but for some reason they break)
+
+            outlineGameObjectsFolder = gameObject.transform.Find("Outline Folder").gameObject;
+            thisOutline = outlineGameObjectsFolder.transform.Find("The Outline").gameObject;
+            spriteOverlay = outlineGameObjectsFolder.transform.Find("Sprite Overlay").gameObject;
+            clippingMask = outlineGameObjectsFolder.transform.Find("Sprite Mask").gameObject;
+
+            //----------Variable Inits
+
+            //---Var Inits from base outline class
+            base.Reset();
+
+            //---Main VEX vs CAVE Init (MUST be after hack inits)
+            SpriteType_O = spriteType.conVEX; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
+                                              //NOTE: many variables are also initialized when this is set
+
+            //---Clipping Mask Vars
+            ClipCenter_CM = true;
+
+            //---Outline Vars
+            Active_O = true; //NOTE: to hide the outline temporarily use: (1)color -or- (2)size
+            Color_O = Color.red;
+            OrderInLayer_O = this.GetComponent<SpriteRenderer>().sortingOrder - 1; //by default behind
+            ScaleWithParentX_O = true;
+            ScaleWithParentY_O = true;
+
+            /*
+             * These should be set only spriteType
+            Size_O = .15f;
+
+            //-----conCAVE Type Vars
+            PatternType_O_CAVE = pushPattern.radial;
+            EdgeCount_O_CAVE_R = 8;
+            StdSize_O_CAVE = true;
+            Rotation_O_CAVE = 0;
+            */
         }
 
         //--------------------------------------------------SLIGHTLY DIFFERENT CODE--------------------------------------------------
 
         new void Update()
         {
-            switch (UpdateSprite)
+            if (_awakeFinished)
             {
-                case spriteUpdateSetting.EveryFrame: updateSpriteData(); break;
-                case spriteUpdateSetting.AfterEveryChange:
-                    if (spriteChanged(this.GetComponent<SpriteRenderer>()))
-                        updateSpriteData();
-                    break;
+                switch (UpdateSprite)
+                {
+                    case spriteUpdateSetting.EveryFrame: updateSpriteData(); break;
+                    case spriteUpdateSetting.AfterEveryChange:
+                        if (spriteChanged(this.GetComponent<SpriteRenderer>()))
+                            updateSpriteData();
+                        break;
+                }
+
+                //required hack because of error
+                //this is because this variables change might trigger a DestroyImmediate
+                //DestoryImmediate MUST be used when a script runs in edit mode... but it cant be called by OnValidate... 
+                //so this is a "HACK" to make it work without it (technically) being inside OnValidate()
+                if (_newEdgeCount)
+                {
+                    updateEdgeCountCAVE();
+                    updateEdgeRotationsCAVE();
+                    _newEdgeCount = false;
+                }
+
+                if (_newVEXinit || _newCAVEinit)
+                {
+                    if (_newVEXinit && _newCAVEinit)
+                        print("ERROR... i cant set the outline to both");
+                    else
+                    {
+                        if (_newVEXinit)
+                        {
+                            print("**********VEX");
+
+                            //--------------wipe out conCAVE outline
+                            spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
+                            patternType_O_CAVE = pushPattern.radial; //DIRECT SETTING... be careful [nothing]
+                            edgeCount_O_CAVE_R = 0; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
+                            updateEdgeCountCAVE();
+
+                            //--------------spawn in conVEX outline
+                            _0Rotation = Vector3.zero;
+                            edgeCount_O_CAVE_R = 1; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
+                            updateEdgeCountCAVE();
+                            _0Rotation = Vector3.right;
+
+                            //---------------set the new value
+                            spriteType_O = spriteType.conVEX; //DIRECT SETTING... be careful [nothing]
+
+                            //---------------initialize variables
+                            Size_O = 2f;
+
+                            print("we should now be VEX " + SpriteType_O.ToString());
+
+                            print("**********VEX");
+                        }
+                        else
+                        {
+                            print("**********CAVE");
+
+                            //--------------wipe out conVEX outline
+                            spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
+                            patternType_O_CAVE = pushPattern.radial; //DIRECT SETTING... be careful [nothing]
+                            edgeCount_O_CAVE_R = 0; //spriteType_O MUST be conCAVE for this to run
+                            updateEdgeCountCAVE();
+                            print("edgecount " + outlineEdges.Count);
+
+                            //--------------spawn in conCAVE outline
+                            edgeCount_O_CAVE_R = 8; //spriteType_O MUST be conCAVE for this to run
+                            updateEdgeCountCAVE();
+                            print("edgecount " + outlineEdges.Count);
+
+                            //---------------initialize variables
+                            Size_O = .25f;
+
+                            PatternType_O_CAVE = pushPattern.radial;
+
+                            //ONLY regular
+                            EdgeCount_O_CAVE_R = 8;
+
+                            //BOTH
+                            StdSize_O_CAVE = true;
+                            //---SIZE goes here in inspector
+                            Rotation_O_CAVE = 0;
+
+                            print("we should now be CAVE " + SpriteType_O.ToString());
+
+                            print("**********CAVE");
+                        }
+                    }
+
+                    //reset vars
+                    _newVEXinit = false;
+                    _newCAVEinit = false;
+                }
+                else //both FALSE
+                    print("sprite type " + SpriteType_O.ToString());
+
+                //required hack because of warnings
+                if (_newActiveCM)
+                {
+                    clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
+                    _newActiveCM = false;
+                }
+
+                if (_newActiveO)
+                {
+                    //all edges set active
+                    if (outlineEdges != null)
+                        foreach (var pair in outlineEdges)
+                            pair.go.SetActive(active_O);
+                }
+
+                base.Update();
             }
-
-            //required hack because of error
-            //this is because this variables change might trigger a DestroyImmediate
-            //DestoryImmediate MUST be used when a script runs in edit mode... but it cant be called by OnValidate... 
-            //so this is a "HACK" to make it work without it (technically) being inside OnValidate()
-            if (newEdgeCount)
-            {
-                updateEdgeCountCAVE();
-                updateEdgeRotationsCAVE();
-                newEdgeCount = false;
-                print("---------");
-            }
-
-            //required hack
-            if (newVEXinit)
-            {
-                print("**********");
-
-                //--------------wipe out conCAVE outline
-                spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
-                pushType_O_CAVE = push.regularPattern; //DIRECT SETTING... be careful [nothing]
-                edgeCount_O_CAVE_R = 0; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
-                updateEdgeCountCAVE();
-
-                //--------------spawn in conVEX outline
-                _0Rotation = Vector3.zero;
-                edgeCount_O_CAVE_R = 1; //DIRECT SETTING... be careful (spriteType_O MUST be conCAVE for this to run) [nothing]
-                updateEdgeCountCAVE();
-                _0Rotation = Vector3.right;
-
-                //---------------set the new value
-                spriteType_O = spriteType.conVEX; //DIRECT SETTING... be careful [nothing]
-
-                //---------------initialize variables
-                Size_O = 2f;
-
-                newVEXinit = false;
-
-                print("we should now be VEX " + SpriteType_O.ToString());
-
-                print("**********");
-            }
-
-            if (newCAVEinit)
-            {
-                print("**********");
-
-                //---------------set the new value
-                spriteType_O = spriteType.conCAVE; //DIRECT SETTING... be careful [nothing]
-
-                //--------------wipe out conVEX outline
-                EdgeCount_O_CAVE_R = 0; //spriteType_O MUST be conCAVE for this to run
-
-                //--------------spawn in conCAVE outline
-
-                //---------------initialize variables
-
-                Size_O = .25f;
-
-                PushType_O_CAVE = push.regularPattern; //NOTE: newEdgeCount next frame
-                StdSize_O_CAVE = true;
-
-                //ONLY regular
-                EdgeCount_O_CAVE_R = 8;
-                StartAngle_O_CAVE_R = 0;
-                PushPattern_O_CAVE_R = pushPattern.squarial;
-
-                //ONLY regular && squarial
-                RectSize_O_CAVE_RS = rectType.regular;
-                //width and height set by the above
-
-                newCAVEinit = false;
-
-                print("we should now be CAVE " + SpriteType_O.ToString());
-
-                print("**********");
-            }
-
-            //required hack because of warnings
-            if (newActiveCM)
-            {
-                clippingMask.GetComponent<SpriteMask>().enabled = clipCenter_CM;
-                newActiveCM = false;
-            }
-
-            if (newActiveO)
-            {
-                //all edges set active
-                if (outlineEdges != null)
-                    foreach (var GameObject in outlineEdges.Keys) //ALSO works for concave type (by simyply having 1 edge here)
-                        GameObject.SetActive(active_O);
-            }
-
-            base.Update();
         }
 
         public void updateSpriteData()
@@ -538,67 +491,28 @@ namespace object2DOutlines
 
             //update outline
             if (outlineEdges != null)
-                foreach (var GameObject in outlineEdges.Keys) //ALSO works for concave type (by simyply having 1 edge here)
-                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), GameObject.GetComponent<SpriteRenderer>());
+                foreach (var pair in outlineEdges)
+                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), pair.go.GetComponent<SpriteRenderer>());
         }
 
         //--------------------------------------------------SUPER DIFFERENT CODE--------------------------------------------------
 
         //-------------------------ONLY conVEX-------------------------
 
-        void updateOutlineVEX()
-        {
-            if (SpriteType_O == spriteType.conVEX)
-            {
-                if (outlineEdges != null)
-                {
-                    print("vex update START ???");
-
-                    List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                    foreach (var GameObject in GOs) //NOTE: this should only run for 1 single "edge"
-                    {
-                        float localSizeX;
-                        float localSizeY;
-
-                        //REQUIRED because: when we want our size to be able to be == to 0
-                        //when size is 0 there should essentially be a "solidly colored sprite behind our current sprite"
-                        //without this adjustment to get a "solidly colored sprite behind our current sprite" our size needs to be 1
-                        float adjustedSize = Size_O + 1;
-
-                        if (ScaleWithParentX_O)
-                            localSizeX = adjustedSize;
-                        else
-                            localSizeX = adjustedSize / this.transform.localScale.x;
-
-                        if (ScaleWithParentY_O)
-                            localSizeY = adjustedSize;
-                        else
-                            localSizeY = adjustedSize / this.transform.localScale.y;
-
-                        GameObject.transform.localScale = new Vector3(localSizeX, localSizeY, 1);
-                    }
-
-                    print("vex update END ???");
-                }
-                //ELSE... the outline doesnt yet exist
-            }
-            //ELSE... this function should not be running
-        }
+        //TODO... addd updateOutlineVEX()
 
         //-------------------------ONLY conCAVE-------------------------
 
-        //-------------------------ONLY PushType == push.regularPattern
+        //-------------------------ONLY RADIAL
 
         void updateEdgeCountCAVE()
         {
-            if (SpriteType_O == spriteType.conCAVE)
+            if (outlineEdges != null)
             {
-                if (PushType_O_CAVE == push.regularPattern)
+                if(SpriteType_O == spriteType.conCAVE)
                 {
-                    if (outlineEdges != null) //precautionary check
+                    if (PatternType_O_CAVE == pushPattern.radial)
                     {
-                        print("cave update START ???");
-
                         if (outlineEdges.Count != EdgeCount_O_CAVE_R)
                         {
                             int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
@@ -611,66 +525,56 @@ namespace object2DOutlines
                             else
                             {
                                 for (int i = 0; i < totalDifferences; i++)
-                                {
-                                    List<GameObject> keyList = new List<GameObject>(outlineEdges.Keys); //MIGHT CAUSE ISSUES
-                                    removeEdge(keyList[keyList.Count - 1], true); //remove from the back
-                                }
+                                    removeEdge(outlineEdges[outlineEdges.Count - 1].go, true); //remove from the back
                             }
                         }
                         //ELSE... we have the correct number of edges
-
-                        print("cave update END ???");
                     }
-                    //ELSE... the outline doesnt yet exist
+                    //ELSE... follow custom outline rules
                 }
-                //ELSE... follow custom outline rules
+                //ELSE... this function is should not be running in conVEX mode
             }
-            //ELSE... this function should not be running
+            //ELSE... no outline to update
         }
 
         //UPDATE ---ROTATIONS--- BASED ON PATTERN
         void updateEdgeRotationsCAVE() //AUTOMATICALLY... calls updateEdgePositions()
         {
-            if (SpriteType_O == spriteType.conCAVE)
+            if (outlineEdges != null)
             {
-                if (PushType_O_CAVE == push.regularPattern)
+                if(SpriteType_O == spriteType.conCAVE)
                 {
-                    if (outlineEdges != null) //precautionary check
+                    if (PatternType_O_CAVE == pushPattern.radial)
                     {
-                        //StartAngle_OPR is used to rotate the shape after this step
-                        float edgeRotation = (PushPattern_O_CAVE_R == pushPattern.radial) ?
-                            0 //for RADIAL... start at _0Rotation
-                            : (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //for SQUARIAL... start by placing the first edge in the first corner (1st quadrant)
-                        float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
+                        float edgeRotation = 0;
 
-                        List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                        foreach (var GameObject in GOs)
+                        float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
+                        foreach (var pair in outlineEdges)
                         {
-                            float oldMagnitude = outlineEdges[GameObject].magnitude;
+                            float oldMag = pair.v2.magnitude;
                             Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                            editEdge(GameObject, newDirection.normalized * oldMagnitude, true); //this will also updateEdgePosition()
+                            editEdge(pair.go, newDirection.normalized * oldMag, true); //this will also updateEdgePosition()
                             edgeRotation += angleBetweenAllEdges;
                         }
                     }
-                    //ELSE... the outline doesnt yet exist
+                    //ELSE... use custom outline rules
                 }
-                //ELSE... follow custom outline rules
+                //ELSE.... this function should not be running
             }
-            //ELSE... this function should not be running
+            //ELSE... no outline to modify yet
         }
 
-        //-------------------------FOR BOTH PushTypes
+        //-------------------------FOR BOTH pushPatterns
 
         //USES... same as "updateEdgePosition()"
         void updateOutlineCAVE()
         {
-            if (SpriteType_O == spriteType.conCAVE)
+            if(SpriteType_O == spriteType.conCAVE)
             {
                 if (outlineEdges != null)
                 {
-                    List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                    foreach (var GameObject in GOs)
-                        updateEdgePositionCAVE(GameObject, outlineEdges[GameObject]);
+                    foreach (var pair in outlineEdges)
+                        updateEdgePositionCAVE(pair.go, pair.v2);
                 }
                 //ELSE... the outline doesnt yet exist
             }
@@ -685,88 +589,21 @@ namespace object2DOutlines
         //UPDATE ---MAGNITUDE--- BASED ON PATTERN
         void updateEdgePositionCAVE(GameObject anEdge, Vector2 vect)
         {
-            if (SpriteType_O == spriteType.conCAVE)
+            if (outlineEdges != null && outEdgesHelper != null && anEdge != null)
             {
-                if (outlineEdges != null)
+                if(SpriteType_O == spriteType.conCAVE)
                 {
-                    outlineEdges[anEdge] = vect;
+                    outlineEdges[outEdgesHelper[anEdge]].v2 = vect;
 
                     //NOTE: we push from origin (0,0,0)
 
                     Vector3 newVect = Vector3.zero;
-                    if (PushType_O_CAVE == push.regularPattern)
+                    if (PatternType_O_CAVE == pushPattern.radial)
                     {
                         if (StdSize_O_CAVE)
-                        {
-                            if (PushPattern_O_CAVE_R == pushPattern.radial) //Radial Push
-                                newVect = vect.normalized * Size_O;
-                            else //Squarial Push
-                            {
-                                //do this pretending 
-                                //that the Rect Width length goes from -x to x
-                                //and that the Rect Length goes from -y to y
-
-                                float cornerAngle = (Mathf.Rad2Deg * Mathf.Atan2((RectHeight_O_CAVE_RS / 2), (RectWidth_O_CAVE_RS / 2))); //top right corner
-                                //TODO... might have to repair below with conversion into degree
-                                float cornerHypotenuse = (RectHeight_O_CAVE_RS / 2) / Mathf.Sin(cornerAngle * Mathf.Deg2Rad);
-
-                                float AF_Up = Vector3.Angle(Vector3.up, vect.normalized);
-                                float AF_Right = Vector3.Angle(Vector3.right, vect.normalized);
-                                float AF_Down = Vector3.Angle(Vector3.down, vect.normalized);
-                                float AF_Left = Vector3.Angle(Vector3.left, vect.normalized);
-
-                                float newMagnitude = 0;
-
-                                //--find what quadrant this outline is in
-                                if (AF_Left > 90 && AF_Down > 90) //1st quad
-                                {
-                                    if (AF_Right < cornerAngle) //base ourselves on width
-                                        newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
-                                    else if (AF_Right > cornerAngle) //base ourselves on height
-                                        newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
-                                    else
-                                        newMagnitude = cornerHypotenuse;
-                                }
-                                else if (AF_Right > 90 && AF_Down > 90) //2nd quad
-                                {
-                                    if (AF_Left < cornerAngle) //base ourselves on width
-                                        newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
-                                    else if (AF_Left > cornerAngle) //base ourselves on height
-                                        newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
-                                    else
-                                        newMagnitude = cornerHypotenuse;
-                                }
-                                else if (AF_Right > 90 && AF_Up > 90) //3rd quad
-                                {
-                                    if (AF_Left < cornerAngle) //base ourselves on width
-                                        newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Left * Mathf.Deg2Rad));
-                                    else if (AF_Left > cornerAngle) //base ourselves on height
-                                        newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Left) * Mathf.Deg2Rad));
-                                    else
-                                        newMagnitude = cornerHypotenuse;
-                                }
-                                else //4th quad
-                                {
-                                    if (AF_Right < cornerAngle) //base ourselves on width
-                                        newMagnitude = (RectWidth_O_CAVE_RS / 2) / (Mathf.Cos(AF_Right * Mathf.Deg2Rad));
-                                    else if (AF_Right > cornerAngle) //base ourselves on height
-                                        newMagnitude = (RectHeight_O_CAVE_RS / 2) / (Mathf.Cos((90 - AF_Right) * Mathf.Deg2Rad));
-                                    else
-                                        newMagnitude = cornerHypotenuse;
-                                }
-
-                                newVect = vect.normalized * newMagnitude;
-
-                                newVect = newVect.normalized * (newVect.magnitude * Size_O);
-                            }
-                        }
+                            newVect = vect.normalized * Size_O;
                         else
                             newVect = vect.normalized;
-
-                        //Rotate the RADIAL or SQUARIAL pattern the number of StartAngle_OPR
-                        float oldMagnitude = newVect.magnitude;
-                        Vector3 newDirection = Quaternion.AngleAxis(StartAngle_O_CAVE_R, Vector3.forward) * newVect.normalized;
-                        newVect = newDirection.normalized * oldMagnitude;
                     }
                     else
                     {
@@ -775,6 +612,13 @@ namespace object2DOutlines
                         else
                             newVect = vect; //use ONLY vector (1) direction (2) magnitude
                     }
+
+                    //Rotate the Edges
+                    float oldMagnitude = newVect.magnitude;
+                    Vector3 newDirection = Quaternion.AngleAxis(Rotation_O_CAVE, Vector3.forward) * newVect.normalized;
+                    newVect = newDirection.normalized * oldMagnitude;
+
+                    //Apply the newVect Value
                     anEdge.transform.position = newVect;
 
                     //NOTE: as of now our position is still on a compass in the (0,0,0) position
@@ -788,9 +632,8 @@ namespace object2DOutlines
                     //take into consideration the POSITION and ROTATION of the sprite we are an edge for
                     anEdge.transform.position = this.transform.position + (this.transform.rotation * anEdge.transform.position);
                 }
-                //ELSE... the outline doesnt yet exist
+                //ELSE... this function should not be running
             }
-            //ELSE... this function should not be running
         }
 
         //-------------------------Outline Edge List Edits-------------------------
@@ -803,9 +646,9 @@ namespace object2DOutlines
         //USES... PushType_OP | Color_O | orderInLayer_O | ClipCenter_CM | Active_O
         bool addEdge(Vector2 outlineDirection, bool sudo)
         {
-            if (PushType_O_CAVE == push.customPattern || sudo == true)
+            if (outlineEdges != null && outEdgesHelper != null && thisOutline != null)
             {
-                if (thisOutline != null) //precautionary check
+                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
                 {
                     //NOTE: here we must manually take into account, color, order in layer, activeness
 
@@ -838,7 +681,8 @@ namespace object2DOutlines
                         tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
 
                     //save our data
-                    outlineEdges.Add(tempSpriteCopy, outlineDirection);
+                    outEdgesHelper.Add(tempSpriteCopy, outlineEdges.Count);
+                    outlineEdges.Add(new GO_to_Vector2(tempSpriteCopy, outlineDirection));
 
                     //update position that is affected by... size, scale par x, scale par y
                     updateEdgePositionCAVE(tempSpriteCopy, outlineDirection);
@@ -851,20 +695,21 @@ namespace object2DOutlines
                 else
                     return false;
             }
-            else //if we have a REGULAR outline then we cant change the list of edges directly
+            else
                 return false;
         }
 
-        //USES... PushType_OP
         bool removeEdge(GameObject edgeGO, bool sudo)
         {
-            if (PushType_O_CAVE == push.customPattern || sudo == true)
+            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
             {
-                if (outlineEdges != null) //precautionary check
+                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
                 {
-                    if (outlineEdges.ContainsKey(edgeGO))
+                    if (outEdgesHelper.ContainsKey(edgeGO))
                     {
-                        outlineEdges.Remove(edgeGO);
+                        outlineEdges.RemoveAt(outEdgesHelper[edgeGO]);
+                        outEdgesHelper.Remove(edgeGO);
+
                         DestroyImmediate(edgeGO);
                         return true;
                     }
@@ -874,32 +719,19 @@ namespace object2DOutlines
                 else
                     return false;
             }
-            else //if we have a regular outline then we cant change the list of edges directly
+            else
                 return false;
         }
 
-        void removeAllEdges()
-        {
-            if (outlineEdges != null)
-            {
-                List<GameObject> GOs = new List<GameObject>(outlineEdges.Keys);
-                foreach (var GameObject in GOs)
-                    removeEdge(GameObject);
-            }
-            //ELSE... the outline doesnt yet exist
-        }
-
-        //USES... PushType_OP
         bool editEdge(GameObject edgeGO, Vector2 newDirection, bool sudo)
         {
-            if (PushType_O_CAVE == push.customPattern || sudo == true)
+            if (outEdgesHelper != null && edgeGO != null)
             {
-                if (outlineEdges != null) //precautionary check
+                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
                 {
-                    if (outlineEdges.ContainsKey(edgeGO))
+                    if (outEdgesHelper.ContainsKey(edgeGO))
                     {
                         updateEdgePositionCAVE(edgeGO, newDirection);
-
                         return true;
                     }
                     else
@@ -908,11 +740,11 @@ namespace object2DOutlines
                 else
                     return false;
             }
-            else //if we have a regular outline then we cant change the list of edges directly
+            else
                 return false;
         }
 
-        //-------------------------PUBLIC
+        //-------------------------PUBLIC (all of these are bool simply so the user knows whether or not a particular operation was successfull)
 
         public bool addEdge(Vector2 outlineDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
         {
@@ -924,26 +756,32 @@ namespace object2DOutlines
             return removeEdge(edgeGO, false);
         }
 
-        public bool editEdge(GameObject edgeGO, Vector2 newDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
+        public bool removeAllEdges()
         {
-            return editEdge(edgeGO, newDirection, false);
+            if (outlineEdges != null)
+            {
+                for(int i=0; i<outlineEdges.Count; i++)
+                    removeEdge(outlineEdges[i].go);
+                return true;
+            }
+            return
+                false;
         }
 
         public bool editEdgeMagnitude(GameObject edgeGO, float newMag)
         {
-            if (outlineEdges != null) //precautionary check
+            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
             {
-                if (outlineEdges.ContainsKey(edgeGO))
-                {
-                    updateEdgePositionCAVE(edgeGO, outlineEdges[edgeGO].normalized * newMag);
-
-                    return true;
-                }
-                else
-                    return false;
+                editEdge(edgeGO, outlineEdges[outEdgesHelper[edgeGO]].v2.normalized * newMag);
+                return true;
             }
             else
                 return false;
+        }
+
+        public bool editEdge(GameObject edgeGO, Vector2 newDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
+        {
+            return editEdge(edgeGO, newDirection, false);
         }
     }
 }

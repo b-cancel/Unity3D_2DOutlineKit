@@ -254,7 +254,7 @@ MonoBehaviour:
   m_MinSize: {x: 434, y: 271}
   m_MaxSize: {x: 14004, y: 10021}
   vertical: 0
-  controlID: 36
+  controlID: 75
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -271,7 +271,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 462
+    width: 461
     height: 528
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -294,9 +294,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 462
+    x: 461
     y: 0
-    width: 1016
+    width: 1017
     height: 528
   m_MinSize: {x: 234, y: 271}
   m_MaxSize: {x: 10004, y: 10021}
@@ -436,14 +436,14 @@ MonoBehaviour:
     height: 398
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 1
-  lastFramingTime: 866.236607670637
+  lastFramingTime: 9392.689868389341
   m_2DMode: 1
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -24.47246, y: -6.8780775, z: -1.1777228}
+    m_Target: {x: -0.15700531, y: 0, z: 0}
     speed: 2
-    m_Value: {x: -24.47246, y: -6.8780775, z: -1.1777228}
+    m_Value: {x: -0.15700531, y: 0, z: 0}
   m_RenderMode: 31
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -471,9 +471,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 141.46573
+    m_Target: 13.973526
     speed: 2
-    m_Value: 141.46573
+    m_Value: 13.973526
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -509,14 +509,14 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 511
-    width: 460
+    width: 459
     height: 507
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 4c2fffff502fffff96fbffff00000000
+    m_ExpandedIDs: 7892fdff7c92fdff7098fdffccbefdff08c3fdff6efdfdff72fdfdff2201feffd437feffd837feffea3bfeffe81affff0a1bffff8044ffff96fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -561,9 +561,9 @@ MonoBehaviour:
   m_DepthBufferBits: 0
   m_Pos:
     serializedVersion: 2
-    x: 464
+    x: 463
     y: 511
-    width: 1012
+    width: 1013
     height: 507
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SearchFilter:
@@ -578,18 +578,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/outlineKit
+    - Assets/outlineKit/Hidden
   m_ViewMode: 1
   m_StartGridSize: 70
   m_LastFolders:
-  - Assets/outlineKit
+  - Assets/outlineKit/Hidden
   m_LastFoldersGridSize: 70
   m_LastProjectPath: D:\GitHub\UnityOutline2DShaders\2D Outline Kit (with GameObjects)
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 9c2b0000
-    m_LastClickedID: 11164
+    m_SelectedIDs: 0a2c0000
+    m_LastClickedID: 11274
     m_ExpandedIDs: 00000000ce2a00009c2b0000c62b00000a2c0000682c00006a2c00006c2c00006e2c0000702c0000722c0000742c0000762c0000782c00007a2c00007c2c00007e2c0000802c0000822c0000842c0000862c0000882c00008a2c00008c2c00008e2c0000902c0000922c0000942c0000962c0000982c00009a2c00009c2c00009e2c0000a02c0000a22c0000a42c0000a62c0000a82c0000aa2c0000ac2c0000ae2c0000b02c0000b22c0000b42c0000b62c0000b82c0000ba2c0000bc2c0000be2c0000c02c0000c22c0000c42c0000c62c0000c82c0000ca2c0000cc2c0000ce2c0000d02c0000d22c0000d42c0000d62c0000d82c000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -695,9 +695,9 @@ MonoBehaviour:
   m_DepthBufferBits: 0
   m_Pos:
     serializedVersion: 2
-    x: 496
+    x: 463
     y: 511
-    width: 1076
+    width: 1013
     height: 507
   m_PersistentViewDataDictionary: {fileID: 0}
 --- !u!114 &20
