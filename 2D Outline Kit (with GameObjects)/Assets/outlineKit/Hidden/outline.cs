@@ -14,13 +14,35 @@ using UnityEngine;
 //BOTH of the features above MIGHT be added when I create the outlineKit with shaders instead of gameobjects
 //NOTE: that if you really wanted to you could force it to support tiled by having multiple sprite masks and multiple outlines for each tile
 
+//-----
+
 //-----Sprite Mask Details
 
 //NOTE: here we are not allowing users to change "backSortingLayerID" -OR- "frontSortingLayerID"
 
 //-----Inspector Tool Details (editor only)
 
-//NOTE: Unity Reset will break things and SHOULD NOT be used
+//-Reset (DOES NOT WORK...)
+//      For reasons unkown vlaues that are marked as serialized of type gameobject and vector 2 (that should be serializable by Unity's standards)
+//      get unserialized or at the very least the reference breaks and no solution I tried to repair this worked
+//-Copy Component... and then Pasting Values onto another gameobject with the same script (DOES NOT WORK... but DOES NOT BREAK)
+//      I have no idea why this does not work
+//-Copy Component... and then Pasting As New onto another gameobject with the same script (DOES NOT WORK...)
+//      The script itself does not seem to be passing by reference but the inspector script attached to is is modfying the outline of the gameobject you copied from
+/*
+ * Solution might be in one of the links below
+ * 
+ * Unity Answers that might help
+ * https://answers.unity.com/questions/12653/editor-wizard-copy-existing-components-to-another.html
+ * https://answers.unity.com/questions/458207/copy-a-component-at-runtime.html
+ * https://answers.unity.com/questions/530178/how-to-get-a-component-from-an-object-and-add-it-t.html
+ * 
+ * Unity Documentation that might help
+ * https://docs.unity3d.com/ScriptReference/Editor.html
+ * https://docs.unity3d.com/ScriptReference/EditorApplication.html
+ * https://docs.unity3d.com/ScriptReference/EditorUtility.html
+ * https://docs.unity3d.com/ScriptReference/EditorWindow.html
+ */
 
 //-----Disabling Details
 
