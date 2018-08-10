@@ -11,7 +11,7 @@ namespace object2DOutlines
         private bool _awakeFinished_VEX; //SHOULD NOT be serialized... if it is... OnValidate will run before it should
 
         [SerializeField]
-        private bool notFirstRun; //NOTE: this releis on the fact that DEFAULT bool value is FALSE
+        private bool notFirstRun;
 
         void OnValidate()
         {

@@ -140,7 +140,7 @@ namespace object2DOutlines
                 EditorGUILayout.PropertyField(size_O, new GUIContent("-it's Size"));
             }
 
-                serializedObject.ApplyModifiedProperties();
+            serializedObject.ApplyModifiedProperties();
         }
     }
 }
