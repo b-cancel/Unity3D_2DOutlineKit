@@ -143,20 +143,10 @@
     </ul>
   </li>
   <li>
-    Push Variables
+    Radial Push Pattern Variables
     <ul>
-      <li>Push Pattern [Radial or Custom]</li>
-      <li>NOT COMPLETE</li>
-    </ul>
-  </li>
-  <li>
-    Functions Available (for push type custom)
-    <ul>
-      <li>bool addEdge(Vector2 outlineDirection)</li>
-      <li>bool removeEdge(GameObject edgeGO)</li>
-      <li>bool removeAllEdges()</li>
-      <li>bool editEdgeMagnitude(GameObject edgeGO, float newMag)</li>
-      <li>bool editEdge(GameObject edgeGO, Vector2 newDirection)</li>
+      <li># of edges [int]</li>
+      <li>rotaion [float]</li>
     </ul>
   </li>
 </ul>
