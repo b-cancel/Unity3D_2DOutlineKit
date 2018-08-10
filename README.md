@@ -68,6 +68,7 @@
     Extras
     <ul>
       <li>creating a prefab and making multiple copies of that prefab</li>
+      <li>semi-transparent sprites supported</li>
       <li>multiple outlines of different types on the same object (for rainbow color outlines)</li>
       <li>works with animated sprites (by setting the "Animator" "Update Mode" to "Animate Physics”)</li>
     </ul>
@@ -81,19 +82,87 @@
   <li>The Standard "Reset" Option Does Not Work (use the built in reset button instead)</li>
   <li>The "Copy Component" Option Does Not Work and therefore the "Paste Component as New" and "Paste Component Value" Options Dont Work Either</li>
 </ul>
-<h4>Features For Convex and Concave Outlines</h4>
-<br>-----<br>
+<h4>Outline Features (for both convex and concave outlines)</h4>
+<ul>
+  <li>
+    Optimization Variables
+    <ul>
+      <li>Update Sprite Every Frame [bool]</li>
+    </ul>
+  </li>
+  <li>
+    Debugging Variables
+    <ul>
+      <li>Show Outline Game Objects in Hierarchy [bool]</li>
+    </ul>
+  </li>
+  <li>
+    Sprite Overlay Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Order in Layer [int]</li>
+      <li>Color [Color]</li>
+    </ul>
+  </li>
+  <li>
+    Clipping Mask Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Alpha Cut Off [float] (only relevant if “Clip Center” == True)</li>
+      <li>Custom Range [bool] (only relevant if “Clip Center” == True)</li>
+      <li>Front Layer [int] (only relevant if “Custom Range” == True)</li>
+      <li>Back Layer [int] (only relevant if “Custom Range” == True)</li>
+    </ul>
+  </li>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Color [Color]</li>
+      <li>Order in Layer [int]</li>
+      <li>Outline Follows The Sprite's X Scale [bool]</li>
+      <li>Outline Follows The Sprite's Y Scale [bool]</li>
+    </ul>
+  </li>
+</ul>
 <h4>Convex Outline Features</h4>
-<br>-----<br>
+<ul>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Size [float] (local scale)</li>
+    </ul>
+  </li>
+</ul>
 <h4>Concave Outline Features</h4>
-<br>-----<br>
-<br>
-<h4><a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
-Documentation
-</a></h4>
-<h4><a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
-Comparison To Other Assets
-</a></h4>
+<ul>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Size [float] (world space)</li>
+    </ul>
+  </li>
+  <li>
+    Push Variables
+    <ul>
+      <li>Push Pattern [Radial or Custom]</li>
+      <li>NOT COMPLETE</li>
+    </ul>
+  </li>
+  <li>
+    Functions Available (for push type custom)
+    <ul>
+      <li>bool addEdge(Vector2 outlineDirection)</li>
+      <li>bool removeEdge(GameObject edgeGO)</li>
+      <li>bool removeAllEdges()</li>
+      <li>bool editEdgeMagnitude(GameObject edgeGO, float newMag)</li>
+      <li>bool editEdge(GameObject edgeGO, Vector2 newDirection)</li>
+    </ul>
+  </li>
+</ul>
+<h4>
+  <a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">Comparison To Other Assets</a>
+</h4>
 <h5>
 <h4>Shader Help Desired</h4>
 <h5>(because I have searched but everything I have found requires too many edits [that I dont know how to make] or doesn't work)</h5>
