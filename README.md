@@ -68,6 +68,7 @@
     Extras
     <ul>
       <li>creating a prefab and making multiple copies of that prefab</li>
+      <li>semi-transparent sprites supported</li>
       <li>multiple outlines of different types on the same object (for rainbow color outlines)</li>
       <li>works with animated sprites (by setting the "Animator" "Update Mode" to "Animate Physics”)</li>
     </ul>
@@ -81,110 +82,89 @@
   <li>The Standard "Reset" Option Does Not Work (use the built in reset button instead)</li>
   <li>The "Copy Component" Option Does Not Work and therefore the "Paste Component as New" and "Paste Component Value" Options Dont Work Either</li>
 </ul>
-<h4>Outline Features</h4>
-<table style="width:100%; border: 1px solid black; text-align:center;">
-  <tr>
-    <td><b>CONCAVE</b><br>(for concave sprites)</td>
-    <td><b>CONVEX</b><br>(for convex sprites)</td>
-  </tr>
-  <tr>
-    <th>OPTIMIZATION VARIABLES</th>
-  </tr>
-  <tr>
-    <td>Update Sprite Every Frame</td>
-  </tr>
-  <tr>
-    <th>DEBUGGING VARIABLES</th>
-  </tr>
-  <tr>
-    <td>Show Outline Game Objects in Hierarchy</td>
-  </tr>
-  <tr>
-    <td>SPRITE OVERLAY VARIABLES</td>
-  </tr>
-  <tr>
-    <td>Active</td>
-  </tr>
-  <tr>
-    <td>Order in Layer</td>
-  </tr>
-  <tr>
-    <td>Color</td>
-  </tr>
-  <tr>
-    <th>CLIPPING MASK VARIABLES<br>(allows outlines to work well with semi transparent sprites)</th>
-  </tr>
-  <tr>
-    <td>Clip Center</td>
-  </tr>
-  <tr>
-    <td>Alpha Cut Off<br>(only relevant if “Clip Center” == True)</td>
-  </tr>
-  <tr>
-    <td>Custom Range<br>(only relevant if “Clip Center” == True)</td>
-  </tr>
-  <tr>
-    <td>Front Layer<br>(only relevant if “Custom Range” == True)</td>
-  </tr>
-  <tr>
-    <td>Back Layer<br>(only relevant if “Custom Range” == True)</td>
-  </tr>
-  <tr>
-    <th>OUTLINE VARIABLES</th>
-  </tr>
-  <tr>
-    <td>Active</td>
-  </tr>
-  <tr>
-    <td>Color</td>
-  </tr>
-  <tr>
-    <td>Order in Layer</td>
-  </tr>
-  <tr>
-    <td>Size (world space)</td>
-    <td>Size (local scale)</td>
-  </tr>
-  <tr>
-    <td>Outline Scale X With Sprite</td>
-  </tr>
-  <tr>
-    <td>Outline Scale Y With Sprite</td>
-  </tr>
-  <tr>
-    <td>Force Retain Proportions With Children</td>
-  </tr>
-  <tr>
-    <th>PUSH VARIABLES</th>
-  </tr>
-  <tr>
-    <td>Push Type is Regular or Custom</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Count of Objects Making Outline</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Start Angle<br>(for type regular)</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Push Type Radial or Square<br>(for type regular)</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>Std Size<br>(for type custom)</td>
-    <td></td>
-  </tr>
-</table>
+<h4>Outline Features (for both convex and concave outlines)</h4>
+<ul>
+  <li>
+    Optimization Variables
+    <ul>
+      <li>Update Sprite Every Frame [bool]</li>
+    </ul>
+  </li>
+  <li>
+    Debugging Variables
+    <ul>
+      <li>Show Outline Game Objects in Hierarchy [bool]</li>
+    </ul>
+  </li>
+  <li>
+    Sprite Overlay Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Order in Layer [int]</li>
+      <li>Color [Color]</li>
+    </ul>
+  </li>
+  <li>
+    Clipping Mask Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Alpha Cut Off [float] (only relevant if “Clip Center” == True)</li>
+      <li>Custom Range [bool] (only relevant if “Clip Center” == True)</li>
+      <li>Front Layer [int] (only relevant if “Custom Range” == True)</li>
+      <li>Back Layer [int] (only relevant if “Custom Range” == True)</li>
+    </ul>
+  </li>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Active [bool]</li>
+      <li>Color [Color]</li>
+      <li>Order in Layer [int]</li>
+      <li>Outline Follows The Sprite's X Scale [bool]</li>
+      <li>Outline Follows The Sprite's Y Scale [bool]</li>
+    </ul>
+  </li>
+</ul>
+<h4>Convex Outline Features</h4>
+<ul>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Size [float] (local scale)</li>
+    </ul>
+  </li>
+</ul>
+<h4>Concave Outline Features</h4>
+<ul>
+  <li>
+    Outline Variables
+    <ul>
+      <li>Size [float] (world space)</li>
+    </ul>
+  </li>
+  <li>
+    Push Variables
+    <ul>
+      <li>Push Type [Regular or Custom]</li>
+      <li>Count of Objects Making Outline [int]</li>
+      <li>Start Angle [float] (for type regular)</li>
+      <li>Push Shape [Radial or Square] (for push type regular)</li>
+      <li>Standard Size [float] (for type custom)</li>
+    </ul>
+  </li>
+  <li>
+    Functions Available (for push type custom)
+    <ul>
+      <li>bool addOutline(Vector2 outlineDirection)</li>
+      <li>bool removeOutline(GameObject edgeGO)</li>
+      <li>bool editOutline(GameObject edgeGO, Vector2 newDirection)</li>
+    </ul>
+  </li>
+</ul>
 <br>
-<h4><a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
-Documentation
-</a></h4>
-<h4><a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
-Comparison To Other Assets
-</a></h4>
+<h4>
+  <a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">Comparison To Other Assets</a>
+</h4>
 <h5>
 <h4>Shader Help Desired</h4>
 <h5>(because I have searched but everything I have found requires too many edits [that I dont know how to make] or doesn't work)</h5>
