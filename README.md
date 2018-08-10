@@ -81,12 +81,103 @@
   <li>The Standard "Reset" Option Does Not Work (use the built in reset button instead)</li>
   <li>The "Copy Component" Option Does Not Work and therefore the "Paste Component as New" and "Paste Component Value" Options Dont Work Either</li>
 </ul>
-<h4>Features For Convex and Concave Outlines</h4>
-<br>-----<br>
-<h4>Convex Outline Features</h4>
-<br>-----<br>
-<h4>Concave Outline Features</h4>
-<br>-----<br>
+<h4>Outline Features</h4>
+<table style="width:100%; border: 1px solid black; text-align:center;">
+  <tr>
+    <td><b>CONCAVE</b><br>(for concave sprites)</td>
+    <td><b>CONVEX</b><br>(for convex sprites)</td>
+  </tr>
+  <tr>
+    <th>OPTIMIZATION VARIABLES</th>
+  </tr>
+  <tr>
+    <td>Update Sprite Every Frame</td>
+  </tr>
+  <tr>
+    <th>DEBUGGING VARIABLES</th>
+  </tr>
+  <tr>
+    <td>Show Outline Game Objects in Hierarchy</td>
+  </tr>
+  <tr>
+    <td>SPRITE OVERLAY VARIABLES</td>
+  </tr>
+  <tr>
+    <td>Active</td>
+  </tr>
+  <tr>
+    <td>Order in Layer</td>
+  </tr>
+  <tr>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <th>CLIPPING MASK VARIABLES<br>(allows outlines to work well with semi transparent sprites)</th>
+  </tr>
+  <tr>
+    <td>Clip Center</td>
+  </tr>
+  <tr>
+    <td>Alpha Cut Off<br>(only relevant if “Clip Center” == True)</td>
+  </tr>
+  <tr>
+    <td>Custom Range<br>(only relevant if “Clip Center” == True)</td>
+  </tr>
+  <tr>
+    <td>Front Layer<br>(only relevant if “Custom Range” == True)</td>
+  </tr>
+  <tr>
+    <td>Back Layer<br>(only relevant if “Custom Range” == True)</td>
+  </tr>
+  <tr>
+    <th>OUTLINE VARIABLES</th>
+  </tr>
+  <tr>
+    <td>Active</td>
+  </tr>
+  <tr>
+    <td>Color</td>
+  </tr>
+  <tr>
+    <td>Order in Layer</td>
+  </tr>
+  <tr>
+    <td>Size (world space)</td>
+    <td>Size (local scale)</td>
+  </tr>
+  <tr>
+    <td>Outline Scale X With Sprite</td>
+  </tr>
+  <tr>
+    <td>Outline Scale Y With Sprite</td>
+  </tr>
+  <tr>
+    <td>Force Retain Proportions With Children</td>
+  </tr>
+  <tr>
+    <th>PUSH VARIABLES</th>
+  </tr>
+  <tr>
+    <td>Push Type is Regular or Custom</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Count of Objects Making Outline</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Start Angle<br>(for type regular)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Push Type Radial or Square<br>(for type regular)</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>Std Size<br>(for type custom)</td>
+    <td></td>
+  </tr>
+</table>
 <br>
 <h4><a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
 Documentation
