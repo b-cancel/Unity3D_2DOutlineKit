@@ -36,14 +36,7 @@ namespace object2DOutlines
         SerializedProperty size_O;
 
         //-----conCAVE
-
-        SerializedProperty patternType_O_CAVE;
-        
-        //ONLY radial
         SerializedProperty edgeCount_O_CAVE_R;
-
-        //BOTH
-        SerializedProperty stdSize_O_CAVE;
         SerializedProperty rotation_O_CAVE;
 
         void OnEnable()
@@ -76,14 +69,7 @@ namespace object2DOutlines
             size_O = serializedObject.FindProperty("size_O");
 
             //-----conCAVE
-
-            patternType_O_CAVE = serializedObject.FindProperty("patternType_O_CAVE");
-            
-            //ONLY radial
             edgeCount_O_CAVE_R = serializedObject.FindProperty("edgeCount_O_CAVE_R");
-
-            //BOTH
-            stdSize_O_CAVE = serializedObject.FindProperty("stdSize_O_CAVE");
             rotation_O_CAVE = serializedObject.FindProperty("rotation_O_CAVE");
         }
 
@@ -162,37 +148,9 @@ namespace object2DOutlines
                 EditorGUILayout.PropertyField(orderInLayer_O, new GUIContent("   it's Order In Layer"));
                 EditorGUILayout.PropertyField(scaleWithParentX_O, new GUIContent("   Follow Parent X Scale"));
                 EditorGUILayout.PropertyField(scaleWithParentY_O, new GUIContent("   Follow Parent Y Scale"));
-
-                EditorGUILayout.Space(); ///-------------------------
-
-                EditorGUILayout.PropertyField(patternType_O_CAVE, new GUIContent("--Push With A"));
-
-                if (script.PatternType_O_CAVE == pushPattern.radial)
-                {
-                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("---Use Pattern Size"));
-
-                    if (script.StdSize_O_CAVE)
-                    {
-                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
-
-                        EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("---# Of Edges"));
-                    }
-                    else
-                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
-                }
-                else
-                {
-                    EditorGUILayout.PropertyField(stdSize_O_CAVE, new GUIContent("--Use Standard Size"));
-
-                    if (script.StdSize_O_CAVE)
-                        EditorGUILayout.PropertyField(size_O, new GUIContent("---it's STD Size"));
-                    else
-                        EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(editEdgeMagnitude) \n*An Editor Based Solution is in the works", MessageType.Info);
-
-                    EditorGUILayout.HelpBox("*you can change each edge by using the script's public function \n(addEdge, removeEdge, and editEdge) \n*An Editor Based Solution is in the works", MessageType.Info);
-                }
-
-                EditorGUILayout.PropertyField(rotation_O_CAVE, new GUIContent("Rotation"));
+                EditorGUILayout.PropertyField(size_O, new GUIContent("   it's Size"));
+                EditorGUILayout.PropertyField(edgeCount_O_CAVE_R, new GUIContent("   it's # Of Edges"));
+                EditorGUILayout.PropertyField(rotation_O_CAVE, new GUIContent("   it's Rotation"));
             }
 
             //apply modified properties

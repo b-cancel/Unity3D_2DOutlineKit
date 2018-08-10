@@ -80,60 +80,11 @@ namespace object2DOutlines
 
     //--------------------------------------------------ENUMERABLES--------------------------------------------------
 
-    //---This Enum makes it easier for us to pass our variables to our children (helps keep code clean)
-    public enum varToUpdate
-    {
-        //optimization
-        US, //updateSprite
-
-        //debugging
-        SOGIH, //showOutline_GOs_InHierarchy
-
-        //overlay
-        A_SO, //active_SO
-        OIL_SO, //orderInLayer_SO
-        C_SO, //color_SO
-
-        //clipping Mask
-        CC_CM, //clipCenter_CM
-        AC_CM, //alphaCutoff_CM
-        CR_CM, //customRange_CM
-        FL_CM, //frontLayer_CM
-        BL_CM, //backLayer_CM
-
-        //outline
-        A_O, //active_O
-        C_O, //color_O
-        OIL_O, //orderInLayer_O
-        SWPX_O, //scaleWithParentX_O
-        SWPY_O, //scaleWithParentY_O
-
-        ST_O, //spriteType_O
-
-        S_O, //size_O
-
-        //-----conCAVE
-
-        PT_O_CAVE, //pushType_O_CAVE
-
-        //ONLY regular
-        EC_O_CAVE_R, //edgeCount_O_CAVE_R
-
-        //BOTH
-        SS_O_CAVE, //stdSize_O_CAVE
-        R_O_CAVE //rotation_O_CAVE
-    };
-
     public enum spriteUpdateSetting { EveryFrame, AfterEveryChange, Manually }
-
-    public enum spriteType { conCAVE, conVEX }; //"SpriteType_O" and the first value of the "spriteType" enum MUST NOT MATCH for things to work properly
-
-    //ONLY for conCAVE outline
-    public enum pushPattern { radial, custom };
 
     //--------------------------------------------------PARENT CLASS--------------------------------------------------
 
-    //NOTE: hack inits dont really need to be serialized by we do so to simplify code
+    //NOTE: hack inits dont really need to be serialized but we do so to simplify code
 
     [System.Serializable, ExecuteInEditMode]
     public class outline : MonoBehaviour

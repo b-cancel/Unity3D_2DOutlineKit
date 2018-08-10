@@ -45,13 +45,7 @@ namespace object2DOutlines
                 Size_O = size_O;
 
                 //-----conCAVE
-                PatternType_O_CAVE = patternType_O_CAVE;
-
-                //pattern type == radial
                 EdgeCount_O_CAVE_R = edgeCount_O_CAVE_R;
-                    
-                //pattern type == BOTH
-                StdSize_O_CAVE = stdSize_O_CAVE;
                 //---SIZE goes here in inspector
                 Rotation_O_CAVE = rotation_O_CAVE;
             }
@@ -199,19 +193,6 @@ namespace object2DOutlines
         [Space(10)]
         [Header("PUSH TYPE VARIABLES-----")]
         [SerializeField, HideInInspector]
-        pushPattern patternType_O_CAVE;
-        public pushPattern PatternType_O_CAVE
-        {
-            get { return patternType_O_CAVE; }
-            set
-            {
-                patternType_O_CAVE = value;
-
-                _newEdgeCount = true;
-            }
-        }
-
-        [SerializeField, HideInInspector]
         private Vector2 _0Rotation; //what we consider 0 rotation (current Vector3.right)
 
         [SerializeField, HideInInspector]
@@ -222,19 +203,6 @@ namespace object2DOutlines
             set
             {
                 edgeCount_O_CAVE_R = (value >= 0) ? value : 0;
-
-                _newEdgeCount = true;
-            }
-        }
-
-        [SerializeField, HideInInspector]
-        bool stdSize_O_CAVE; //NOTE: this size refers to the world space thickness of the outline
-        public bool StdSize_O_CAVE
-        {
-            get { return stdSize_O_CAVE; }
-            set
-            {
-                stdSize_O_CAVE = value;
 
                 _newEdgeCount = true;
             }
@@ -322,9 +290,7 @@ namespace object2DOutlines
             Size_O = .15f;
 
             //-----conCAVE Type Vars
-            PatternType_O_CAVE = pushPattern.radial;
             EdgeCount_O_CAVE_R = 8;
-            StdSize_O_CAVE = true;
             Rotation_O_CAVE = 0;
         }
 
@@ -402,54 +368,44 @@ namespace object2DOutlines
 
         //-------------------------ONLY PUSH TYPE OUTLINE-------------------------
 
-        //-------------------------ONLY PushType == push.regularPattern
-
         void updateEdgeCount()
         {
             if (outlineEdges != null) 
             {
-                if(PatternType_O_CAVE == pushPattern.radial)
+                if (outlineEdges.Count != EdgeCount_O_CAVE_R)
                 {
-                    if (outlineEdges.Count != EdgeCount_O_CAVE_R)
-                    {
-                        int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
+                    int totalDifferences = Mathf.Abs(EdgeCount_O_CAVE_R - outlineEdges.Count);
 
-                        if (outlineEdges.Count < EdgeCount_O_CAVE_R)
-                        {
-                            for (int i = 0; i < totalDifferences; i++)
-                                addEdge(_0Rotation, true);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < totalDifferences; i++)
-                                removeEdge(outlineEdges[outlineEdges.Count-1].go, true); //remove from the back
-                        }
+                    if (outlineEdges.Count < EdgeCount_O_CAVE_R)
+                    {
+                        for (int i = 0; i < totalDifferences; i++)
+                            addEdge(_0Rotation);
                     }
-                    //ELSE... we have the correct number of edges
+                    else
+                    {
+                        for (int i = 0; i < totalDifferences; i++)
+                            removeEdge(outlineEdges[outlineEdges.Count - 1].go); //remove from the back
+                    }
                 }
-                //ELSE... follow custom outline rules
+                //ELSE... we have the correct number of edges
             }
             //ELSE... no outline to update
         }
 
-        //UPDATE ---ROTATIONS--- BASED ON PATTERN
+        //UPDATE ---ROTATIONS--- 
         void updateEdgeRotationsALL() //AUTOMATICALLY... calls updateEdgePositions()
         {
             if (outlineEdges != null)
             {
-                if (PatternType_O_CAVE == pushPattern.radial)
+                float edgeRotation = 0;
+
+                float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
+                foreach (var pair in outlineEdges)
                 {
-                    float edgeRotation = 0;
-
-                    float angleBetweenAllEdges = (EdgeCount_O_CAVE_R == 0) ? 0 : 360 / (float)EdgeCount_O_CAVE_R;
-                    foreach (var pair in outlineEdges)
-                    {
-                        float oldMag = pair.v2.magnitude;
-                        Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
-                        editEdge(pair.go, newDirection.normalized * oldMag, true); //this will also updateEdgePosition()
-                        edgeRotation += angleBetweenAllEdges;
-                    }
-
+                    float oldMag = pair.v2.magnitude;
+                    Vector3 newDirection = Quaternion.AngleAxis(edgeRotation, Vector3.forward) * _0Rotation;
+                    editEdge(pair.go, newDirection.normalized * oldMag); //this will also updateEdgePosition()
+                    edgeRotation += angleBetweenAllEdges;
                 }
             }
         }
@@ -466,12 +422,7 @@ namespace object2DOutlines
             }
         }
 
-        //USES...
-        //(PushType_OP == regular)... use (PushPattern_OPR)
-        //(PushType_OP == custom)... use (StdSize_OPC) 
-        //(PushType_OP == either)... use (Size_O) (ScaleWithParentX_O) (ScaleWithParentY_O)
-
-        //UPDATE ---MAGNITUDE--- BASED ON PATTERN
+        //UPDATE ---MAGNITUDE--- 
         void updateEdgePosition(GameObject anEdge, Vector2 vect)
         {
             if (outlineEdges != null && outEdgesHelper != null && anEdge != null) 
@@ -480,21 +431,7 @@ namespace object2DOutlines
 
                 //NOTE: we push from origin (0,0,0)
 
-                Vector3 newVect = Vector3.zero;
-                if (PatternType_O_CAVE == pushPattern.radial)
-                {
-                    if (StdSize_O_CAVE)
-                        newVect = vect.normalized * Size_O;
-                    else
-                        newVect = vect.normalized;
-                }
-                else
-                {
-                    if (StdSize_O_CAVE) //STANDARD size for all vectors
-                        newVect = vect.normalized * Size_O; //use ONLY vector (1) direction
-                    else
-                        newVect = vect; //use ONLY vector (1) direction (2) magnitude
-                }
+                Vector3 newVect = vect.normalized * Size_O;
 
                 //Rotate the Edges
                 float oldMagnitude = newVect.magnitude;
@@ -518,59 +455,70 @@ namespace object2DOutlines
         }
 
         //-------------------------Outline Edge List Edits-------------------------
-        //So... these are used by BOTH (1) regular and (2) custom patterns
-        //So... don't update the outline as a whole... 
-        //the function that called these GIVEN REGULAR PATTERN should call the functions required to update the outline or pattern as a whole
 
         //-------------------------PRIVATE
 
         //USES... PushType_OP | Color_O | orderInLayer_O | ClipCenter_CM | Active_O
-        bool addEdge(Vector2 outlineDirection, bool sudo)
+        bool addEdge(Vector2 outlineDirection)
         {
             if (outlineEdges != null && outEdgesHelper != null && thisOutline != null)
             {
-                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
+                //NOTE: here we must manually take into account, color, order in layer, activeness
+
+                GameObject tempSpriteCopy = new GameObject();
+                tempSpriteCopy.AddComponent<SpriteRenderer>();
+
+                copyTransform(gameObject, tempSpriteCopy);
+
+                //assign our parent
+                tempSpriteCopy.transform.parent = thisOutline.transform;
+
+                //use text shader so that we only conserve the silhouette of our sprite
+                var tempMaterial = new Material(tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial);
+                tempMaterial.shader = Shader.Find("GUI/Text Shader");
+                tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
+
+                //set color
+                tempSpriteCopy.GetComponent<SpriteRenderer>().color = Color_O;
+
+                //set sorting layer
+                tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = OrderInLayer_O;
+
+                //set sprite renderer data
+                copySpriteRendererData(this.GetComponent<SpriteRenderer>(), tempSpriteCopy.GetComponent<SpriteRenderer>());
+
+                //set interaction with mask
+                if (ClipCenter_CM)
+                    tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
+                else
+                    tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
+
+                //save our data
+                outEdgesHelper.Add(tempSpriteCopy, outlineEdges.Count);
+                outlineEdges.Add(new GO_to_Vector2(tempSpriteCopy, outlineDirection));
+
+                //update position that is affected by... size, scale par x, scale par y
+                updateEdgePosition(tempSpriteCopy, outlineDirection);
+
+                //set active state
+                tempSpriteCopy.SetActive(Active_O);
+
+                return true;
+            }
+            else
+                return false;
+        }
+
+        bool removeEdge(GameObject edgeGO)
+        {
+            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
+            {
+                if (outEdgesHelper.ContainsKey(edgeGO))
                 {
-                    //NOTE: here we must manually take into account, color, order in layer, activeness
+                    outlineEdges.RemoveAt(outEdgesHelper[edgeGO]);
+                    outEdgesHelper.Remove(edgeGO);
 
-                    GameObject tempSpriteCopy = new GameObject();
-                    tempSpriteCopy.AddComponent<SpriteRenderer>();
-
-                    copyTransform(gameObject, tempSpriteCopy);
-
-                    //assign our parent
-                    tempSpriteCopy.transform.parent = thisOutline.transform;
-
-                    //use text shader so that we only conserve the silhouette of our sprite
-                    var tempMaterial = new Material(tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial);
-                    tempMaterial.shader = Shader.Find("GUI/Text Shader");
-                    tempSpriteCopy.GetComponent<SpriteRenderer>().sharedMaterial = tempMaterial;
-
-                    //set color
-                    tempSpriteCopy.GetComponent<SpriteRenderer>().color = Color_O;
-
-                    //set sorting layer
-                    tempSpriteCopy.GetComponent<SpriteRenderer>().sortingOrder = OrderInLayer_O;
-
-                    //set sprite renderer data
-                    copySpriteRendererData(this.GetComponent<SpriteRenderer>(), tempSpriteCopy.GetComponent<SpriteRenderer>());
-
-                    //set interaction with mask
-                    if (ClipCenter_CM)
-                        tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.VisibleOutsideMask;
-                    else
-                        tempSpriteCopy.GetComponent<SpriteRenderer>().maskInteraction = SpriteMaskInteraction.None;
-
-                    //save our data
-                    outEdgesHelper.Add(tempSpriteCopy, outlineEdges.Count);
-                    outlineEdges.Add(new GO_to_Vector2(tempSpriteCopy, outlineDirection));
-
-                    //update position that is affected by... size, scale par x, scale par y
-                    updateEdgePosition(tempSpriteCopy, outlineDirection);
-
-                    //set active state
-                    tempSpriteCopy.SetActive(Active_O);
-
+                    DestroyImmediate(edgeGO);
                     return true;
                 }
                 else
@@ -580,89 +528,20 @@ namespace object2DOutlines
                 return false;
         }
 
-        bool removeEdge(GameObject edgeGO, bool sudo)
-        {
-            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
-            {
-                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
-                {
-                    if (outEdgesHelper.ContainsKey(edgeGO))
-                    {
-                        outlineEdges.RemoveAt(outEdgesHelper[edgeGO]);
-                        outEdgesHelper.Remove(edgeGO);
-
-                        DestroyImmediate(edgeGO);
-                        return true;
-                    }
-                    else
-                        return false;
-                }
-                else 
-                    return false;
-            }
-            else
-                return false;
-        }
-
-        bool editEdge(GameObject edgeGO, Vector2 newDirection, bool sudo)
+        bool editEdge(GameObject edgeGO, Vector2 newDirection)
         {
             if (outEdgesHelper != null && edgeGO != null)
             {
-                if (PatternType_O_CAVE == pushPattern.custom || sudo == true)
+                if (outEdgesHelper.ContainsKey(edgeGO))
                 {
-                    if (outEdgesHelper.ContainsKey(edgeGO))
-                    {
-                        updateEdgePosition(edgeGO, newDirection);
-                        return true;
-                    }
-                    else
-                        return false;
+                    updateEdgePosition(edgeGO, newDirection);
+                    return true;
                 }
                 else
                     return false;
             }
             else
                 return false;
-        }
-
-        //-------------------------PUBLIC (all of these are bool simply so the user knows whether or not a particular operation was successfull)
-
-        public bool addEdge(Vector2 outlineDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
-        {
-            return addEdge(outlineDirection, false);
-        }
-
-        public bool removeEdge(GameObject edgeGO) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
-        {
-            return removeEdge(edgeGO, false);
-        }
-
-        public bool removeAllEdges()
-        {
-            if (outlineEdges != null)
-            {
-                for (int i = 0; i < outlineEdges.Count; i++)
-                    removeEdge(outlineEdges[i].go);
-                return true;
-            }
-            return
-                false;
-        }
-
-        public bool editEdgeMagnitude(GameObject edgeGO, float newMag)
-        {
-            if (outlineEdges != null && outEdgesHelper != null && edgeGO != null)
-            {
-                editEdge(edgeGO, outlineEdges[outEdgesHelper[edgeGO]].v2.normalized * newMag);
-                return true;
-            }
-            else
-                return false;
-        }
-
-        public bool editEdge(GameObject edgeGO, Vector2 newDirection) //you WONT BE ABLE to use me unless your (PushType == push.customPattern)
-        {
-            return editEdge(edgeGO, newDirection, false);
         }
     }
 }
