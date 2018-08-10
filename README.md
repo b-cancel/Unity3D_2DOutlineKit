@@ -145,19 +145,18 @@
   <li>
     Push Variables
     <ul>
-      <li>Push Type [Regular or Custom]</li>
-      <li>Count of Objects Making Outline [int]</li>
-      <li>Start Angle [float] (for type regular)</li>
-      <li>Push Shape [Radial or Square] (for push type regular)</li>
-      <li>Standard Size [float] (for type custom)</li>
+      <li>Push Pattern [Radial or Custom]</li>
+      <li>NOT COMPLETE</li>
     </ul>
   </li>
   <li>
     Functions Available (for push type custom)
     <ul>
-      <li>bool addOutline(Vector2 outlineDirection)</li>
-      <li>bool removeOutline(GameObject edgeGO)</li>
-      <li>bool editOutline(GameObject edgeGO, Vector2 newDirection)</li>
+      <li>bool addEdge(Vector2 outlineDirection)</li>
+      <li>bool removeEdge(GameObject edgeGO)</li>
+      <li>bool removeAllEdges()</li>
+      <li>bool editEdgeMagnitude(GameObject edgeGO, float newMag)</li>
+      <li>bool editEdge(GameObject edgeGO, Vector2 newDirection)</li>
     </ul>
   </li>
 </ul>
