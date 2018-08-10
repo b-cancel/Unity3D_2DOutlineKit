@@ -1,12 +1,12 @@
 # Unity3D_2DOutlineKit_INPROG
 A flexible, option filled, 2D outline solution, that works for both concave and convex sprites and is editable in Play Mode.
 <br>
-<a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
-<h4>Click Here for Documentation</h4>
-</a>
-<a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
-<h4>Click Here for A Look At The Asset When Compared To Others Like It</h4>
-</a>
+<h4><a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
+Click Here for Documentation
+</a></h4>
+<h4><a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
+Click Here for A Look At The Asset When Compared To Others Like It
+</a></h4>
 <h5>
 <h4>Note:</h4>
 If you absolutely need child parent relationships you can easily add then, simply look for the commit marked "MERGE AND CHILDREN CODE REMOVED".
