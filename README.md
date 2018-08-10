@@ -160,7 +160,6 @@
     </ul>
   </li>
 </ul>
-<br>
 <h4>
   <a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">Comparison To Other Assets</a>
 </h4>
