@@ -2,10 +2,10 @@
 A flexible, option filled, 2D outline solution, that works for both concave and convex sprites and is editable in Play Mode.
 <br>
 <h4><a href="https://docs.google.com/document/d/1UCxu07cAwVSxPS3i7ouwJIBSrV2yh9v0bNlYWYeJJcs/edit?usp=sharing">
-Click Here for Documentation
+Documentation
 </a></h4>
 <h4><a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
-Click Here for A Look At The Asset When Compared To Others Like It
+A Look At The Asset When Compared To Others Like It
 </a></h4>
 <h5>
 <h4>Note:</h4>
