@@ -251,13 +251,11 @@ namespace object2DOutlines
 
         void OnDisable()
         {
-            print("disabled");
+
         }
 
         void OnDestroy()
         {
-            print("destroy");
-
             DestroyImmediate(outlineGameObjectsFolder);
 
             //TODO... here we also break our relationship with our parent

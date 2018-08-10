@@ -138,7 +138,7 @@ namespace object2DOutlines
             {
                 orderInLayer_O = value;
 
-                //update our edges with the new color
+                //update our edges with the new order in layer
                 if (outlineEdges != null)
                     foreach (var pair in outlineEdges)
                         pair.go.GetComponent<SpriteRenderer>().sortingOrder = orderInLayer_O;
@@ -375,13 +375,10 @@ namespace object2DOutlines
 
         void OnDisable()
         {
-            print("disabled");
         }
 
         void OnDestroy()
         {
-            print("destroy");
-
             DestroyImmediate(outlineGameObjectsFolder);
 
             //TODO... here we also break our relationship with our parent
