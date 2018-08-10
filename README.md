@@ -7,8 +7,8 @@ A flexible, option filled, 2D outline solution, that works for both concave and 
 <a href="https://docs.google.com/document/d/1wpzp4dFecQ3u8pj6IuYlhem_of8CiI_OEGuR32aKG_w/edit?usp=sharing">
 <h4>Asset When Compared To Others</h4>
 </a>
-<h4>Note</h4>
 <h5>
+<h4>Note:</h4>
 If you absolutely need child parent relationships you can easily add then, simply look for the commit marked "MERGE AND CHILDREN CODE REMOVED".
 This Commit has deleted code that can guide you in your implementation. 
 I didn't Implement it because there are different ways to make it for different circumstances 
