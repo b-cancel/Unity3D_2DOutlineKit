@@ -5,10 +5,15 @@
 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=bryan%2eo%2ecancel%40gmail%2ecom&lc=US&item_name=Cup%20Of%20Coffee&item_number=0000&no_note=0&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest">
   <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" alt="PayPal Donate Button">
 </a>
-<h4>Basic Features</h4>
+<h4>How To Use</h4>
+<ul>
+  <li>for a convex sprite, drag the "convexOut" script into the gameobject or add it as a component</li>
+  <li>for a concave sprite, drag the "concaveOut" script into the gameobject or add it as a component</li>
+</ul>
+<h4>All Test Basic Tests and Features</h4>
 <ul>
   <li>
-    <h5>basics</h5>
+    Basics
     <ul>
       <li>viewable in scene view</li>
       <li>viewable in game view</li>
@@ -17,10 +22,10 @@
     </ul>
   </li>
   <li>
-    <h5>camera</h5>
+    Camera
     <ul>
-      <li>work in both perspective and orthographic mode</li>
-      <li>works with all rendering paths</li>
+      <li>both perspective and orthographic mode</li>
+      <li>all rendering paths</li>
       <li>occlusion culling (on or off)</li>
       <li>allow hdr (on or off)</li>
       <li>allow msaa (on or off)</li>
@@ -28,7 +33,7 @@
     </ul>
   </li>
   <li>
-    <h5>object transform</h5>
+    Follows Object Transform
     <ul>
       <li>position</li> 
       <li>rotation</li> 
@@ -36,13 +41,13 @@
     </ul>
   </li>
   <li>
-    <h5>inspector options</h5>
+    Inspector Options
     <ul>
       <li>remove component</li>
     </ul>
   </li>
   <li>
-    <h5>hierarchy right click options</h5>
+    Hierarchy Right Click Options
     <ul>
       <li>copy</li>
       <li>paste</li>
@@ -51,7 +56,7 @@
     </ul>
   </li>
   <li>
-    <h5>sprite renderer</h5>
+    Sprite Renderer
     <ul>
       <li>can switch sprite</li>
       <li>can change sprite color with no effect on outline or overlay</li>
@@ -60,15 +65,17 @@
     </ul>
   </li>
   <li>
-    <h5>extras</h5>
+    Extras
     <ul>
       <li>creating a prefab and making multiple copies of that prefab</li>
       <li>multiple outlines of different types on the same object (for rainbow color outlines)</li>
+      <li>works with animated sprites (by setting the "Animator" "Update Mode" to "Animate Physics”)</li>
     </ul>
   </li>
 </ul>
 <h4>Limitations</h4>
 <ul>
+  <li>Since I am using the sprite itself to create it's outline, if the sprite is semi transparent, then the outline and the overlay will also be semi transparent</li>
   <li>"Draw Mode Sliced" Does Not Work if you use a clipping mask (because Unity's Sprite Mask doesn't currently work with its 9 slice system)</li>
   <li>"Draw Mode Tiled" Does Not Work (because Unity's Sprite Mask doesn't currently work with it)</li>
   <li>The Standard "Reset" Option Does Not Work (use the built in reset button instead)</li>
